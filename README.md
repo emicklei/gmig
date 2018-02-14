@@ -4,7 +4,7 @@ pronounced as `gimmick`.
 
 Manage Google Cloud Platform infrastructure using migrations that describe incremental changes such as additions or deletions of resources. This work is inspired by MyBatis migrations for SQL database setup.
 
-Your gmig configuration is basically a folder with change files, each with a timestamp prefix and readable name.
+Your gmig configuration is basically a folder with change files, each with a timestamp prefix (for sort ordering) and readable name.
 
     \migrations
         \20180214t071402_create_some_account.yaml
@@ -33,12 +33,14 @@ Creates a new file for you to describe a change to the current state of infrastr
 
     gmig new "set view permissions for cloudbuild account"
 
+### gmig status
+List all migrations with an indicator whether is has been applied or not.
+
 ### gmig up
 Calls the up section compared to the last applied change to the infrastructure. If completed then update the `gmig.state`. file.
 
 ### gmig down
 Calls the down section of the last applied change to the infrastructure. If completed then update the `gmig.state`.
-
 
 ### gmig export service-accounts
 Generates the YAML files by exporting from existing infrastructure of a project (creation of service accounts and setting IAM policies)
