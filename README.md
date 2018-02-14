@@ -1,5 +1,7 @@
 # gmig - gcloud migrations
 
+pronounced as `gimmick`.
+
 Manage Google Cloud Platform infrastructure using migrations that describe incremental changes such as additions or deletions of resources. This work is inspired by MyBatis migrations for SQL database setup.
 
 Your gmig configuration is basically a folder with change files, each with a timestamp prefix and readable name.
@@ -21,8 +23,6 @@ This migration uses [gcloud create](https://cloud.google.com/sdk/gcloud/referenc
     down: >
         gcloud iam service-accounts delete some-account-name
 
-
-
 ## Getting started
 
 ### gmig init
@@ -43,7 +43,4 @@ Calls the down section of the last applied change to the infrastructure. If comp
 ### gmig export service-accounts
 Generates the YAML files by exporting from existing infrastructure of a project (creation of service accounts and setting IAM policies)
 
-
 &copy; 2018, ernestmicklei.com
-
-
