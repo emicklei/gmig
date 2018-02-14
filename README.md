@@ -28,20 +28,20 @@ This migration uses [gcloud create](https://cloud.google.com/sdk/gcloud/referenc
 ### gmig init
 Prepares your setup for working the migrations. It checks the read/write permissions of your Bucket containing the state file.
 
-### gmigs new
+### gmig new
 Creates a new file for you to describe a change to the current state of infrastructure.
 
     gmig new "set view permissions for cloudbuild account"
 
-### gmigs up
+### gmig up
 Calls the up section of the last applied change to the infrastructure. If completed then update the `gmig.state` file.
 
-### gmigs down
+### gmig down
 Calls the down section of the last applied change to the infrastructure.
 
 
 ### gmig export service-accounts
-Generates the YAML files by exporting from existing infrastructure of a project.
+Generates the YAML files by exporting from existing infrastructure of a project (creation of service accounts and setting IAM policies)
 
 
 &copy; 2018, ernestmicklei.com
