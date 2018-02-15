@@ -2,6 +2,8 @@
 
 pronounced as `gimmick`.
 
+## NOTE: this is work in progress. This is not usable until the first git tag!
+
 Manage Google Cloud Platform infrastructure using migrations that describe incremental changes such as additions or deletions of resources. This work is inspired by MyBatis migrations for SQL database setup.
 
 Your gmig configuration is basically a folder with change files, each with a timestamp prefix (for sort ordering) and readable name.
