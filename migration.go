@@ -15,10 +15,10 @@ import (
 
 // Migration holds shell commands for applying or reverting a change.
 type Migration struct {
-	Filename    string `yaml:"-"`
-	Description string `yaml:"-"`
-	Up          string `yaml:"up"`
-	Down        string `yaml:"down"`
+	Filename    string   `yaml:"-"`
+	Description string   `yaml:"-"`
+	Up          []string `yaml:"up"`
+	Down        []string `yaml:"down"`
 }
 
 // NewFilename generates a filename for storing a new migration.
@@ -40,30 +40,30 @@ func LoadMigration(filename string) (m Migration, err error) {
 
 // ToYAML returns the contents of a YAML encoded fixture.
 func (m Migration) ToYAML() ([]byte, error) {
-	// cannot use yaml.Marshal because it does not output JSON in a dev friendly way
 	out := new(bytes.Buffer)
-	fmt.Fprintf(out, "# %s\n", m.Description)
-	// yaml wants spaces as prefix
-	fmt.Fprintf(out, "\n# write a shell command here (indent with 2 spaces)\n")
-	fmt.Fprintf(out, "up: >\n  %s\n", m.Up)
-	// yaml wants spaces as prefix
-	fmt.Fprintf(out, "\n# write a shell command here that reverts the effect of up:\n")
-	fmt.Fprintf(out, "down: >\n  %s\n", m.Down)
+	fmt.Fprintf(out, "# %s\n\n", m.Description)
+	data, err := yaml.Marshal(m)
+	if err != nil {
+		return data, err
+	}
+	out.Write(data)
 	return out.Bytes(), nil
 }
 
 // Execute the commands for this migration.
-func (m Migration) Execute(command string) error {
-	if len(command) == 0 {
+func (m Migration) Execute(commands []string) error {
+	if len(commands) == 0 {
 		return nil
 	}
-	log.Println("sh -c ", command)
-	cmd := exec.Command("sh", "-c", command)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	err := cmd.Run()
-	if err != nil {
-		return fmt.Errorf("failed to run :%v", err)
+	for i, each := range commands {
+		log.Println("sh -c ", each)
+		cmd := exec.Command("sh", "-c", each)
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		err := cmd.Run()
+		if err != nil {
+			return fmt.Errorf("%d: failed to run :%v", i, err)
+		}
 	}
 	return nil
 }

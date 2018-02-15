@@ -10,18 +10,17 @@ Your gmig configuration is basically a folder with change files, each with a tim
         \20180214t071402_create_some_account.yaml
 
 Each change is a single YAML file with one or more gcloud commands that change infrastructure for a project.
-A change must be have at least an `up` and a `down` section. The `up` section must have gcloud commands that create resources.
+A change must be have at least an `up` and a `down` section. The `up` section typically has gcloud commands that create resources.
 
 Information about the last applied change to a project is stored in a Google Storage Bucket file.
 
 ## Example: service account
-This migration uses [gcloud create](https://cloud.google.com/sdk/gcloud/reference/iam/service-accounts/create)
+This migration uses [gcloud create service account](https://cloud.google.com/sdk/gcloud/reference/iam/service-accounts/create)
 
-    up: >
-        gcloud iam service-accounts create some-account-name \
-            --display-name "My Service Account"
-    down: >
-        gcloud iam service-accounts delete some-account-name
+    up:
+    - gcloud iam service-accounts create some-account-name --display-name "My Service Account"
+    down:
+    - gcloud iam service-accounts delete some-account-name
 
 ## Getting started
 

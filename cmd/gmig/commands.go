@@ -16,8 +16,8 @@ func cmdCreateMigration(c *cli.Context) error {
 	filename := gmig.NewFilename(desc)
 	m := gmig.Migration{
 		Description: desc,
-		Up:          `gcloud config list`,
-		Down:        `gcloud config list`,
+		Up:          []string{"gcloud config list"},
+		Down:        []string{"gcloud config list"},
 	}
 	yaml, err := m.ToYAML()
 	if err != nil {
