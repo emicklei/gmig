@@ -8,9 +8,11 @@ import (
 	"github.com/urfave/cli"
 )
 
+const version = "0.1"
+
 func main() {
 	app := cli.NewApp()
-	app.Version = "0.0.1"
+	app.Version = version
 	app.EnableBashCompletion = true
 	app.Name = "gmig"
 	app.Usage = "GCP migrations tool"

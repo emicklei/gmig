@@ -7,6 +7,8 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
+	"sort"
 	"strings"
 	"time"
 
@@ -66,4 +68,41 @@ func (m Migration) Execute(commands []string) error {
 		}
 	}
 	return nil
+}
+
+// LoadMigrationsBetweenAnd returns a list of pending Migration <firstFilename..lastFilename]
+func LoadMigrationsBetweenAnd(firstFilename, lastFilename string) (list []Migration, err error) {
+	workdir, err := os.Getwd()
+	if err != nil {
+		return
+	}
+	// collect all filenames
+	filenames := []string{}
+	filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
+		if info.IsDir() || !strings.HasSuffix(path, ".yaml") {
+			return nil
+		}
+		filenames = append(filenames, path)
+		return nil
+	})
+	// old -> new
+	sort.StringSlice(filenames).Sort()
+	// load only pending migrations
+	for _, each := range filenames {
+		// do not include firstFilename
+		if strings.Compare(each, firstFilename) == -1 {
+			continue
+		}
+		var m Migration
+		m, err = LoadMigration(filepath.Join(workdir, filenames[0]))
+		if err != nil {
+			return
+		}
+		list = append(list, m)
+		// include lastFilename
+		if strings.Compare(each, lastFilename) == 1 {
+			return
+		}
+	}
+	return
 }
