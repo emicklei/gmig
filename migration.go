@@ -36,6 +36,7 @@ func LoadMigration(filename string) (m Migration, err error) {
 	if err != nil {
 		return m, err
 	}
+	m.Filename = filepath.Base(filename)
 	err = yaml.Unmarshal(data, &m)
 	return
 }
@@ -52,13 +53,13 @@ func (m Migration) ToYAML() ([]byte, error) {
 	return out.Bytes(), nil
 }
 
-// Execute the commands for this migration.
-func (m Migration) Execute(commands []string) error {
+// ExecuteAll the commands for this migration.
+func ExecuteAll(commands []string) error {
 	if len(commands) == 0 {
 		return nil
 	}
 	for i, each := range commands {
-		log.Println("sh -c ", each)
+		log.Println(each)
 		cmd := exec.Command("sh", "-c", each)
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
@@ -90,17 +91,20 @@ func LoadMigrationsBetweenAnd(firstFilename, lastFilename string) (list []Migrat
 	// load only pending migrations
 	for _, each := range filenames {
 		// do not include firstFilename
-		if strings.Compare(each, firstFilename) == -1 {
+		if each < firstFilename {
 			continue
 		}
 		var m Migration
-		m, err = LoadMigration(filepath.Join(workdir, filenames[0]))
+		m, err = LoadMigration(filepath.Join(workdir, each))
 		if err != nil {
 			return
 		}
 		list = append(list, m)
 		// include lastFilename
-		if strings.Compare(each, lastFilename) == 1 {
+		if len(lastFilename) == 0 {
+			continue
+		}
+		if each == lastFilename {
 			return
 		}
 	}

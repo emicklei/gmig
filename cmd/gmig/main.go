@@ -5,10 +5,13 @@ import (
 	"os"
 	"sort"
 
+	"github.com/emicklei/gmig"
 	"github.com/urfave/cli"
 )
 
 const version = "0.1"
+
+var stateProvider = gmig.FileStateProvider{}
 
 func main() {
 	app := cli.NewApp()
@@ -23,9 +26,21 @@ func main() {
 			Action: cmdCreateMigration,
 		},
 		{
-			Name:   "up",
-			Usage:  "gmig up",
-			Action: cmdMigrationsUp,
+			Name:        "up",
+			Usage:       "gmig up [|file]",
+			Description: "The up command runs the do section of all pending migrations in order, one after the other.",
+			Action:      cmdMigrationsUp,
+		},
+		{
+			Name:        "down",
+			Usage:       "gmig down [|file]",
+			Description: "The down command runs the undo section of the last applied migration only.",
+			Action:      cmdMigrationsDown,
+		},
+		{
+			Name:   "status",
+			Usage:  "gmig status",
+			Action: cmdMigrationsStatus,
 		},
 	}
 	sort.Sort(cli.FlagsByName(app.Flags))
