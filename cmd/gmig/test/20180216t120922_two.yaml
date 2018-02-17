@@ -1,6 +1,6 @@
 # two
 
-up:
+do:
 - echo "two up"
-down:
+undo:
 - echo "two down"

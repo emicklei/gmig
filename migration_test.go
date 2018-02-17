@@ -7,10 +7,10 @@ import (
 )
 
 var one = `
-up:
+do:
 - going up
 # comment for down
-down:
+undo:
 - going down
 `
 
@@ -19,10 +19,10 @@ func TestParseMigration(t *testing.T) {
 	if err := yaml.Unmarshal([]byte(one), &m); err != nil {
 		t.Error(err)
 	}
-	if got, want := m.Up[0], "going up"; got != want {
+	if got, want := m.DoSection[0], "going up"; got != want {
 		t.Errorf("got [%v] want [%v]", got, want)
 	}
-	if got, want := m.Down[0], "going down"; got != want {
+	if got, want := m.UndoSection[0], "going down"; got != want {
 		t.Errorf("got [%v] want [%v]", got, want)
 	}
 }

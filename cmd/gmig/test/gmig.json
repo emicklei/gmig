@@ -1,5 +1,4 @@
 {
-    "bucket" :"kramphub-gmig-toolshed-shared",
-    "project":"kramphub-toolshed-shared",
-    "state"  :"gmig-last-migration"
+    "bucket": "kramphub-gmig-toolshed-shared",
+    "state": "gmig-last-migration"
 }

@@ -19,9 +19,10 @@ Information about the last applied change to a project is stored in a Google Sto
 ## Example: service account
 This migration uses [gcloud create service account](https://cloud.google.com/sdk/gcloud/reference/iam/service-accounts/create)
 
-    up:
+    do:
     - gcloud iam service-accounts create some-account-name --display-name "My Service Account"
-    down:
+    
+    undo:
     - gcloud iam service-accounts delete some-account-name
 
 ## Getting started

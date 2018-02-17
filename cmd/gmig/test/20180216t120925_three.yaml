@@ -1,6 +1,6 @@
 # three
 
-up:
+do:
 - echo "three up"
-down:
+undo:
 - echo "three down"

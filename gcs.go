@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"log"
+	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
@@ -21,31 +22,35 @@ type GCS struct {
 
 // LoadState implements StateProvider
 func (g GCS) LoadState() (string, error) {
-	capturedErr := new(bytes.Buffer)
-	cmd := exec.Command("gsutil", "-q", "cp",
-		"gs://"+filepath.Join(g.Configuration.Bucket, g.Configuration.StateObject),
-		localStateFilename)
-	cmd.Stderr = capturedErr
-	err := cmd.Run()
-	if err != nil {
+	cmdline := []string{"gsutil", "-q", "cp",
+		"gs://" + filepath.Join(g.Configuration.Bucket, g.Configuration.StateObject),
+		localStateFilename}
+	if err := g.gsutil(cmdline); err != nil {
 		return "", err
-	}
-	if len(capturedErr.String()) > 0 {
-		return "", errors.New("stderr:" + capturedErr.String())
 	}
 	return g.onDiskAccess.LoadState()
 }
 
+// SaveState implements StateProvider
 func (g GCS) SaveState(filename string) error {
 	if err := g.onDiskAccess.SaveState(filename); err != nil {
 		return err
 	}
-	capturedErr := new(bytes.Buffer)
 	cmdline := []string{"gsutil", "-q", "cp",
 		localStateFilename,
 		"gs://" + filepath.Join(g.Configuration.Bucket, g.Configuration.StateObject)}
-	log.Println(strings.Join(cmdline, " "))
+	return g.gsutil(cmdline)
+}
+
+func (g GCS) gsutil(cmdline []string) error {
+	if g.Configuration.Verbose {
+		log.Println(strings.Join(cmdline, " "))
+	}
 	cmd := exec.Command(cmdline[0], cmdline[1:]...)
+	capturedErr := new(bytes.Buffer)
+	if g.Configuration.Verbose {
+		cmd.Stdout = os.Stdout
+	}
 	cmd.Stderr = capturedErr
 	err := cmd.Run()
 	if err != nil {

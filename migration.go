@@ -19,8 +19,8 @@ import (
 type Migration struct {
 	Filename    string   `yaml:"-"`
 	Description string   `yaml:"-"`
-	Up          []string `yaml:"up"`
-	Down        []string `yaml:"down"`
+	DoSection   []string `yaml:"do"`
+	UndoSection []string `yaml:"undo"`
 }
 
 // NewFilename generates a filename for storing a new migration.
