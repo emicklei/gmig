@@ -82,10 +82,10 @@ func cmdMigrationsStatus(c *cli.Context) error {
 	log.Println(logseparator)
 	var last string
 	for _, each := range all {
-		status := "APPLIED"
+		status := "---applied---"
 		if each.Filename > lastApplied {
-			status = "PENDING"
-			if last != status {
+			status = "...pending..."
+			if len(last) > 0 && last != status {
 				log.Println(logseparator)
 			}
 		}

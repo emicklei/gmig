@@ -2,7 +2,6 @@ package gmig
 
 import (
 	"io/ioutil"
-	"log"
 	"os"
 )
 
@@ -16,10 +15,10 @@ type StateProvider interface {
 type FileStateProvider struct{}
 
 func (l FileStateProvider) LoadState() (string, error) {
-	data, err := ioutil.ReadFile(".gmig.state")
+	data, err := ioutil.ReadFile(localStateFilename)
 	return string(data), err
 }
 func (l FileStateProvider) SaveState(filename string) error {
-	log.Println("[gmig] saving state")
-	return ioutil.WriteFile(".gmig.state", []byte(filename), os.ModePerm)
+	//log.Println("[gmig] saving state")
+	return ioutil.WriteFile(localStateFilename, []byte(filename), os.ModePerm)
 }
