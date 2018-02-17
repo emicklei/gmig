@@ -13,15 +13,17 @@ type StateProvider interface {
 }
 
 // FileStateProvider use a local file to store state (last migration applied).
-type FileStateProvider struct{}
+type FileStateProvider struct {
+	Configuration Config
+}
 
 // LoadState implements StateProvider
 func (l FileStateProvider) LoadState() (string, error) {
-	data, err := ioutil.ReadFile(localStateFilename)
+	data, err := ioutil.ReadFile(LastMigrationObjectName)
 	return string(data), err
 }
 
 // SaveState implements StateProvider
 func (l FileStateProvider) SaveState(filename string) error {
-	return ioutil.WriteFile(localStateFilename, []byte(filename), os.ModePerm)
+	return ioutil.WriteFile(LastMigrationObjectName, []byte(filename), os.ModePerm)
 }

@@ -14,7 +14,6 @@ import (
 const logseparator = "~-------------- ---------------------~"
 
 func cmdCreateMigration(c *cli.Context) error {
-	verbose = c.Bool("v")
 	desc := c.Args().First()
 	filename := gmig.NewFilename(desc)
 	m := gmig.Migration{
@@ -101,20 +100,32 @@ func cmdMigrationsStatus(c *cli.Context) error {
 func cmdInit(c *cli.Context) error {
 	_, err := os.Stat(gmig.ConfigFilename)
 	if err == nil {
-		log.Println("configuration file [", gmig.ConfigFilename, "] already present")
+		log.Println("config file [", gmig.ConfigFilename, "] already present.")
+		cfg, err := gmig.LoadConfig()
+		if err != nil {
+			log.Println("cannot read configuration", err)
+			return nil
+		}
+		// TODO move to Config
+		log.Println("config [ project:", cfg.Project, ",bucket:", cfg.Bucket, ",verbose:", cfg.Verbose, "]")
 		return nil
 	}
 	cfg := gmig.Config{
-		Bucket:      "<your accessible bucket name>",
-		StateObject: lastMigrationObject,
-		Verbose:     false,
+		Project: "your-gcp-project-name",
+		Bucket:  "your-accessible-bucket",
+		Verbose: false,
 	}
 	data, _ := json.Marshal(cfg)
 	return ioutil.WriteFile(gmig.ConfigFilename, data, os.ModePerm)
 }
 
+var currentStateProvider gmig.StateProvider
+
 func getStateProvider(c *cli.Context) gmig.StateProvider {
-	verbose = c.GlobalBool("v")
+	if currentStateProvider != nil {
+		return currentStateProvider
+	}
+	verbose := c.GlobalBool("v")
 	if verbose {
 		log.Println("loading configuration from", gmig.ConfigFilename)
 	}
@@ -122,6 +133,7 @@ func getStateProvider(c *cli.Context) gmig.StateProvider {
 	if err != nil {
 		log.Fatalln("error loading configuration (did you init?)", err)
 	}
-	cfg.Verbose = verbose
-	return gmig.GCS{Configuration: cfg}
+	cfg.Verbose = cfg.Verbose || verbose
+	currentStateProvider = gmig.GCS{Configuration: cfg}
+	return currentStateProvider
 }

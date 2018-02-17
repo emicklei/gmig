@@ -33,6 +33,11 @@ func main() {
 
 	app.Commands = []cli.Command{
 		{
+			Name:   "init",
+			Usage:  "Create the initial configuration, if absent.",
+			Action: cmdInit,
+		},
+		{
 			Name:   "new",
 			Usage:  "gmig new \"create tester service account\"",
 			Action: cmdCreateMigration,
@@ -51,17 +56,11 @@ func main() {
 		},
 		{
 			Name:   "status",
-			Usage:  "gmig status",
+			Usage:  "List all migrations with details compared to the current state.",
 			Action: cmdMigrationsStatus,
-		},
-		{
-			Name:   "init",
-			Usage:  "gmig init",
-			Action: cmdInit,
 		},
 	}
 	sort.Sort(cli.FlagsByName(app.Flags))
-	sort.Sort(cli.CommandsByName(app.Commands))
 	if err := app.Run(os.Args); err != nil {
 		log.Fatalln(err)
 	}

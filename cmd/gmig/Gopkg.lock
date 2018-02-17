@@ -5,7 +5,7 @@
   branch = "master"
   name = "github.com/emicklei/gmig"
   packages = ["."]
-  revision = "0efa995e41e82a197e5c9127bd89c7aab23b7bb3"
+  revision = "10f636a133c5d12e0f8d136bed73ddaac1953ff5"
 
 [[projects]]
   name = "github.com/emicklei/tre"

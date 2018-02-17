@@ -10,8 +10,6 @@ import (
 	"github.com/urfave/cli"
 )
 
-const lastMigrationObject = "gmig-last-migration"
-
 // space is right after timestamp
 const logseparator = "~-------------- ---------------------~"
 

@@ -5,7 +5,13 @@
   branch = "master"
   name = "github.com/emicklei/gmig"
   packages = ["."]
-  revision = "e804da2ef1dba86494d25439a343a488d53031e9"
+  revision = "0efa995e41e82a197e5c9127bd89c7aab23b7bb3"
+
+[[projects]]
+  name = "github.com/emicklei/tre"
+  packages = ["."]
+  revision = "6532a42132095bf0f3e8eb6a5173f35040b241ec"
+  version = "1.0.0"
 
 [[projects]]
   branch = "v2"
@@ -22,6 +28,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "670d6313eb4ea4bd0595be16ab3e2458350564576ed4d9264cc1a6ec3e28d964"
+  inputs-digest = "c4c7ee01b16bab4f90f7f7c3ab834653b806090dbfe376e08b19a6d0a34cdc8c"
   solver-name = "gps-cdcl"
   solver-version = 1

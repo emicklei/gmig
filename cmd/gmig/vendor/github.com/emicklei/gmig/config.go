@@ -3,18 +3,19 @@ package gmig
 import (
 	"encoding/json"
 	"io/ioutil"
-	"os"
 )
 
 // ConfigFilename is for reading bucket info
 const ConfigFilename = "gmig.json"
 
+// LastMigrationObjectName is the of the bucket object and the local (temporary) file.
+const LastMigrationObjectName = ".gmig-last-migration"
+
 // Config holds gmig program config
 type Config struct {
-	Bucket      string `json:"bucket"`
-	StateObject string `json:"state"`
-	Verbose     bool   `json:"verbose"`
-	TempDir     string `json:"-"`
+	Project string `json:"project"`
+	Bucket  string `json:"bucket"`
+	Verbose bool   `json:"verbose"`
 }
 
 // LoadConfig reads from gmig.json
@@ -27,6 +28,5 @@ func LoadConfig() (Config, error) {
 	if err := json.Unmarshal(data, &c); err != nil {
 		return c, err
 	}
-	c.TempDir = os.TempDir()
 	return c, nil
 }
