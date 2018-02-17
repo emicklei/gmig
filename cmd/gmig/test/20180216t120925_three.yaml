@@ -1,0 +1,6 @@
+# three
+
+up:
+- echo "three up"
+down:
+- echo "three down"
