@@ -1,9 +1,17 @@
 package gmig
 
-import "testing"
+import (
+	"os"
+	"testing"
+)
 
 func TestLoadStateFromGCS(t *testing.T) {
-	gcs := GCS{Configuration: Config{Bucket: "gs://kramphub-gmig-toolshed-shared", StateObject: "gmig-last-migration"}}
+	bucket := os.Getenv("BB")
+	if len(bucket) == 0 {
+		t.Log("set BB environment variable to a valid accessible Google Storaget Bucket name (without the gs:// prefix)")
+		t.Skip()
+	}
+	gcs := GCS{Configuration: Config{Bucket: bucket, StateObject: "gmig-last-migration"}}
 	t.Log("save state")
 	if err := gcs.SaveState("temp"); err != nil {
 		t.Fatal(err)

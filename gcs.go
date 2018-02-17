@@ -3,8 +3,10 @@ package gmig
 import (
 	"bytes"
 	"errors"
+	"log"
 	"os/exec"
 	"path/filepath"
+	"strings"
 
 	"github.com/emicklei/tre"
 )
@@ -21,7 +23,7 @@ type GCS struct {
 func (g GCS) LoadState() (string, error) {
 	capturedErr := new(bytes.Buffer)
 	cmd := exec.Command("gsutil", "-q", "cp",
-		filepath.Join(g.Configuration.Bucket, g.Configuration.StateObject),
+		"gs://"+filepath.Join(g.Configuration.Bucket, g.Configuration.StateObject),
 		localStateFilename)
 	cmd.Stderr = capturedErr
 	err := cmd.Run()
@@ -39,9 +41,11 @@ func (g GCS) SaveState(filename string) error {
 		return err
 	}
 	capturedErr := new(bytes.Buffer)
-	cmd := exec.Command("gsutil", "-q", "cp",
+	cmdline := []string{"gsutil", "-q", "cp",
 		localStateFilename,
-		filepath.Join(g.Configuration.Bucket, g.Configuration.StateObject))
+		"gs://" + filepath.Join(g.Configuration.Bucket, g.Configuration.StateObject)}
+	log.Println(strings.Join(cmdline, " "))
+	cmd := exec.Command(cmdline[0], cmdline[1:]...)
 	cmd.Stderr = capturedErr
 	err := cmd.Run()
 	if err != nil {
