@@ -12,6 +12,8 @@ import (
 	"github.com/emicklei/tre"
 )
 
+const localStateFilename = ".gmig.state"
+
 // GCS = Google Cloud Storage
 type GCS struct {
 	Configuration Config
@@ -21,8 +23,8 @@ type GCS struct {
 // LoadState implements StateProvider
 func (g GCS) LoadState() (string, error) {
 	cmdline := []string{"gsutil", "-q", "cp",
-		"gs://" + filepath.Join(g.Configuration.Bucket, LastMigrationObjectName),
-		LastMigrationObjectName}
+		"gs://" + filepath.Join(g.Configuration.Bucket, g.Configuration.StateObject),
+		localStateFilename}
 	if err := g.gsutil(cmdline); err != nil {
 		return "", err
 	}
@@ -35,8 +37,8 @@ func (g GCS) SaveState(filename string) error {
 		return err
 	}
 	cmdline := []string{"gsutil", "-q", "cp",
-		LastMigrationObjectName,
-		"gs://" + filepath.Join(g.Configuration.Bucket, LastMigrationObjectName)}
+		localStateFilename,
+		"gs://" + filepath.Join(g.Configuration.Bucket, g.Configuration.StateObject)}
 	return g.gsutil(cmdline)
 }
 

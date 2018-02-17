@@ -28,7 +28,7 @@ This migration uses [gcloud create service account](https://cloud.google.com/sdk
 ## Getting started
 
 ### gmig init
-Prepares your setup for working the migrations. It checks the read/write permissions of your Bucket containing the `.gmig-last-migration` file. This file contains the name of the last applied migration file.
+Prepares your setup for working the migrations. It checks the read/write permissions of your Bucket containing the `gmig.state` file.
 
 ### gmig new
 Creates a new file for you to describe a change to the current state of infrastructure.
@@ -39,10 +39,12 @@ Creates a new file for you to describe a change to the current state of infrastr
 List all migrations with an indicator whether is has been applied or not.
 
 ### gmig up
-Calls the `do` section compared to the last applied change to the infrastructure. If completed then update the `.gmig-last-migration` object.
+Calls the up section compared to the last applied change to the infrastructure. If completed then update the `gmig.state`. file.
 
 ### gmig down
-Calls the `undo` section of the last applied change to the infrastructure. If completed then update the `.gmig-last-migration` object.
+Calls the down section of the last applied change to the infrastructure. If completed then update the `gmig.state`.
 
+### gmig export service-accounts
+Generates the YAML files by exporting from existing infrastructure of a project (creation of service accounts and setting IAM policies)
 
 &copy; 2018, ernestmicklei.com

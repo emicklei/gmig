@@ -1,0 +1,6 @@
+# one
+
+do:
+- echo "one up"
+undo:
+- echo "one down"
