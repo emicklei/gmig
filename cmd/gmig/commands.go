@@ -29,7 +29,11 @@ func cmdCreateMigration(c *cli.Context) error {
 }
 
 func cmdMigrationsUp(c *cli.Context) error {
-	lastApplied, _ := getStateProvider(c).LoadState()
+	stateProvider := getStateProvider(c)
+	lastApplied, err := stateProvider.LoadState()
+	if err != nil {
+		return err
+	}
 	all, err := gmig.LoadMigrationsBetweenAnd(lastApplied, c.Args().First())
 	if err != nil {
 		return err
@@ -39,11 +43,13 @@ func cmdMigrationsUp(c *cli.Context) error {
 		log.Println(each.Filename)
 		log.Println(logseparator)
 		if err := gmig.ExecuteAll(each.DoSection); err != nil {
+			reportError(stateProvider.Config(), "do", err)
 			return err
 		}
 		lastApplied = each.Filename
 		// save after each succesful migration
 		if err := getStateProvider(c).SaveState(lastApplied); err != nil {
+			reportError(stateProvider.Config(), "save state", err)
 			return err
 		}
 	}
@@ -51,7 +57,12 @@ func cmdMigrationsUp(c *cli.Context) error {
 }
 
 func cmdMigrationsDown(c *cli.Context) error {
-	lastApplied, _ := getStateProvider(c).LoadState()
+	stateProvider := getStateProvider(c)
+	lastApplied, err := stateProvider.LoadState()
+	if err != nil {
+		reportError(stateProvider.Config(), "load state", err)
+		return err
+	}
 	all, err := gmig.LoadMigrationsBetweenAnd("", lastApplied)
 	if err != nil {
 		return err
@@ -61,6 +72,7 @@ func cmdMigrationsDown(c *cli.Context) error {
 	log.Println(lastApplied)
 	log.Println(logseparator)
 	if err := gmig.ExecuteAll(lastMigration.UndoSection); err != nil {
+		reportError(stateProvider.Config(), "undo", err)
 		return err
 	}
 	// save after succesful migration
@@ -69,13 +81,19 @@ func cmdMigrationsDown(c *cli.Context) error {
 		previousFilename = all[len(all)-2].Filename
 	}
 	if err := getStateProvider(c).SaveState(previousFilename); err != nil {
+		reportError(stateProvider.Config(), "save state", err)
 		return err
 	}
 	return nil
 }
 
 func cmdMigrationsStatus(c *cli.Context) error {
-	lastApplied, _ := getStateProvider(c).LoadState()
+	stateProvider := getStateProvider(c)
+	lastApplied, err := stateProvider.LoadState()
+	if err != nil {
+		reportError(stateProvider.Config(), "load state", err)
+		return err
+	}
 	all, err := gmig.LoadMigrationsBetweenAnd("", "")
 	if err != nil {
 		return err
@@ -107,7 +125,7 @@ func cmdInit(c *cli.Context) error {
 			return nil
 		}
 		// TODO move to Config
-		log.Println("config [ project:", cfg.Project, ",bucket:", cfg.Bucket, ",verbose:", cfg.Verbose, "]")
+		log.Println("config [ project=", cfg.Project, ",bucket=", cfg.Bucket, ",verbose=", cfg.Verbose, "]")
 		return nil
 	}
 	cfg := gmig.Config{
@@ -134,6 +152,6 @@ func getStateProvider(c *cli.Context) gmig.StateProvider {
 		log.Fatalln("error loading configuration (did you init?)", err)
 	}
 	cfg.Verbose = cfg.Verbose || verbose
-	currentStateProvider = gmig.GCS{Configuration: cfg}
+	currentStateProvider = gmig.NewGCS(cfg)
 	return currentStateProvider
 }

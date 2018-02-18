@@ -10,6 +10,7 @@ type StateProvider interface {
 	// LoadState returns the last applied migration
 	LoadState() (string, error)
 	SaveState(filename string) error
+	Config() Config
 }
 
 // FileStateProvider use a local file to store state (last migration applied).
@@ -26,4 +27,9 @@ func (l FileStateProvider) LoadState() (string, error) {
 // SaveState implements StateProvider
 func (l FileStateProvider) SaveState(filename string) error {
 	return ioutil.WriteFile(LastMigrationObjectName, []byte(filename), os.ModePerm)
+}
+
+// Config implements StateProvider
+func (l FileStateProvider) Config() Config {
+	return l.Configuration
 }

@@ -30,3 +30,9 @@ func LoadConfig() (Config, error) {
 	}
 	return c, nil
 }
+
+// ToJSON returns the JSON representation.
+func (c Config) ToJSON() string {
+	data, _ := json.MarshalIndent(c, "", "\t")
+	return string(data)
+}

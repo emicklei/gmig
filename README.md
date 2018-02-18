@@ -6,15 +6,15 @@ pronounced as `gimmick`.
 
 Manage Google Cloud Platform infrastructure using migrations that describe incremental changes such as additions or deletions of resources. This work is inspired by MyBatis migrations for SQL database setup.
 
-Your gmig configuration is basically a folder with change files, each with a timestamp prefix (for sort ordering) and readable name.
+Your gmig infrastructure is basically a folder with incremental change files, each with a timestamp prefix (for sort ordering) and readable name.
 
     \migrations
         \20180214t071402_create_some_account.yaml
 
-Each change is a single YAML file with one or more gcloud commands that change infrastructure for a project.
-A change must be have at least an `up` and a `down` section. The `up` section typically has gcloud commands that create resources.
+Each change is a single YAML file with one or more shell commands that change infrastructure for a project.
+A change must be have at least an `do` and a `undo` section. The `do` section typically has gcloud commands that create resources.
 
-Information about the last applied change to a project is stored in a Google Storage Bucket file.
+Information about the last applied change to a project is stored in a Google Storage Bucket object.
 
 ## Example: service account
 This migration uses [gcloud create service account](https://cloud.google.com/sdk/gcloud/reference/iam/service-accounts/create)
@@ -28,21 +28,28 @@ This migration uses [gcloud create service account](https://cloud.google.com/sdk
 ## Getting started
 
 ### gmig init
-Prepares your setup for working the migrations. It checks the read/write permissions of your Bucket containing the `.gmig-last-migration` file. This file contains the name of the last applied migration file.
+Prepares your setup for working with migrations by creating a `gmig.json` file if absent.
+It checks the read/write permissions of your Bucket containing the `.gmig-last-migration` object which will contain the name of the last applied migration.
+
+    gmig init project=your-gcp-project bucket=your-bucket-name
+
 
 ### gmig new
-Creates a new file for you to describe a change to the current state of infrastructure.
+Creates a new migration for you to describe a change to the current state of infrastructure.
 
     gmig new "set view permissions for cloudbuild account"
 
+
 ### gmig status
-List all migrations with an indicator whether is has been applied or not.
+List all migrations with an indicator (applied,pending) whether is has been applied or not.
+
 
 ### gmig up
-Calls the `do` section compared to the last applied change to the infrastructure. If completed then update the `.gmig-last-migration` object.
+Calls all the `do` sections of each pending migration compared to the last applied change to the infrastructure. Upon each completed migration, the `.gmig-last-migration` object is updated.
+
 
 ### gmig down
-Calls the `undo` section of the last applied change to the infrastructure. If completed then update the `.gmig-last-migration` object.
+Calls one `undo` section of the last applied change to the infrastructure. If completed then update the `.gmig-last-migration` object.
 
 
-&copy; 2018, ernestmicklei.com
+&copy; 2018, ernestmicklei.com. MIT License. Contributions welcome.

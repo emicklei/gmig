@@ -1,10 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
+	"os/exec"
 	"sort"
 
+	"github.com/emicklei/gmig"
 	"github.com/urfave/cli"
 )
 
@@ -60,4 +63,18 @@ func main() {
 	if err := app.Run(os.Args); err != nil {
 		log.Fatalln(err)
 	}
+}
+
+func reportError(cfg gmig.Config, action string, err error) error {
+	log.Printf("executing [%s] failed, see error below.\n", action)
+
+	log.Println("checking gmig config ...")
+	fmt.Println(cfg.ToJSON())
+
+	log.Println("checking gcloud config list ...")
+	cmd := exec.Command("gcloud", "config", "list")
+	out, _ := cmd.CombinedOutput()
+	fmt.Println(string(out))
+
+	return err
 }

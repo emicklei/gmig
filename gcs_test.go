@@ -11,7 +11,7 @@ func TestLoadStateFromGCS(t *testing.T) {
 		t.Log("set BB environment variable to a valid accessible Google Storaget Bucket name (without the gs:// prefix)")
 		t.Skip()
 	}
-	gcs := GCS{Configuration: Config{Bucket: bucket}}
+	gcs := NewGCS(Config{Bucket: bucket, Verbose: true})
 	t.Log("save state")
 	if err := gcs.SaveState("temp"); err != nil {
 		t.Fatal(err)
