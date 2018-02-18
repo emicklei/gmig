@@ -7,9 +7,8 @@ This work is inspired by MyBatis migrations for SQL database setup.
 
 Your gmig infrastructure is basically a folder with incremental change files, each with a timestamp prefix (for sort ordering) and readable name.
 
-    \migrations
-        \20180214t071402_create_some_account.yaml
-        \gmig.json
+    \20180214t071402_create_some_account.yaml
+    \gmig.json
 
 Each change is a single YAML file with one or more shell commands that change infrastructure for a project.
 A change must be have at least a `do` and an `undo` section. 
@@ -37,10 +36,10 @@ This migration uses [gcloud create service account](https://cloud.google.com/sdk
 ### gmig init
 Prepares your setup for working with migrations by creating a `gmig.json` file if absent.
 
-    gmig init project=your-gcp-project bucket=your-bucket-name
+    gmig init
 
-You must change this file to set the Bucket name. 
-If you decide to store state files of different projects in one bucket then set the state object name to reflect this.
+You must change the file `gmig.json` to set the Bucket name. 
+If you decide to store state files of different projects in one Bucket then set the state object name to reflect this.
 
 
 ### gmig new
