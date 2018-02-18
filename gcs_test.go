@@ -1,4 +1,4 @@
-package gmig
+package main
 
 import (
 	"os"
@@ -11,13 +11,14 @@ func TestLoadStateFromGCS(t *testing.T) {
 		t.Log("set BB environment variable to a valid accessible Google Storaget Bucket name (without the gs:// prefix)")
 		t.Skip()
 	}
-	gcs := NewGCS(Config{Bucket: bucket, Verbose: true})
+	gcs := NewGCS(Config{Bucket: bucket, Verbose: true, LastMigrationObjectName: "stateobject"})
 	t.Log("save state")
 	if err := gcs.SaveState("temp"); err != nil {
 		t.Fatal(err)
 	}
 	t.Log("load state")
-	v, err := gcs.LoadState()
-	t.Log(v)
-	t.Log(err)
+	_, err := gcs.LoadState()
+	if err != nil {
+		t.Error(err)
+	}
 }

@@ -20,6 +20,13 @@
 #  version = "2.4.0"
 
 
+[[constraint]]
+  name = "github.com/emicklei/tre"
+  version = "1.0.0"
+
+[[constraint]]
+  branch = "v2"
+  name = "github.com/go-yaml/yaml"
 
 [[constraint]]
   name = "github.com/urfave/cli"

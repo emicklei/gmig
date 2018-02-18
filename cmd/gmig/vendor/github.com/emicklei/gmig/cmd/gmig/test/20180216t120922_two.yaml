@@ -1,6 +1,0 @@
-# two
-
-do:
-- echo "two up"
-undo:
-- echo "two down"

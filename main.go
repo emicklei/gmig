@@ -7,7 +7,6 @@ import (
 	"os/exec"
 	"sort"
 
-	"github.com/emicklei/gmig"
 	"github.com/urfave/cli"
 )
 
@@ -65,8 +64,8 @@ func main() {
 	}
 }
 
-func reportError(cfg gmig.Config, action string, err error) error {
-	log.Printf("executing [%s] failed, see error below.\n", action)
+func reportError(cfg Config, action string, err error) error {
+	log.Printf("executing [%s] failed, see error above and or below.\n", action)
 
 	log.Println("checking gmig config ...")
 	fmt.Println(cfg.ToJSON())

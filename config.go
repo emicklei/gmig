@@ -1,4 +1,4 @@
-package gmig
+package main
 
 import (
 	"encoding/json"
@@ -8,14 +8,16 @@ import (
 // ConfigFilename is for reading bucket info
 const ConfigFilename = "gmig.json"
 
-// LastMigrationObjectName is the of the bucket object and the local (temporary) file.
-const LastMigrationObjectName = ".gmig-last-migration"
-
 // Config holds gmig program config
 type Config struct {
-	Project string `json:"project"`
-	Bucket  string `json:"bucket"`
-	Verbose bool   `json:"verbose"`
+	// Bucket is the name of the Google Storage Bucket.
+	Bucket string `json:"bucket"`
+
+	//LastMigrationObjectName is the name of the bucket object and the local (temporary) file.
+	LastMigrationObjectName string `json:"state"`
+
+	// Verbose if true then procduce more logging.
+	Verbose bool `json:"verbose"`
 }
 
 // LoadConfig reads from gmig.json

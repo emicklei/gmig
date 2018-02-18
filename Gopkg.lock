@@ -2,12 +2,6 @@
 
 
 [[projects]]
-  branch = "master"
-  name = "github.com/emicklei/gmig"
-  packages = ["."]
-  revision = "10f636a133c5d12e0f8d136bed73ddaac1953ff5"
-
-[[projects]]
   name = "github.com/emicklei/tre"
   packages = ["."]
   revision = "6532a42132095bf0f3e8eb6a5173f35040b241ec"
@@ -28,6 +22,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "c4c7ee01b16bab4f90f7f7c3ab834653b806090dbfe376e08b19a6d0a34cdc8c"
+  inputs-digest = "b71b8e1fb0c9c536e9f1fc831b46ddedda08f14f5a104d1d2f62e689b931bdd1"
   solver-name = "gps-cdcl"
   solver-version = 1

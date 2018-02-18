@@ -1,4 +1,4 @@
-package gmig
+package main
 
 import (
 	"bytes"
@@ -91,7 +91,7 @@ func LoadMigrationsBetweenAnd(firstFilename, lastFilename string) (list []Migrat
 	// load only pending migrations
 	for _, each := range filenames {
 		// do not include firstFilename
-		if each < firstFilename {
+		if each <= firstFilename {
 			continue
 		}
 		var m Migration

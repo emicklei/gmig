@@ -1,4 +1,4 @@
-package gmig
+package main
 
 import (
 	"testing"

@@ -1,4 +1,4 @@
-package gmig
+package main
 
 import (
 	"log"
@@ -21,9 +21,10 @@ func NewGCS(cfg Config) GCS {
 
 // LoadState implements StateProvider
 func (g GCS) LoadState() (string, error) {
+	defer g.onDiskAccess.DeleteState()
 	cmdline := []string{"gsutil", "-q", "cp",
-		"gs://" + filepath.Join(g.Config().Bucket, LastMigrationObjectName),
-		LastMigrationObjectName}
+		"gs://" + filepath.Join(g.Config().Bucket, g.Config().LastMigrationObjectName),
+		g.Config().LastMigrationObjectName}
 	if err := g.gsutil(cmdline); err != nil {
 		// see if there was no last applied state
 		if strings.Contains(err.Error(), "No URLs matched") { // lame detection method TODO
@@ -39,12 +40,13 @@ func (g GCS) LoadState() (string, error) {
 
 // SaveState implements StateProvider
 func (g GCS) SaveState(filename string) error {
+	defer g.onDiskAccess.DeleteState()
 	if err := g.onDiskAccess.SaveState(filename); err != nil {
 		return err
 	}
 	cmdline := []string{"gsutil", "-q", "cp",
-		LastMigrationObjectName,
-		"gs://" + filepath.Join(g.Config().Bucket, LastMigrationObjectName)}
+		g.Config().LastMigrationObjectName,
+		"gs://" + filepath.Join(g.Config().Bucket, g.Config().LastMigrationObjectName)}
 	return g.gsutil(cmdline)
 }
 
