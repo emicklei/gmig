@@ -18,19 +18,6 @@ The `undo` section typically has gcloud commands that deletes the same resources
 Information about the last applied change to a project is stored as a Google Storage Bucket object.
 
 
-
-## Example: service account
-This migration uses [gcloud create service account](https://cloud.google.com/sdk/gcloud/reference/iam/service-accounts/create)
-
-    do:
-    - gcloud iam service-accounts create some-account-name --display-name "My Service Account"
-    
-    undo:
-    - gcloud iam service-accounts delete some-account-name
-
-
-
-
 ## Getting started
 
 ### gmig init
@@ -72,12 +59,12 @@ If completed then update the `.gmig-last-migration` object.
     undo:
     - gcloud iam service-accounts delete loadrunner
 
-## Example: Add Storage Viewer role
 
+## Example: Add Storage Viewer role
 
     # allow loadrunner to access GCS
 
-    # https://cloud.google.com/iam/docs/granting-roles-to-service-accounts
+    # https://cloud.google.com/iam/docs/understanding-roles#predefined_roles
 
     do:
     - gcloud projects add-iam-policy-binding gmig-demo --member serviceAccount:loadrunner@gmig-demo.iam.gserviceaccount.com
@@ -87,6 +74,19 @@ If completed then update the `.gmig-last-migration` object.
     - gcloud projects remove-iam-policy-binding gmig-demo --member serviceAccount:loadrunner@gmig-demo.iam.gserviceaccount.com
     --role roles/storage.objectViewer
 
+
+## Example: Add Cloud KMS CryptoKey Decrypter to cloudbuilder account
+
+    # let cloudbuilder decrypt secrets for deployment
+
+    # https://cloud.google.com/kms/docs/iam
+    # https://cloud.google.com/kms/docs/reference/permissions-and-roles
+
+    do:
+    - gcloud kms keys add-iam-policy-binding CRYPTOKEY --location LOCATION --keyring KEYRING --member serviceAccount:00000000@cloudbuild.gserviceaccount.com --role roles/cloudkms.cryptoKeyDecrypter
+
+    undo:
+    - gcloud kms keys remove-iam-policy-binding CRYPTOKEY --location LOCATION --keyring KEYRING --member serviceAccount:00000000@cloudbuild.gserviceaccount.com --role roles/cloudkms.cryptoKeyDecrypter
 
 
 &copy; 2018, ernestmicklei.com. MIT License. Contributions welcome.
