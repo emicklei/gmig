@@ -44,7 +44,7 @@ func (g GCS) SaveState(filename string) error {
 	if err := g.onDiskAccess.SaveState(filename); err != nil {
 		return err
 	}
-	cmdline := []string{"gsutil", "-q", "cp",
+	cmdline := []string{"gsutil", "-q", "-h", "Content-Type:text/plain", "cp",
 		g.Config().LastMigrationObjectName,
 		"gs://" + filepath.Join(g.Config().Bucket, g.Config().LastMigrationObjectName)}
 	return g.gsutil(cmdline)
