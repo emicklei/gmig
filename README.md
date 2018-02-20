@@ -7,10 +7,10 @@ This work is inspired by MyBatis migrations for SQL database setup.
 
 Your gmig infrastructure is basically a folder with incremental change files, each with a timestamp prefix (for sort ordering) and readable name.
 
-    \20180214t071402_create_some_account.yaml
-    \my-staging-project
+    /20180214t071402_create_some_account.yaml
+    /my-staging-project
         gmig.json
-    \my-production-project
+    /my-production-project
         gmig.json
 
 Each change is a single YAML file with one or more shell commands that change infrastructure for a project.
@@ -28,9 +28,9 @@ Information about the last applied change to a project is stored as a Google Sto
 
 Prepares your setup for working with migrations by creating a `gmig.json` file in a project folder.
 
-    gmig init my-production-project
+### gmig init my-production-project
 
-You must change the file `my-production-project\gmig.json` to set the Bucket name.
+You must change the file `my-production-project/gmig.json` to set the Bucket name.
 
     {
         "bucket":"mycompany-gmig-states",
@@ -51,18 +51,21 @@ Creates a new migration for you to describe a change to the current state of inf
 
 List all migrations with an indicator (applied,pending) whether is has been applied or not.
 
+    gmig my-production-project status
 
 ### gmig [project] up
 
 Executes the `do` section of each pending migration compared to the last applied change to the infrastructure. 
 Upon each completed migration, the `gmig-last-migration` object is updated.
 
+    gmig my-production-project up
 
 ### gmig [project] down
 
 Executes one `undo` section of the last applied change to the infrastructure.
 If completed then update the `gmig-last-migration` object.
 
+    gmig my-production-project down
 
 ## Example: Add service account
 
