@@ -54,13 +54,14 @@ func (m Migration) ToYAML() ([]byte, error) {
 }
 
 // ExecuteAll the commands for this migration.
-func ExecuteAll(commands []string) error {
+func ExecuteAll(commands []string, envs []string) error {
 	if len(commands) == 0 {
 		return nil
 	}
 	for i, each := range commands {
 		log.Println(each)
 		cmd := exec.Command("sh", "-c", each)
+		cmd.Env = envs
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 		err := cmd.Run()

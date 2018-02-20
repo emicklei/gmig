@@ -16,13 +16,13 @@ type Config struct {
 	//LastMigrationObjectName is the name of the bucket object and the local (temporary) file.
 	LastMigrationObjectName string `json:"state"`
 
-	// Verbose if true then procduce more logging.
-	Verbose bool `json:"verbose"`
+	// verbose if true then procduce more logging.
+	verbose bool
 }
 
 // LoadConfig reads from gmig.json
-func LoadConfig() (Config, error) {
-	data, err := ioutil.ReadFile(ConfigFilename)
+func LoadConfig(location string) (Config, error) {
+	data, err := ioutil.ReadFile(location)
 	if err != nil {
 		return Config{}, err
 	}

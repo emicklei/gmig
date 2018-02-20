@@ -33,29 +33,34 @@ func main() {
 
 	app.Commands = []cli.Command{
 		{
-			Name:   "init",
-			Usage:  "Create the initial configuration, if absent.",
-			Action: cmdInit,
+			Name:      "init",
+			Usage:     "Create the initial configuration, if absent.",
+			Action:    cmdInit,
+			ArgsUsage: "[project] name of the folder that contains the configuration of the target project",
 		},
 		{
-			Name:   "new",
-			Usage:  "Create a new migration file from a template using a generated timestamp and a given title.",
-			Action: cmdCreateMigration,
+			Name:      "new",
+			Usage:     "Create a new migration file from a template using a generated timestamp and a given title.",
+			Action:    cmdCreateMigration,
+			ArgsUsage: "[title] what the migration achieves",
 		},
 		{
-			Name:   "up",
-			Usage:  "Runs the do section of all pending migrations in order, one after the other.",
-			Action: cmdMigrationsUp,
+			Name:      "up",
+			Usage:     "Runs the do section of all pending migrations in order, one after the other.",
+			Action:    cmdMigrationsUp,
+			ArgsUsage: "[project] name of the folder that contains the configuration of the target project",
 		},
 		{
-			Name:   "down",
-			Usage:  "Runs the undo section of the last applied migration only.",
-			Action: cmdMigrationsDown,
+			Name:      "down",
+			Usage:     "Runs the undo section of the last applied migration only.",
+			Action:    cmdMigrationsDown,
+			ArgsUsage: "[project] name of the folder that contains the configuration of the target project",
 		},
 		{
-			Name:   "status",
-			Usage:  "List all migrations with details compared to the current state.",
-			Action: cmdMigrationsStatus,
+			Name:      "status",
+			Usage:     "List all migrations with details compared to the current state.",
+			Action:    cmdMigrationsStatus,
+			ArgsUsage: "[project] name of the folder that contains the configuration of the target project",
 		},
 	}
 	sort.Sort(cli.FlagsByName(app.Flags))

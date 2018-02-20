@@ -5,8 +5,8 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
 
-	"github.com/emicklei/tre"
 	"github.com/urfave/cli"
 )
 
@@ -29,6 +29,8 @@ func cmdCreateMigration(c *cli.Context) error {
 }
 
 func cmdMigrationsUp(c *cli.Context) error {
+	project := c.Args().First()
+	gcloudConfigSetProject(project)
 	stateProvider := getStateProvider(c)
 	lastApplied, err := stateProvider.LoadState()
 	if err != nil {
@@ -48,7 +50,7 @@ func cmdMigrationsUp(c *cli.Context) error {
 		log.Println(logseparator)
 		log.Println(each.Filename)
 		log.Println(logseparator)
-		if err := ExecuteAll(each.DoSection); err != nil {
+		if err := ExecuteAll(each.DoSection, []string{"PROJECT=" + project}); err != nil {
 			reportError(stateProvider.Config(), "do", err)
 			return err
 		}
@@ -63,6 +65,8 @@ func cmdMigrationsUp(c *cli.Context) error {
 }
 
 func cmdMigrationsDown(c *cli.Context) error {
+	project := c.Args().First()
+	gcloudConfigSetProject(project)
 	stateProvider := getStateProvider(c)
 	lastApplied, err := stateProvider.LoadState()
 	if err != nil {
@@ -83,7 +87,7 @@ func cmdMigrationsDown(c *cli.Context) error {
 	log.Println(logseparator)
 	log.Println(lastApplied)
 	log.Println(logseparator)
-	if err := ExecuteAll(lastMigration.UndoSection); err != nil {
+	if err := ExecuteAll(lastMigration.UndoSection, []string{"PROJECT=" + project}); err != nil {
 		reportError(stateProvider.Config(), "undo", err)
 		return err
 	}
@@ -134,47 +138,27 @@ func cmdMigrationsStatus(c *cli.Context) error {
 }
 
 func cmdInit(c *cli.Context) error {
-	_, err := os.Stat(ConfigFilename)
+	project := c.Args().First()
+	if err := os.MkdirAll(project, os.ModePerm|os.ModeDir); err != nil {
+		return err
+	}
+	location := filepath.Join(project, ConfigFilename)
+	_, err := os.Stat(location)
 	if err == nil {
-		log.Println("config file [", ConfigFilename, "] already present.")
-		cfg, err := LoadConfig()
+		log.Println("config file [", location, "] already present.")
+		cfg, err := LoadConfig(location)
 		if err != nil {
 			log.Println("cannot read configuration", err)
 			return nil
 		}
 		// TODO move to Config
-		log.Println("config [ bucket=", cfg.Bucket, ",state=", cfg.LastMigrationObjectName, ",verbose=", cfg.Verbose, "]")
+		log.Println("config [ bucket=", cfg.Bucket, ",state=", cfg.LastMigrationObjectName, ",verbose=", cfg.verbose, "]")
 		return nil
 	}
 	cfg := Config{
 		Bucket:                  "your-accessible-bucket",
-		LastMigrationObjectName: ".gmig-last-migration",
-		Verbose:                 false,
+		LastMigrationObjectName: "gmig-last-migration",
 	}
 	data, _ := json.Marshal(cfg)
-	return ioutil.WriteFile(ConfigFilename, data, os.ModePerm)
-}
-
-var currentStateProvider StateProvider
-
-func getStateProvider(c *cli.Context) StateProvider {
-	if currentStateProvider != nil {
-		return currentStateProvider
-	}
-	verbose := c.GlobalBool("v")
-	if verbose {
-		log.Println("loading configuration from", ConfigFilename)
-	}
-	cfg, err := LoadConfig()
-	if err != nil {
-		log.Fatalln("error loading configuration (did you init?)", err)
-	}
-	cfg.Verbose = cfg.Verbose || verbose
-	currentStateProvider = NewGCS(cfg)
-	return currentStateProvider
-}
-
-func checkExists(filename string) error {
-	_, err := os.Stat(filename)
-	return tre.New(err, "no such migration (wrong project?)", "file", filename)
+	return ioutil.WriteFile(location, data, os.ModePerm)
 }

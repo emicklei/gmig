@@ -28,7 +28,7 @@ func (g GCS) LoadState() (string, error) {
 	if err := g.gsutil(cmdline); err != nil {
 		// see if there was no last applied state
 		if strings.Contains(err.Error(), "No URLs matched") { // lame detection method TODO
-			if g.Config().Verbose {
+			if g.Config().verbose {
 				log.Println("no last applied migration found.")
 			}
 			return "", nil
@@ -56,7 +56,7 @@ func (g GCS) Config() Config {
 }
 
 func (g GCS) gsutil(cmdline []string) error {
-	if g.onDiskAccess.Config().Verbose {
+	if g.onDiskAccess.Config().verbose {
 		log.Println(strings.Join(cmdline, " "))
 	}
 	cmd := exec.Command(cmdline[0], cmdline[1:]...)
