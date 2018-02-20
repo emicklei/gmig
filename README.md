@@ -24,11 +24,11 @@ Information about the last applied change to a project is stored as a Google Sto
 
 ## Getting started
 
-    ### gmig init [project]
+### gmig init [project]
 
 Prepares your setup for working with migrations by creating a `gmig.json` file in a project folder.
 
-### gmig init my-production-project
+    gmig init my-production-project
 
 You must change the file `my-production-project/gmig.json` to set the Bucket name.
 
