@@ -21,10 +21,9 @@ Each command can use the following environment variables: `$PROJECT`.
 
 Information about the last applied change to a project is stored as a Google Storage Bucket object.
 
-
 ## Getting started
 
-### gmig init [project]
+### init [project]
 
 Prepares your setup for working with migrations by creating a `gmig.json` file in a project folder.
 
@@ -39,33 +38,43 @@ You must change the file `my-production-project/gmig.json` to set the Bucket nam
 
 If you decide to store state files of different projects in one Bucket then set the state object name to reflect this, eg. `myproject-gmig-state`.
 
-
-### gmig new
+### new [title]
 
 Creates a new migration for you to describe a change to the current state of infrastructure.
 
     gmig new "add storage view rol to cloudbuild account"
 
-
-### gmig [project] status
+### status [project]
 
 List all migrations with an indicator (applied,pending) whether is has been applied or not.
 
-    gmig my-production-project status
+    gmig status my-production-project
 
-### gmig [project] up
+### up [project]
 
 Executes the `do` section of each pending migration compared to the last applied change to the infrastructure. 
 Upon each completed migration, the `gmig-last-migration` object is updated.
 
-    gmig my-production-project up
+    gmig up my-production-project
 
-### gmig [project] down
+### down [project]
 
 Executes one `undo` section of the last applied change to the infrastructure.
 If completed then update the `gmig-last-migration` object.
 
-    gmig my-production-project down
+    gmig down my-production-project
+
+## Export existing infrastructure
+
+Exporting migrations from existing infrastructure is useful when you start working with `gmig` but do not want to start from scratch.
+Several sub commands are available to inspect a project and export migrations to reflect the current state.
+After marking the current state in `gmig`, new migrations can be added that will bring your infrastructure to the next state.
+
+### export project-iam-policy [project]
+
+    Generate a new migration by reading all the IAM policy binding from the current infrastructure of the project.
+
+    gmig export project-iam-policy my-production-project
 
 ## Example: Add service account
 
