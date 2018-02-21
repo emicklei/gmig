@@ -62,11 +62,13 @@ func getStateProvider(c *cli.Context) (StateProvider, error) {
 	// pre: project has been checked by the caller
 	location := filepath.Join(project, ConfigFilename)
 	if verbose {
-		log.Println("loading configuration from", location)
+		abs, _ := filepath.Abs(location)
+		log.Println("loading configuration from", abs)
 	}
 	cfg, err := LoadConfig(location)
 	if err != nil {
-		return currentStateProvider, tre.New(err, "error loading configuration (did you init?)")
+		workdir, _ := os.Getwd()
+		return currentStateProvider, tre.New(err, "error loading configuration (did you init?)", "workdir", workdir)
 	}
 	cfg.verbose = cfg.verbose || verbose
 	currentStateProvider = NewGCS(cfg)
@@ -75,5 +77,6 @@ func getStateProvider(c *cli.Context) (StateProvider, error) {
 
 func checkExists(filename string) error {
 	_, err := os.Stat(filename)
-	return tre.New(err, "no such migration (wrong project?)", "file", filename)
+	abs, _ := filepath.Abs(filename)
+	return tre.New(err, "no such migration (wrong project?)", "file", abs)
 }
