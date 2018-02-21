@@ -26,7 +26,7 @@ type FileStateProvider struct {
 // LoadState implements StateProvider
 func (l FileStateProvider) LoadState() (string, error) {
 	data, err := ioutil.ReadFile(l.Configuration.LastMigrationObjectName)
-	return string(data), err
+	return string(data), tre.New(err, "error reading state", "file", l.Configuration.LastMigrationObjectName)
 }
 
 // SaveState implements StateProvider
@@ -47,24 +47,27 @@ func (l FileStateProvider) DeleteState() {
 	os.Remove(l.Configuration.LastMigrationObjectName)
 }
 
+// read it once
 var currentStateProvider StateProvider
 
-func getStateProvider(c *cli.Context) StateProvider {
+func getStateProvider(c *cli.Context) (StateProvider, error) {
 	if currentStateProvider != nil {
-		return currentStateProvider
+		return currentStateProvider, nil
 	}
 	verbose := c.GlobalBool("v")
-	location := filepath.Join(c.Args().First(), ConfigFilename)
+	project := c.Args().First()
+	// pre: project has been checked by the caller
+	location := filepath.Join(project, ConfigFilename)
 	if verbose {
 		log.Println("loading configuration from", location)
 	}
 	cfg, err := LoadConfig(location)
 	if err != nil {
-		log.Fatalln("error loading configuration (did you init?)", err)
+		return currentStateProvider, tre.New(err, "error loading configuration (did you init?)")
 	}
 	cfg.verbose = cfg.verbose || verbose
 	currentStateProvider = NewGCS(cfg)
-	return currentStateProvider
+	return currentStateProvider, nil
 }
 
 func checkExists(filename string) error {

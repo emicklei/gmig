@@ -62,6 +62,17 @@ func main() {
 			Action:    cmdMigrationsStatus,
 			ArgsUsage: "[project] name of the folder that contains the configuration of the target project",
 		},
+		{
+			Name: "export",
+			Subcommands: []cli.Command{
+				{
+					Name:      "project-iam-policy",
+					Usage:     "Print a migration that describes the current IAM policy binding on project level.",
+					Action:    cmdExportProjectIAMPolicy,
+					ArgsUsage: "[project] name of the folder that contains the configuration of the target project",
+				},
+			},
+		},
 	}
 	sort.Sort(cli.FlagsByName(app.Flags))
 	if err := app.Run(os.Args); err != nil {
