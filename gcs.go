@@ -56,7 +56,7 @@ func (g GCS) Config() Config {
 }
 
 func (g GCS) gsutil(cmdline []string) error {
-	if g.onDiskAccess.Config().verbose {
+	if g.Config().verbose {
 		log.Println(strings.Join(cmdline, " "))
 	}
 	cmd := exec.Command(cmdline[0], cmdline[1:]...)

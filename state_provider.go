@@ -31,6 +31,9 @@ func (l FileStateProvider) LoadState() (string, error) {
 
 // SaveState implements StateProvider
 func (l FileStateProvider) SaveState(filename string) error {
+	if l.Configuration.verbose {
+		log.Println("writing local copy", l.Configuration.LastMigrationObjectName)
+	}
 	return ioutil.WriteFile(l.Configuration.LastMigrationObjectName, []byte(filename), os.ModePerm)
 }
 

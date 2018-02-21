@@ -70,6 +70,12 @@ func main() {
 					Usage:     "Print a migration that describes the current IAM policy binding on project level.",
 					Action:    cmdExportProjectIAMPolicy,
 					ArgsUsage: "[project] name of the folder that contains the configuration of the target project",
+					Flags: []cli.Flag{
+						cli.BoolFlag{
+							Name:  "set-last-migration, s",
+							Usage: "if true then mark this migration as being applied. It will be the new state.",
+						},
+					},
 				},
 			},
 		},

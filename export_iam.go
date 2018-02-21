@@ -5,8 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"os/exec"
+	"strings"
 )
 
 // ProjectsIAMPolicy is for capturing the project iam policy
@@ -19,17 +21,22 @@ type ProjectsIAMPolicy struct {
 
 // ExportProjectsIAMPolicy reads the current IAM bindings on project level
 // and outputs the contents of a gmig migration file.
-func ExportProjectsIAMPolicy(project string) error {
+// Return the filename of the migration.
+func ExportProjectsIAMPolicy(cfg Config, project string) (string, error) {
 	out := new(bytes.Buffer)
-	cmd := exec.Command("gcloud", "projects", "get-iam-policy", project, "--format", "json")
+	cmdline := []string{"gcloud", "projects", "get-iam-policy", project, "--format", "json"}
+	if cfg.verbose {
+		log.Println(strings.Join(cmdline, " "))
+	}
+	cmd := exec.Command(cmdline[0], cmdline[1:]...)
 	cmd.Stdout = out
 	cmd.Stderr = os.Stderr
 	if err := cmd.Run(); err != nil {
-		return err
+		return "", err
 	}
 	var p ProjectsIAMPolicy
 	if err := json.Unmarshal(out.Bytes(), &p); err != nil {
-		return err
+		return "", err
 	}
 	content := new(bytes.Buffer)
 	fmt.Fprintln(content, "# exported projects iam policy")
@@ -52,5 +59,8 @@ func ExportProjectsIAMPolicy(project string) error {
 		}
 	}
 	filename := NewFilename("exported project iam policy")
-	return ioutil.WriteFile(filename, content.Bytes(), os.ModePerm)
+	if cfg.verbose {
+		log.Println("writing", filename)
+	}
+	return filename, ioutil.WriteFile(filename, content.Bytes(), os.ModePerm)
 }

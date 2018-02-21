@@ -201,9 +201,16 @@ func cmdExportProjectIAMPolicy(c *cli.Context) error {
 		printError(err.Error())
 		return errAbort
 	}
-	if err := ExportProjectsIAMPolicy(mtx.project); err != nil {
+	filename, err := ExportProjectsIAMPolicy(mtx.stateProvider.Config(), mtx.project)
+	if err != nil {
 		printError(err.Error())
 		return err
+	}
+	if c.Bool("s") {
+		if err := mtx.stateProvider.SaveState(filename); err != nil {
+			printError(err.Error())
+			return err
+		}
 	}
 	return nil
 }
