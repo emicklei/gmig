@@ -74,7 +74,7 @@ After marking the current state in `gmig`, new migrations can be added that will
 
 Generate a new migration by reading all the IAM policy binding from the current infrastructure of the project.
 
-    gmig export --set-last-migration project-iam-policy my-production-project
+    gmig -v export project-iam-policy -s my-production-project
 
 ## Example: Add service account
 
