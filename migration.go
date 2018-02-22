@@ -61,7 +61,7 @@ func ExecuteAll(commands []string, envs []string) error {
 	for i, each := range commands {
 		log.Println(each)
 		cmd := exec.Command("sh", "-c", each)
-		cmd.Env = append(cmd.Env, envs...) // extend, not replace
+		cmd.Env = append(os.Environ(), envs...) // extend, not replace
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 		err := cmd.Run()
