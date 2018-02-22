@@ -41,7 +41,8 @@ type migrationContext struct {
 }
 
 func getMigrationContext(c *cli.Context) (ctx migrationContext, err error) {
-	project := c.Args().First()
+	// allow project as folder name
+	project := filepath.Base(c.Args().First())
 	if len(project) == 0 {
 		err = fmt.Errorf("missing project name in command line")
 		return

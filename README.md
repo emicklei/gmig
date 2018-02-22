@@ -21,6 +21,28 @@ Each command can use the following environment variables: `$PROJECT`.
 
 Information about the last applied change to a project is stored as a Google Storage Bucket object.
 
+## Help
+
+    NAME:
+    gmig - Google Cloud Platform infrastructure migration tool
+
+    USAGE:
+    gmig [global options] command [command options] [arguments...]
+
+    COMMANDS:
+        init     Create the initial configuration, if absent.
+        new      Create a new migration file from a template using a generated timestamp and a given title.
+        up       Runs the do section of all pending migrations in order, one after the other.
+        down     Runs the undo section of the last applied migration only.
+        status   List all migrations with details compared to the current state.
+        export
+        help, h  Shows a list of commands or help for one command
+
+    GLOBAL OPTIONS:
+    -v                   verbose logging
+    --help, -h           show help
+    --print-version, -V  print only the version
+
 ## Getting started
 
 ### init [project]
