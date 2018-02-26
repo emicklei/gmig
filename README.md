@@ -1,8 +1,8 @@
-# gmig - gcloud migrations
+# gmig - GCP migrations
 
 pronounced as `gimmick`.
 
-Manage Google Cloud Platform infrastructure using migrations that describe incremental changes such as additions or deletions of resources.
+Manage Google Cloud Platform (GCP) infrastructure using migrations that describe incremental changes such as additions or deletions of resources.
 This work is inspired by MyBatis migrations for SQL database setup.
 
 Your gmig infrastructure is basically a folder with incremental change files, each with a timestamp prefix (for sort ordering) and readable name.
@@ -14,10 +14,10 @@ Your gmig infrastructure is basically a folder with incremental change files, ea
         gmig.json
 
 Each change is a single YAML file with one or more shell commands that change infrastructure for a project.
-A change must be have at least a `do` and an `undo` section.
-The `do` section typically has a list of gcloud commands that create resources.
+A change must have at least a `do` section and optionally an `undo` section.
+The `do` section typically has a list of gcloud commands that create resources. Each line will be executed as a shell command so any available tool can be used.
 The `undo` section typically has a list of gcloud commands that deletes the same resources (in reverse order if relevant).
-Each command can use the following environment variables: `$PROJECT`.
+Each command can use the following environment variables: `$PROJECT`,`$REGION`,`$ZONE` populated from the target configuration.
 
 Information about the last applied change to a project is stored as a Google Storage Bucket object.
 
@@ -45,20 +45,24 @@ Information about the last applied change to a project is stored as a Google Sto
 
 ## Getting started
 
-### init [project]
+### init [target]
 
-Prepares your setup for working with migrations by creating a `gmig.json` file in a project folder.
+Prepares your setup for working with migrations by creating a `gmig.json` file in a target folder.
 
     gmig init my-production-project
 
 You must change the file `my-production-project/gmig.json` to set the Bucket name.
 
     {
+        "project": "my-production-project",
+        "region": "europe-west1",
+        "zone": "europe-west1-b",
         "bucket":"mycompany-gmig-states",
         "state":"gmig-last-migration"
     }
 
 If you decide to store state files of different projects in one Bucket then set the state object name to reflect this, eg. `myproject-gmig-state`.
+If you want to apply the same migrations to different regions/zones then choose a target folder name to reflect this, eg. `my-production-project-us-east`. Values for `region` and `zone` are only required if you want to create Compute Engine resources.
 
 ### new [title]
 
@@ -66,20 +70,20 @@ Creates a new migration for you to describe a change to the current state of inf
 
     gmig new "add storage view rol to cloudbuild account"
 
-### status [project]
+### status [target]
 
 List all migrations with an indicator (applied,pending) whether is has been applied or not.
 
     gmig status my-production-project
 
-### up [project]
+### up [target]
 
 Executes the `do` section of each pending migration compared to the last applied change to the infrastructure. 
-Upon each completed migration, the `gmig-last-migration` object is updated.
+Upon each completed migration, the `gmig-last-migration` object is updated in the bucket.
 
     gmig up my-production-project
 
-### down [project]
+### down [target]
 
 Executes one `undo` section of the last applied change to the infrastructure.
 If completed then update the `gmig-last-migration` object.
@@ -89,10 +93,10 @@ If completed then update the `gmig-last-migration` object.
 ## Export existing infrastructure
 
 Exporting migrations from existing infrastructure is useful when you start working with `gmig` but do not want to start from scratch.
-Several sub commands are available to inspect a project and export migrations to reflect the current state.
+Several sub commands are (or will become) available to inspect a project and export migrations to reflect the current state.
 After marking the current state in `gmig`, new migrations can be added that will bring your infrastructure to the next state.
 
-### export project-iam-policy [project]
+### export project-iam-policy [target]
 
 Generate a new migration by reading all the IAM policy binding from the current infrastructure of the project.
 

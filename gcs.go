@@ -60,7 +60,7 @@ func (g GCS) gsutil(cmdline []string) error {
 		log.Println(strings.Join(cmdline, " "))
 	}
 	cmd := exec.Command(cmdline[0], cmdline[1:]...)
-	stdoutStderr, err := cmd.CombinedOutput()
+	stdoutStderr, err := runCommand(cmd)
 	if err != nil {
 		return tre.New(err, "gsutil cp failed", "output:", string(stdoutStderr))
 	}

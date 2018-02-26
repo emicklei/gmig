@@ -25,6 +25,9 @@ type FileStateProvider struct {
 
 // LoadState implements StateProvider
 func (l FileStateProvider) LoadState() (string, error) {
+	if l.Configuration.verbose {
+		log.Println("reading local copy", l.Configuration.LastMigrationObjectName)
+	}
 	data, err := ioutil.ReadFile(l.Configuration.LastMigrationObjectName)
 	return string(data), tre.New(err, "error reading state", "file", l.Configuration.LastMigrationObjectName)
 }
@@ -58,9 +61,9 @@ func getStateProvider(c *cli.Context) (StateProvider, error) {
 		return currentStateProvider, nil
 	}
 	verbose := c.GlobalBool("v")
-	project := c.Args().First()
-	// pre: project has been checked by the caller
-	location := filepath.Join(project, ConfigFilename)
+	target := c.Args().First()
+	// pre: target is already checked by caller
+	location := filepath.Join(target, ConfigFilename)
 	if verbose {
 		abs, _ := filepath.Abs(location)
 		log.Println("loading configuration from", abs)
@@ -73,10 +76,4 @@ func getStateProvider(c *cli.Context) (StateProvider, error) {
 	cfg.verbose = cfg.verbose || verbose
 	currentStateProvider = NewGCS(cfg)
 	return currentStateProvider, nil
-}
-
-func checkExists(filename string) error {
-	_, err := os.Stat(filename)
-	abs, _ := filepath.Abs(filename)
-	return tre.New(err, "no such migration (wrong project?)", "file", abs)
 }

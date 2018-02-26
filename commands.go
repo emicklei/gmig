@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -34,44 +33,6 @@ func cmdCreateMigration(c *cli.Context) error {
 	return ioutil.WriteFile(filename, []byte(yaml), os.ModePerm)
 }
 
-type migrationContext struct {
-	project       string
-	lastApplied   string
-	stateProvider StateProvider
-}
-
-func getMigrationContext(c *cli.Context) (ctx migrationContext, err error) {
-	// allow project as folder name
-	project := filepath.Base(c.Args().First())
-	if len(project) == 0 {
-		err = fmt.Errorf("missing project name in command line")
-		return
-	}
-	stateProvider, err := getStateProvider(c)
-	if err != nil {
-		return
-	}
-	err = gcloudConfigSetProject(stateProvider.Config(), project)
-	if err != nil {
-		return
-	}
-	lastApplied, err := stateProvider.LoadState()
-	if err != nil {
-		return
-	}
-	if len(lastApplied) > 0 {
-		e := checkExists(lastApplied)
-		if e != nil {
-			err = e
-			return
-		}
-	}
-	ctx.stateProvider = stateProvider
-	ctx.project = project
-	ctx.lastApplied = lastApplied
-	return
-}
-
 func cmdMigrationsUp(c *cli.Context) error {
 	mtx, err := getMigrationContext(c)
 	if err != nil {
@@ -87,7 +48,7 @@ func cmdMigrationsUp(c *cli.Context) error {
 		log.Println(logseparator)
 		log.Println(each.Filename)
 		log.Println(logseparator)
-		if err := ExecuteAll(each.DoSection, []string{"PROJECT=" + mtx.project}); err != nil {
+		if err := ExecuteAll(each.DoSection, mtx.shellEnv()); err != nil {
 			reportError(mtx.stateProvider.Config(), "do", err)
 			return errAbort
 		}
@@ -161,16 +122,16 @@ func cmdMigrationsStatus(c *cli.Context) error {
 }
 
 func cmdInit(c *cli.Context) error {
-	project := c.Args().First()
-	if len(project) == 0 {
-		printError("missing project name in command line")
+	target := c.Args().First()
+	if len(target) == 0 {
+		printError("missing target name in command line")
 		return errAbort
 	}
-	if err := os.MkdirAll(project, os.ModePerm|os.ModeDir); err != nil {
+	if err := os.MkdirAll(target, os.ModePerm|os.ModeDir); err != nil {
 		printError(err.Error())
 		return errAbort
 	}
-	location := filepath.Join(project, ConfigFilename)
+	location := filepath.Join(target, ConfigFilename)
 	_, err := os.Stat(location)
 	if err == nil {
 		log.Println("config file [", location, "] already present.")
@@ -184,7 +145,6 @@ func cmdInit(c *cli.Context) error {
 		return nil
 	}
 	cfg := Config{
-		Bucket:                  "your-accessible-bucket",
 		LastMigrationObjectName: "gmig-last-migration",
 	}
 	data, _ := json.Marshal(cfg)

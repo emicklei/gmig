@@ -1,16 +1,14 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
-	"os/exec"
 	"sort"
 
 	"github.com/urfave/cli"
 )
 
-const version = "0.9"
+const version = "0.10"
 
 func main() {
 	app := cli.NewApp()
@@ -84,18 +82,4 @@ func main() {
 	if err := app.Run(os.Args); err != nil {
 		log.Fatalln(err)
 	}
-}
-
-func reportError(cfg Config, action string, err error) error {
-	log.Printf("executing [%s] failed, see error above and or below.\n", action)
-
-	log.Println("checking gmig config ...")
-	fmt.Println(cfg.ToJSON())
-
-	log.Println("checking gcloud config list ...")
-	cmd := exec.Command("gcloud", "config", "list")
-	out, _ := cmd.CombinedOutput()
-	fmt.Println(string(out))
-
-	return err
 }
