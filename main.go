@@ -8,7 +8,7 @@ import (
 	"github.com/urfave/cli"
 )
 
-const version = "0.12"
+const version = "0.13"
 
 func main() {
 	app := cli.NewApp()
@@ -46,19 +46,25 @@ func main() {
 			Name:      "up",
 			Usage:     "Runs the do section of all pending migrations in order, one after the other.",
 			Action:    cmdMigrationsUp,
-			ArgsUsage: "[project] name of the folder that contains the configuration of the target project",
+			ArgsUsage: "[target] name of the folder that contains the configuration of the target project",
 		},
 		{
 			Name:      "down",
 			Usage:     "Runs the undo section of the last applied migration only.",
 			Action:    cmdMigrationsDown,
-			ArgsUsage: "[project] name of the folder that contains the configuration of the target project",
+			ArgsUsage: "[target] name of the folder that contains the configuration of the target project",
 		},
 		{
 			Name:      "status",
 			Usage:     "List all migrations with details compared to the current state.",
 			Action:    cmdMigrationsStatus,
-			ArgsUsage: "[project] name of the folder that contains the configuration of the target project",
+			ArgsUsage: "[target] name of the folder that contains the configuration of the target project",
+		},
+		{
+			Name:      "force-state",
+			Usage:     "Explicitly set the current state; filename of the last applied migration.",
+			Action:    cmdMigrationsSetState,
+			ArgsUsage: "[target] [filename] name of the folder that contains the configuration of the target project",
 		},
 		{
 			Name: "export",
@@ -67,13 +73,7 @@ func main() {
 					Name:      "project-iam-policy",
 					Usage:     "Print a migration that describes the current IAM policy binding on project level.",
 					Action:    cmdExportProjectIAMPolicy,
-					ArgsUsage: "[project] name of the folder that contains the configuration of the target project",
-					Flags: []cli.Flag{
-						cli.BoolFlag{
-							Name:  "set-last-migration, s",
-							Usage: "if true then mark this migration as being applied. It will be the new state.",
-						},
-					},
+					ArgsUsage: "[target] name of the folder that contains the configuration of the target project",
 				},
 			},
 		},

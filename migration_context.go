@@ -8,7 +8,6 @@ import (
 )
 
 type migrationContext struct {
-	project       string
 	lastApplied   string
 	stateProvider StateProvider
 }

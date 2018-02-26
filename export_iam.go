@@ -22,9 +22,9 @@ type ProjectsIAMPolicy struct {
 // ExportProjectsIAMPolicy reads the current IAM bindings on project level
 // and outputs the contents of a gmig migration file.
 // Return the filename of the migration.
-func ExportProjectsIAMPolicy(cfg Config, project string) (string, error) {
+func ExportProjectsIAMPolicy(cfg Config) error {
 	out := new(bytes.Buffer)
-	cmdline := []string{"gcloud", "projects", "get-iam-policy", project, "--format", "json"}
+	cmdline := []string{"gcloud", "projects", "get-iam-policy", cfg.Project, "--format", "json"}
 	if cfg.verbose {
 		log.Println(strings.Join(cmdline, " "))
 	}
@@ -32,29 +32,39 @@ func ExportProjectsIAMPolicy(cfg Config, project string) (string, error) {
 	cmd.Stdout = out
 	cmd.Stderr = os.Stderr
 	if err := cmd.Run(); err != nil {
-		return "", err
+		return err
 	}
 	var p ProjectsIAMPolicy
 	if err := json.Unmarshal(out.Bytes(), &p); err != nil {
-		return "", err
+		return err
+	}
+	// Build reverse mapping
+	memberToRoles := map[string][]string{}
+	for _, each := range p.Bindings {
+		role := each.Role
+		for _, member := range each.Members {
+			list, ok := memberToRoles[member]
+			if !ok {
+				list = []string{}
+			}
+			memberToRoles[member] = append(list, role)
+		}
 	}
 	content := new(bytes.Buffer)
 	fmt.Fprintln(content, "# exported projects iam policy")
 	fmt.Fprint(content, "\ndo:")
-	for _, each := range p.Bindings {
-		role := each.Role
-		fmt.Fprintf(content, "\n  # role = %s\n", role)
-		for _, member := range each.Members {
-			cmd := fmt.Sprintf("  - gcloud projects add-iam-policy-binding $PROJECT --member %s --role %s", member, role)
+	for member, roles := range memberToRoles {
+		fmt.Fprintf(content, "\n  # member = %s\n", member)
+		for _, role := range roles {
+			cmd := fmt.Sprintf("  - gcloud projects add-iam-policy-binding $PROJECT --member %s --role %s\n", member, role)
 			fmt.Fprintf(content, cmd)
 		}
 	}
 	fmt.Fprintf(content, "\nundo:")
-	for _, each := range p.Bindings {
-		role := each.Role
-		fmt.Fprintf(content, "\n  # role = %s\n", role)
-		for _, member := range each.Members {
-			cmd := fmt.Sprintf("  - gcloud projects remove-iam-policy-binding $PROJECT --member %s --role %s", member, role)
+	for member, roles := range memberToRoles {
+		fmt.Fprintf(content, "\n  # member = %s\n", member)
+		for _, role := range roles {
+			cmd := fmt.Sprintf("  - gcloud projects remove-iam-policy-binding $PROJECT --member %s --role %s\n", member, role)
 			fmt.Fprintf(content, cmd)
 		}
 	}
@@ -62,5 +72,5 @@ func ExportProjectsIAMPolicy(cfg Config, project string) (string, error) {
 	if cfg.verbose {
 		log.Println("writing", filename)
 	}
-	return filename, ioutil.WriteFile(filename, content.Bytes(), os.ModePerm)
+	return ioutil.WriteFile(filename, content.Bytes(), os.ModePerm)
 }

@@ -77,7 +77,7 @@ func cmdMigrationsDown(c *cli.Context) error {
 	log.Println(logseparator)
 	log.Println(mtx.lastApplied)
 	log.Println(logseparator)
-	if err := ExecuteAll(lastMigration.UndoSection, []string{"PROJECT=" + mtx.project}); err != nil {
+	if err := ExecuteAll(lastMigration.UndoSection, mtx.shellEnv()); err != nil {
 		reportError(mtx.stateProvider.Config(), "undo", err)
 		return errAbort
 	}
@@ -118,6 +118,24 @@ func cmdMigrationsStatus(c *cli.Context) error {
 		last = status
 	}
 	log.Println(logseparator)
+	return nil
+}
+
+func cmdMigrationsSetState(c *cli.Context) error {
+	mtx, err := getMigrationContext(c)
+	if err != nil {
+		printError(err.Error())
+		return errAbort
+	}
+	filename := c.Args().Get(1) // 0=target
+	if err := checkExists(filename); err != nil {
+		printError(err.Error())
+		return err
+	}
+	if err := mtx.stateProvider.SaveState(filename); err != nil {
+		printError(err.Error())
+		return err
+	}
 	return nil
 }
 
@@ -162,16 +180,9 @@ func cmdExportProjectIAMPolicy(c *cli.Context) error {
 		printError(err.Error())
 		return errAbort
 	}
-	filename, err := ExportProjectsIAMPolicy(mtx.stateProvider.Config(), mtx.project)
-	if err != nil {
+	if err := ExportProjectsIAMPolicy(mtx.stateProvider.Config()); err != nil {
 		printError(err.Error())
 		return err
-	}
-	if c.Bool("s") {
-		if err := mtx.stateProvider.SaveState(filename); err != nil {
-			printError(err.Error())
-			return err
-		}
 	}
 	return nil
 }

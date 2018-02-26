@@ -19,9 +19,9 @@ func gcloudConfigSetProject(cfg Config) error {
 	for _, each := range []struct {
 		Key, Value string
 	}{
-		{"project", cfg.Project},
-		{"region", cfg.Region},
-		{"zone", cfg.Zone},
+		{"core/project", cfg.Project},
+		{"compute/region", cfg.Region},
+		{"compute/zone", cfg.Zone},
 	} {
 		k := each.Key
 		v := each.Value
