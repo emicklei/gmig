@@ -90,6 +90,12 @@ If completed then update the `gmig-last-migration` object.
 
     gmig down my-production-project
 
+### force-state [target] [filename]
+
+Explicitly set the state for the target to the last applied filename. This command can be useful if you need to working from existing infrastructure. Effectively, this filename is written to the bucket object.
+
+    gmig force-state my-production-project 20180214t071402_create_some_account.yaml
+
 ## Export existing infrastructure
 
 Exporting migrations from existing infrastructure is useful when you start working with `gmig` but do not want to start from scratch.
