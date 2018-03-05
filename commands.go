@@ -14,6 +14,7 @@ import (
 const logseparator = "~-------------- --------------~"
 
 func cmdCreateMigration(c *cli.Context) error {
+
 	desc := c.Args().First()
 	if len(desc) == 0 {
 		printError("missing migration title")

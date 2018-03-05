@@ -7,8 +7,10 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"time"
 
 	"github.com/emicklei/tre"
+	"github.com/urfave/cli"
 )
 
 func printError(args ...interface{}) {
@@ -35,4 +37,17 @@ func reportError(cfg Config, action string, err error) error {
 	fmt.Println(cfg.ToJSON())
 	gcloudConfigList()
 	return err
+}
+
+func started(c *cli.Context, action string) func() {
+	v := c.GlobalBool("v")
+	if v {
+		log.Println("gmig version", version)
+		log.Println("BEGIN", action)
+	}
+	start := time.Now()
+	if v {
+		return func() { log.Println("END", action, "completed in", time.Now().Sub(start)) }
+	}
+	return func() {}
 }
