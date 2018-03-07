@@ -15,15 +15,15 @@ func TestGcloudConfigSetProject(t *testing.T) {
 		t.Fatal(err)
 	}
 	if got, want := len(cc.args), 3; got != want {
-		t.Logf("got [%v] want [%v]", got, want)
+		t.Errorf("got [%v] want [%v]", got, want)
 	}
-	if got, want := fmt.Sprint(cc.args[0]), "[gcloud config set project p]"; got != want {
-		t.Logf("got [%v] want [%v]", got, want)
+	if got, want := fmt.Sprint(cc.args[0]), "[gcloud config set core/project p]"; got != want {
+		t.Errorf("got [%v] want [%v]", got, want)
 	}
-	if got, want := fmt.Sprint(cc.args[1]), "[gcloud config set region r]"; got != want {
-		t.Logf("got [%v] want [%v]", got, want)
+	if got, want := fmt.Sprint(cc.args[1]), "[gcloud config set compute/region r]"; got != want {
+		t.Errorf("got [%v] want [%v]", got, want)
 	}
-	if got, want := fmt.Sprint(cc.args[2]), "[gcloud config set zone z]"; got != want {
-		t.Logf("got [%v] want [%v]", got, want)
+	if got, want := fmt.Sprint(cc.args[2]), "[gcloud config set compute/zone z]"; got != want {
+		t.Errorf("got [%v] want [%v]", got, want)
 	}
 }
