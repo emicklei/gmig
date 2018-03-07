@@ -49,7 +49,7 @@ func cmdMigrationsUp(c *cli.Context) error {
 		log.Println(logseparator)
 		log.Println(each.Filename)
 		log.Println(logseparator)
-		if err := ExecuteAll(each.DoSection, mtx.shellEnv()); err != nil {
+		if err := ExecuteAll(each.DoSection, mtx.config().shellEnv()); err != nil {
 			reportError(mtx.stateProvider.Config(), "do", err)
 			return errAbort
 		}
@@ -78,7 +78,7 @@ func cmdMigrationsDown(c *cli.Context) error {
 	log.Println(logseparator)
 	log.Println(mtx.lastApplied)
 	log.Println(logseparator)
-	if err := ExecuteAll(lastMigration.UndoSection, mtx.shellEnv()); err != nil {
+	if err := ExecuteAll(lastMigration.UndoSection, mtx.config().shellEnv()); err != nil {
 		reportError(mtx.stateProvider.Config(), "undo", err)
 		return errAbort
 	}

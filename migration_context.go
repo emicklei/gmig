@@ -43,10 +43,6 @@ func getMigrationContext(c *cli.Context) (ctx migrationContext, err error) {
 	return
 }
 
-func (m migrationContext) shellEnv() (envs []string) {
-	return append(envs, "PROJECT="+m.config().Project, "REGION="+m.config().Project, "ZONE="+m.config().Zone)
-}
-
 func (m migrationContext) config() Config {
 	return m.stateProvider.Config()
 }

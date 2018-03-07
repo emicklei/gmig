@@ -11,7 +11,7 @@ func TestExportProjectsIAMPolicy(t *testing.T) {
 		t.Log("set PP environment variable to a valid accessible Google GCP project")
 		t.Skip()
 	}
-	_, e := ExportProjectsIAMPolicy(Config{}, project)
+	e := ExportProjectsIAMPolicy(Config{})
 	if e != nil {
 		t.Fatal(e)
 	}

@@ -17,7 +17,7 @@ Each change is a single YAML file with one or more shell commands that change in
 A change must have at least a `do` section and optionally an `undo` section.
 The `do` section typically has a list of gcloud commands that create resources. Each line will be executed as a shell command so any available tool can be used.
 The `undo` section typically has a list of gcloud commands that deletes the same resources (in reverse order if relevant).
-Each command can use the following environment variables: `$PROJECT`,`$REGION`,`$ZONE` populated from the target configuration.
+Each command can use the following environment variables: `$PROJECT`,`$REGION`,`$ZONE` and any additional environment variables populated from the target configuration (see `env`).
 
 Information about the last applied change to a project is stored as a Google Storage Bucket object.
 
@@ -58,11 +58,14 @@ You must change the file `my-production-project/gmig.json` to set the Bucket nam
         "region": "europe-west1",
         "zone": "europe-west1-b",
         "bucket":"mycompany-gmig-states",
-        "state":"gmig-last-migration"
+        "state":"gmig-last-migration",
+        "env" : {
+            "ANSWER" : "42"
+        }
     }
 
 If you decide to store state files of different projects in one Bucket then set the state object name to reflect this, eg. `myproject-gmig-state`.
-If you want to apply the same migrations to different regions/zones then choose a target folder name to reflect this, eg. `my-production-project-us-east`. Values for `region` and `zone` are only required if you want to create Compute Engine resources.
+If you want to apply the same migrations to different regions/zones then choose a target folder name to reflect this, eg. `my-production-project-us-east`. Values for `region` and `zone` are required if you want to create Compute Engine resources.
 
 ### new [title]
 

@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 )
 
@@ -25,6 +26,11 @@ type Config struct {
 
 	//LastMigrationObjectName is the name of the bucket object and the local (temporary) file.
 	LastMigrationObjectName string `json:"state"`
+
+	// EnvironmentVars hold additional environment values
+	// that can be accessed by each command line in the Do & Undo section.
+	// Note that PROJECT,REGION and ZONE are already available.
+	EnvironmentVars map[string]string `json:"env"`
 
 	// verbose if true then procduce more logging.
 	verbose bool
@@ -64,4 +70,13 @@ func (c Config) Validate() error {
 		return errors.New("missing state name in configuration")
 	}
 	return nil
+}
+
+func (c Config) shellEnv() (envs []string) {
+	envs = append(envs, "PROJECT="+c.Project, "REGION="+c.Project, "ZONE="+c.Zone)
+	// now (override) with any custom values ; do not check values
+	for k, v := range c.EnvironmentVars {
+		envs = append(envs, fmt.Sprintf("%s=%s", k, v))
+	}
+	return
 }
