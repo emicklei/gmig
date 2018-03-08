@@ -125,17 +125,16 @@ func cmdMigrationsStatus(c *cli.Context) error {
 func cmdMigrationsSetState(c *cli.Context) error {
 	mtx, err := getMigrationContext(c)
 	if err != nil {
-		printError(err.Error())
-		return errAbort
+		printWarning(err.Error())
 	}
 	filename := c.Args().Get(1) // 0=target
 	if err := checkExists(filename); err != nil {
 		printError(err.Error())
-		return err
+		return errAbort
 	}
 	if err := mtx.stateProvider.SaveState(filename); err != nil {
 		printError(err.Error())
-		return err
+		return errAbort
 	}
 	return nil
 }
@@ -183,7 +182,7 @@ func cmdExportProjectIAMPolicy(c *cli.Context) error {
 	}
 	if err := ExportProjectsIAMPolicy(mtx.stateProvider.Config()); err != nil {
 		printError(err.Error())
-		return err
+		return errAbort
 	}
 	return nil
 }

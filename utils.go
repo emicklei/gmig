@@ -9,7 +9,6 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/emicklei/tre"
 	"github.com/urfave/cli"
 )
 
@@ -17,12 +16,19 @@ func printError(args ...interface{}) {
 	log.Println(append([]interface{}{"\033[1;31mERROR:\033[0m"}, args...)...)
 }
 
+func printWarning(args ...interface{}) {
+	log.Println(append([]interface{}{"\033[1;31mWARNING:\033[0m"}, args...)...)
+}
+
 var errAbort = errors.New("gmig aborted")
 
 func checkExists(filename string) error {
 	_, err := os.Stat(filename)
+	if err == nil {
+		return nil
+	}
 	abs, _ := filepath.Abs(filename)
-	return tre.New(err, "no such migration (wrong project?)", "file", abs)
+	return fmt.Errorf("no such migration (wrong project?):%s", abs)
 }
 
 // runCommand is wrapper for CombinedOutput to make this package easy testable.

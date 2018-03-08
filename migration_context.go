@@ -31,6 +31,8 @@ func getMigrationContext(c *cli.Context) (ctx migrationContext, err error) {
 	if err != nil {
 		return
 	}
+	ctx.stateProvider = stateProvider
+	ctx.lastApplied = lastApplied
 	if len(lastApplied) > 0 {
 		e := checkExists(lastApplied)
 		if e != nil {
@@ -38,8 +40,6 @@ func getMigrationContext(c *cli.Context) (ctx migrationContext, err error) {
 			return
 		}
 	}
-	ctx.stateProvider = stateProvider
-	ctx.lastApplied = lastApplied
 	return
 }
 
