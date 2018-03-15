@@ -11,36 +11,18 @@ import (
 	"strings"
 )
 
-// ProjectsIAMPolicy is for capturing the project iam policy
-type ProjectsIAMPolicy struct {
+// IAMPolicy is for capturing the project iam policy
+type IAMPolicy struct {
 	Bindings []struct {
 		Members []string
 		Role    string
 	}
 }
 
-// ExportProjectsIAMPolicy reads the current IAM bindings on project level
-// and outputs the contents of a gmig migration file.
-// Return the filename of the migration.
-func ExportProjectsIAMPolicy(cfg Config) error {
-	out := new(bytes.Buffer)
-	cmdline := []string{"gcloud", "projects", "get-iam-policy", cfg.Project, "--format", "json"}
-	if cfg.verbose {
-		log.Println(strings.Join(cmdline, " "))
-	}
-	cmd := exec.Command(cmdline[0], cmdline[1:]...)
-	cmd.Stdout = out
-	cmd.Stderr = os.Stderr
-	if err := cmd.Run(); err != nil {
-		return err
-	}
-	var p ProjectsIAMPolicy
-	if err := json.Unmarshal(out.Bytes(), &p); err != nil {
-		return err
-	}
-	// Build reverse mapping
+// buildMemberToRoles builds the reverse mapping
+func (i IAMPolicy) buildMemberToRoles() map[string][]string {
 	memberToRoles := map[string][]string{}
-	for _, each := range p.Bindings {
+	for _, each := range i.Bindings {
 		role := each.Role
 		for _, member := range each.Members {
 			list, ok := memberToRoles[member]
@@ -50,6 +32,36 @@ func ExportProjectsIAMPolicy(cfg Config) error {
 			memberToRoles[member] = append(list, role)
 		}
 	}
+	return memberToRoles
+}
+
+func fetchIAMPolicy(cmdline []string, verbose bool) (IAMPolicy, error) {
+	var p IAMPolicy
+	out := new(bytes.Buffer)
+	if verbose {
+		log.Println(strings.Join(cmdline, " "))
+	}
+	cmd := exec.Command(cmdline[0], cmdline[1:]...)
+	cmd.Stdout = out
+	cmd.Stderr = os.Stderr
+	if err := cmd.Run(); err != nil {
+		return p, err
+	}
+	if err := json.Unmarshal(out.Bytes(), &p); err != nil {
+		return p, err
+	}
+	return p, nil
+}
+
+// ExportProjectsIAMPolicy reads the current IAM bindings on project level
+// and outputs the contents of a gmig migration file.
+// Return the filename of the migration.
+func ExportProjectsIAMPolicy(cfg Config) error {
+	policy, err := fetchIAMPolicy([]string{"gcloud", "projects", "get-iam-policy", cfg.Project, "--format", "json"}, cfg.verbose)
+	if err != nil {
+		return err
+	}
+	memberToRoles := policy.buildMemberToRoles()
 	content := new(bytes.Buffer)
 	fmt.Fprintln(content, "# exported projects iam policy")
 	fmt.Fprint(content, "\ndo:")
