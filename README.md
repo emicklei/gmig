@@ -9,7 +9,7 @@ pronounced as `gimmick`.
 Manage Google Cloud Platform (GCP) infrastructure using migrations that describe incremental changes such as additions or deletions of resources.
 This work is inspired by MyBatis migrations for SQL database setup.
 
-Your gmig infrastructure is basically a folder with incremental change files, each with a timestamp prefix (for sort ordering) and readable name.
+Your `gmig` infrastructure is basically a folder with incremental change files, each with a timestamp prefix (for sort ordering) and readable name.
 
     /20180214t071402_create_some_account.yaml
     /my-staging-project
@@ -19,17 +19,13 @@ Your gmig infrastructure is basically a folder with incremental change files, ea
 
 Each change is a single YAML file with one or more shell commands that change infrastructure for a project.
 
-    # allow loadrunner to access GCS
-
-    # https://cloud.google.com/iam/docs/understanding-roles#predefined_roles
+    # add loadrunner service account
 
     do:
-    - gcloud projects add-iam-policy-binding $PROJECT --member serviceAccount:loadrunner@$PROJECT.iam.gserviceaccount.com
-    --role roles/storage.objectViewer
+    - gcloud iam service-accounts create loadrunner --display-name "LoadRunner"
 
     undo:
-    - gcloud projects remove-iam-policy-binding $PROJECT --member serviceAccount:loadrunner@$PROJECT.iam.gserviceaccount.com
-    --role roles/storage.objectViewer
+    - gcloud iam service-accounts delete loadrunner
 
 A change must have at least a `do` section and optionally an `undo` section.
 The `do` section typically has a list of gcloud commands that create resources. Each line will be executed as a shell command so any available tool can be used.
@@ -64,7 +60,7 @@ Information about the last applied change to a project is stored as a Google Sto
 
 
 ### Instalation
-Currently, no pre-compiled binaries are available for download (even using some package manager) so you need to compile it using the Go SDK.
+Currently, no pre-compiled binaries are available for download (or via a package manager) so you need to compile it using the [Go SDK](https://golang.org/dl/).
 
 	go get github.com/emicklei/gmig
 
@@ -84,7 +80,7 @@ You must change the file `my-production-project/gmig.json` to set the Bucket nam
         "bucket":"mycompany-gmig-states",
         "state":"gmig-last-migration",
         "env" : {
-            "ANSWER" : "42"
+            "FOO" : "bar"
         }
     }
 
@@ -143,15 +139,18 @@ Generate a new migration by reading all the IAM policy bindings, per Google Stor
 
 ## Examples
 
-### Add service account
 
-    # add loadrunner service account
-
-    do:
-    - gcloud iam service-accounts create loadrunner --display-name "LoadRunner"
-
-    undo:
-    - gcloud iam service-accounts delete loadrunner
+### Create Cloud SQL Database
+	
+	# Create database
+	
+	do:
+	# Standard tiers are not working for some reason using the CLI. It works using the UI
+	# Note regarding the name. If already used, then cannot be used again for some time: https://github.com/hashicorp/terraform/issues/4557
+	- gcloud beta sql instances create my-db --database-version=POSTGRES_9_6 --region=europe-west1 --gce-zone=europe-west1-b --availability-type=REGIONAL --cpu=1 --memory=4GB
+	
+	undo:
+	- gcloud beta sql instances delete my-db
 
 
 ### Add Storage Viewer role
