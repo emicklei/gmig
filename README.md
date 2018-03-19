@@ -18,10 +18,23 @@ Your gmig infrastructure is basically a folder with incremental change files, ea
         gmig.json
 
 Each change is a single YAML file with one or more shell commands that change infrastructure for a project.
+
+    # allow loadrunner to access GCS
+
+    # https://cloud.google.com/iam/docs/understanding-roles#predefined_roles
+
+    do:
+    - gcloud projects add-iam-policy-binding $PROJECT --member serviceAccount:loadrunner@$PROJECT.iam.gserviceaccount.com
+    --role roles/storage.objectViewer
+
+    undo:
+    - gcloud projects remove-iam-policy-binding $PROJECT --member serviceAccount:loadrunner@$PROJECT.iam.gserviceaccount.com
+    --role roles/storage.objectViewer
+
 A change must have at least a `do` section and optionally an `undo` section.
 The `do` section typically has a list of gcloud commands that create resources. Each line will be executed as a shell command so any available tool can be used.
-The `undo` section typically has a list of gcloud commands that deletes the same resources (in reverse order if relevant).
-Each command can use the following environment variables: `$PROJECT`,`$REGION`,`$ZONE` and any additional environment variables populated from the target configuration (see `env`).
+The `undo` section typically has an ordered list of gcloud commands that deletes the same resources (in reverse order if relevant).
+Each command can use the following environment variables: `$PROJECT`,`$REGION`,`$ZONE` and any additional environment variables populated from the target configuration (see `env` section in the configuration below).
 
 Information about the last applied change to a project is stored as a Google Storage Bucket object.
 
@@ -48,6 +61,13 @@ Information about the last applied change to a project is stored as a Google Sto
     --print-version, -V  print only the version
 
 ## Getting started
+
+
+### Instalation
+Currently, no pre-compiled binaries are available for download (even using some package manager) so you need to compile it using the Go SDK.
+
+	go get github.com/emicklei/gmig
+
 
 ### init [target]
 
@@ -107,17 +127,23 @@ Explicitly set the state for the target to the last applied filename. This comma
 
 Exporting migrations from existing infrastructure is useful when you start working with `gmig` but do not want to start from scratch.
 Several sub commands are (or will become) available to inspect a project and export migrations to reflect the current state.
-After marking the current state in `gmig`, new migrations can be added that will bring your infrastructure to the next state.
+After marking the current state in `gmig` (using `force-state`), new migrations can be added that will bring your infrastructure to the next state.
+The generated migration can ofcourse also be used to just copy commands to your own migration.
 
 ### export project-iam-policy [target]
 
-Generate a new migration by reading all the IAM policy binding from the current infrastructure of the project.
+Generate a new migration by reading all the IAM policy bindings from the current infrastructure of the project.
 
-    gmig -v export project-iam-policy my-production-project
+    gmig -v export project-iam-policy my-project/
 
-Option `v` means verbose logging.
+### export storage-iam-policy [target]
+Generate a new migration by reading all the IAM policy bindings, per Google Storage Bucket owned by the project.
 
-## Example: Add service account
+    gmig -v export storage-iam-policy my-project/
+
+## Examples
+
+### Add service account
 
     # add loadrunner service account
 
@@ -128,7 +154,7 @@ Option `v` means verbose logging.
     - gcloud iam service-accounts delete loadrunner
 
 
-## Example: Add Storage Viewer role
+### Add Storage Viewer role
 
     # allow loadrunner to access GCS
 
@@ -143,7 +169,7 @@ Option `v` means verbose logging.
     --role roles/storage.objectViewer
 
 
-## Example: Add Cloud KMS CryptoKey Decrypter to cloudbuilder account
+### Add Cloud KMS CryptoKey Decrypter to cloudbuilder account
 
     # let cloudbuilder decrypt secrets for deployment
 

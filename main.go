@@ -96,6 +96,15 @@ func main() {
 					},
 					ArgsUsage: "[target] name of the folder that contains the configuration of the target project",
 				},
+				{
+					Name:  "storage-iam-policy",
+					Usage: "Print a migration that describes the current IAM policy bindings for Google Storage.",
+					Action: func(c *cli.Context) error {
+						defer started(c, "export storage IAM policy")()
+						return cmdExportStorageIAMPolicy(c)
+					},
+					ArgsUsage: "[target] name of the folder that contains the configuration of the target project",
+				},
 			},
 		},
 	}

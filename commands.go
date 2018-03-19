@@ -186,3 +186,16 @@ func cmdExportProjectIAMPolicy(c *cli.Context) error {
 	}
 	return nil
 }
+
+func cmdExportStorageIAMPolicy(c *cli.Context) error {
+	mtx, err := getMigrationContext(c)
+	if err != nil {
+		printError(err.Error())
+		return errAbort
+	}
+	if err := ExportStorageIAMPolicy(mtx.stateProvider.Config()); err != nil {
+		printError(err.Error())
+		return errAbort
+	}
+	return nil
+}
