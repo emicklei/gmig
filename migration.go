@@ -23,9 +23,12 @@ type Migration struct {
 	UndoSection []string `yaml:"undo"`
 }
 
+// for testing
+var timeNow = time.Now
+
 // NewFilename generates a filename for storing a new migration.
 func NewFilename(desc string) string {
-	now := time.Now()
+	now := timeNow()
 	sanitized := strings.Replace(strings.ToLower(desc), " ", "_", -1)
 	return fmt.Sprintf("%d%02d%02dt%02d%02d%02d_%s.yaml", now.Year(), now.Month(), now.Day(), now.Hour(), now.Minute(), now.Second(), sanitized)
 }
@@ -73,13 +76,14 @@ func ExecuteAll(commands []string, envs []string) error {
 }
 
 // LoadMigrationsBetweenAnd returns a list of pending Migration <firstFilename..lastFilename]
-func LoadMigrationsBetweenAnd(firstFilename, lastFilename string) (list []Migration, err error) {
-	workdir, err := os.Getwd()
-	if err != nil {
-		return
-	}
+func LoadMigrationsBetweenAnd(workdir, firstFilename, lastFilename string) (list []Migration, err error) {
 	// collect all filenames
 	filenames := []string{}
+	// firstFilename and lastFilename are relative to workdir.
+	here, _ := os.Getwd()
+	// change and restore finally
+	os.Chdir(workdir)
+	defer os.Chdir(here)
 	filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
 		if info.IsDir() || !strings.HasSuffix(path, ".yaml") {
 			return nil
@@ -96,6 +100,7 @@ func LoadMigrationsBetweenAnd(firstFilename, lastFilename string) (list []Migrat
 			continue
 		}
 		var m Migration
+		log.Println("load migration", each)
 		m, err = LoadMigration(filepath.Join(workdir, each))
 		if err != nil {
 			return

@@ -16,10 +16,10 @@ type Config struct {
 	Project string `json:"project"`
 
 	// Region is a GCP region. Optional, use the default one if absent.
-	Region string `json:"region"`
+	Region string `json:"region,omitempty"`
 
 	// Region is a GCP zone. Optional, use the default one if absent.
-	Zone string `json:"zone"`
+	Zone string `json:"zone,omitempty"`
 
 	// Bucket is the name of the Google Storage Bucket.
 	Bucket string `json:"bucket"`
@@ -30,9 +30,9 @@ type Config struct {
 	// EnvironmentVars hold additional environment values
 	// that can be accessed by each command line in the Do & Undo section.
 	// Note that PROJECT,REGION and ZONE are already available.
-	EnvironmentVars map[string]string `json:"env"`
+	EnvironmentVars map[string]string `json:"env,omitempty"`
 
-	// verbose if true then procduce more logging.
+	// verbose if true then produce more logging.
 	verbose bool
 }
 

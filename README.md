@@ -58,14 +58,13 @@ Information about the last applied change to a project is stored as a Google Sto
 
 ## Getting started
 
-
 ### Instalation
+
 Currently, no pre-compiled binaries are available for download (or via a package manager) so you need to compile it using the [Go SDK](https://golang.org/dl/).
 
-	go get github.com/emicklei/gmig
+    go get github.com/emicklei/gmig
 
-
-### init [target]
+### init [path]
 
 Prepares your setup for working with migrations by creating a `gmig.json` file in a target folder.
 
@@ -93,31 +92,25 @@ Creates a new migration for you to describe a change to the current state of inf
 
     gmig new "add storage view rol to cloudbuild account"
 
-### status [target]
+### status [path]
 
 List all migrations with an indicator (applied,pending) whether is has been applied or not.
 
-    gmig status my-production-project
+    gmig status my-production-project/
 
-### up [target]
+### up [path]
 
 Executes the `do` section of each pending migration compared to the last applied change to the infrastructure. 
 Upon each completed migration, the `gmig-last-migration` object is updated in the bucket.
 
     gmig up my-production-project
 
-### down [target]
+### down [path]
 
 Executes one `undo` section of the last applied change to the infrastructure.
 If completed then update the `gmig-last-migration` object.
 
     gmig down my-production-project
-
-### force-state [target] [filename]
-
-Explicitly set the state for the target to the last applied filename. This command can be useful if you need to working from existing infrastructure. Effectively, this filename is written to the bucket object.
-
-    gmig force-state my-production-project 20180214t071402_create_some_account.yaml
 
 ## Export existing infrastructure
 
@@ -126,32 +119,57 @@ Several sub commands are (or will become) available to inspect a project and exp
 After marking the current state in `gmig` (using `force-state`), new migrations can be added that will bring your infrastructure to the next state.
 The generated migration can ofcourse also be used to just copy commands to your own migration.
 
-### export project-iam-policy [target]
+### export project-iam-policy [path]
 
 Generate a new migration by reading all the IAM policy bindings from the current infrastructure of the project.
 
     gmig -v export project-iam-policy my-project/
 
-### export storage-iam-policy [target]
+### export storage-iam-policy [path]
+
 Generate a new migration by reading all the IAM policy bindings, per Google Storage Bucket owned by the project.
 
     gmig -v export storage-iam-policy my-project/
 
+## Working around migrations
+Sometimes you need to fix things because you made a mistake or want to reorganise your work. Use the `force` and confirm your action.
+
+### force state [path] [filename]
+
+Explicitly set the state for the target to the last applied filename. This command can be useful if you need to working from existing infrastructure. Effectively, this filename is written to the bucket object.
+Use this command with care!.
+
+    gmig force state my-production-project 20180214t071402_create_some_account.yaml
+
+### force do [path] [filename]
+
+Explicitly run the commands in de `do` section of a given migration filename.
+The `gmig-last-migration` object is `not` updated in the bucket.
+Use this command with care!.
+
+    gmig force do my-production-project 20180214t071402_create_some_account.yaml
+
+### force undo [path] [filename]
+
+Explicitly run the commands in de `undo` section of a given migration filename.
+The `gmig-last-migration` object is `not` updated in the bucket.
+Use this command with care!.
+
+    gmig force undo my-production-project 20180214t071402_create_some_account.yaml
+
 ## Examples
 
-
 ### Create Cloud SQL Database
-	
-	# Create database
-	
-	do:
-	# Standard tiers are not working for some reason using the CLI. It works using the UI
-	# Note regarding the name. If already used, then cannot be used again for some time: https://github.com/hashicorp/terraform/issues/4557
-	- gcloud beta sql instances create my-db --database-version=POSTGRES_9_6 --region=europe-west1 --gce-zone=europe-west1-b --availability-type=REGIONAL --cpu=1 --memory=4GB
-	
-	undo:
-	- gcloud beta sql instances delete my-db
 
+    # Create database
+
+    do:
+    # Standard tiers are not working for some reason using the CLI. It works using the UI
+    # Note regarding the name. If already used, then cannot be used again for some time: https://github.com/hashicorp/terraform/issues/4557
+    - gcloud beta sql instances create my-db --database-version=POSTGRES_9_6 --region=europe-west1 --gce-zone=europe-west1-b --availability-type=REGIONAL --cpu=1 --memory=4GB
+
+    undo:
+    - gcloud beta sql instances delete my-db
 
 ### Add Storage Viewer role
 
@@ -167,7 +185,6 @@ Generate a new migration by reading all the IAM policy bindings, per Google Stor
     - gcloud projects remove-iam-policy-binding $PROJECT --member serviceAccount:loadrunner@$PROJECT.iam.gserviceaccount.com
     --role roles/storage.objectViewer
 
-
 ### Add Cloud KMS CryptoKey Decrypter to cloudbuilder account
 
     # let cloudbuilder decrypt secrets for deployment
@@ -180,6 +197,5 @@ Generate a new migration by reading all the IAM policy bindings, per Google Stor
 
     undo:
     - gcloud kms keys remove-iam-policy-binding CRYPTOKEY --location LOCATION --keyring KEYRING --member serviceAccount:00000000@cloudbuild.gserviceaccount.com --role roles/cloudkms.cryptoKeyDecrypter
-
 
 &copy; 2018, ernestmicklei.com. MIT License. Contributions welcome.

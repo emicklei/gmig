@@ -8,9 +8,15 @@ import (
 	"github.com/urfave/cli"
 )
 
-const version = "0.15"
+const version = "0.16"
 
 func main() {
+	if err := newApp().Run(os.Args); err != nil {
+		log.Fatalln(err)
+	}
+}
+
+func newApp() *cli.App {
 	app := cli.NewApp()
 	app.Version = version
 	app.EnableBashCompletion = true
@@ -27,6 +33,10 @@ func main() {
 			Name:  "v",
 			Usage: "verbose logging",
 		},
+		cli.BoolFlag{
+			Name:  "q",
+			Usage: "quiet mode, accept any prompt",
+		},
 	}
 
 	app.Commands = []cli.Command{
@@ -37,7 +47,7 @@ func main() {
 				defer started(c, "init")()
 				return cmdInit(c)
 			},
-			ArgsUsage: "[project] name of the folder that contains the configuration of the target project",
+			ArgsUsage: "[path] name of the folder that contains the configuration of the target project",
 		},
 		{
 			Name:  "new",
@@ -55,7 +65,7 @@ func main() {
 				defer started(c, "up = apply pending migrations")()
 				return cmdMigrationsUp(c)
 			},
-			ArgsUsage: "[target] name of the folder that contains the configuration of the target project",
+			ArgsUsage: "[path] name of the folder that contains the configuration of the target project",
 		},
 		{
 			Name:  "down",
@@ -64,7 +74,7 @@ func main() {
 				defer started(c, "down = undo last applied migration")()
 				return cmdMigrationsDown(c)
 			},
-			ArgsUsage: "[target] name of the folder that contains the configuration of the target project",
+			ArgsUsage: "[path] name of the folder that contains the configuration of the target project",
 		},
 		{
 			Name:  "status",
@@ -73,19 +83,44 @@ func main() {
 				defer started(c, "show status of migrations")()
 				return cmdMigrationsStatus(c)
 			},
-			ArgsUsage: "[target] name of the folder that contains the configuration of the target project",
+			ArgsUsage: "[path] name of the folder that contains the configuration of the target project",
 		},
 		{
-			Name:  "force-state",
-			Usage: "Explicitly set the current state; filename of the last applied migration.",
-			Action: func(c *cli.Context) error {
-				defer started(c, "force last applied migration (state)")()
-				return cmdMigrationsSetState(c)
+			Name:  "force",
+			Usage: "state | do | undo",
+			Subcommands: []cli.Command{
+				{
+					Name:  "state",
+					Usage: "Explicitly set the current state; filename of the last applied migration.",
+					Action: func(c *cli.Context) error {
+						defer started(c, "force last applied migration (state)")()
+						return cmdMigrationsSetState(c)
+					},
+					ArgsUsage: "[path] [filename] name of the folder that contains the configuration of the target project",
+				},
+				{
+					Name:  "do",
+					Usage: "Explicitly execute the DO section of a migration.",
+					Action: func(c *cli.Context) error {
+						defer started(c, "execute DO section")()
+						return cmdRundoOnly(c)
+					},
+					ArgsUsage: "[path] [filename] name of the migration that contains a do: section",
+				},
+				{
+					Name:  "undo",
+					Usage: "Explicitly execute the UNDO section of a migration.",
+					Action: func(c *cli.Context) error {
+						defer started(c, "execute UNDO section")()
+						return cmdRunUndoOnly(c)
+					},
+					ArgsUsage: "[path] [filename] name of the migration that contains an undo: section",
+				},
 			},
-			ArgsUsage: "[target] [filename] name of the folder that contains the configuration of the target project",
 		},
 		{
-			Name: "export",
+			Name:  "export",
+			Usage: "project-iam-policy | storage-iam-policy",
 			Subcommands: []cli.Command{
 				{
 					Name:  "project-iam-policy",
@@ -94,7 +129,7 @@ func main() {
 						defer started(c, "export project IAM policy")()
 						return cmdExportProjectIAMPolicy(c)
 					},
-					ArgsUsage: "[target] name of the folder that contains the configuration of the target project",
+					ArgsUsage: "[path] name of the folder that contains the configuration of the target project",
 				},
 				{
 					Name:  "storage-iam-policy",
@@ -103,13 +138,11 @@ func main() {
 						defer started(c, "export storage IAM policy")()
 						return cmdExportStorageIAMPolicy(c)
 					},
-					ArgsUsage: "[target] name of the folder that contains the configuration of the target project",
+					ArgsUsage: "[path] name of the folder that contains the configuration of the target project",
 				},
 			},
 		},
 	}
 	sort.Sort(cli.FlagsByName(app.Flags))
-	if err := app.Run(os.Args); err != nil {
-		log.Fatalln(err)
-	}
+	return app
 }

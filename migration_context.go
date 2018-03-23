@@ -2,21 +2,24 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"path/filepath"
 
 	"github.com/urfave/cli"
 )
 
 type migrationContext struct {
+	// lastApplied is the filename of last migration, relative to migrationsPath
 	lastApplied   string
 	stateProvider StateProvider
+	// folder that contains migrations files
+	migrationsPath string
 }
 
 func getMigrationContext(c *cli.Context) (ctx migrationContext, err error) {
-	// allow target as folder name
-	target := filepath.Base(c.Args().First())
-	if len(target) == 0 {
-		err = fmt.Errorf("missing target name in command line")
+	pathToConfig := c.Args().First()
+	if len(pathToConfig) == 0 {
+		err = fmt.Errorf("missing path containing gmig.json in command line")
 		return
 	}
 	stateProvider, err := getStateProvider(c)
@@ -32,9 +35,17 @@ func getMigrationContext(c *cli.Context) (ctx migrationContext, err error) {
 		return
 	}
 	ctx.stateProvider = stateProvider
+	fullPathToConfig, err := filepath.Abs(pathToConfig)
+	if err != nil {
+		return
+	}
+	ctx.migrationsPath = filepath.Dir(fullPathToConfig)
+	if ctx.config().verbose {
+		log.Println("accessing migrations from", ctx.migrationsPath)
+	}
 	ctx.lastApplied = lastApplied
 	if len(lastApplied) > 0 {
-		e := checkExists(lastApplied)
+		e := checkExists(filepath.Join(ctx.migrationsPath, lastApplied))
 		if e != nil {
 			err = e
 			return

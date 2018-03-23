@@ -45,12 +45,15 @@ func (l FileStateProvider) Config() Config {
 	return l.Configuration
 }
 
+// for testing
+var osRemove = os.Remove
+
 // DeleteState implements StateProvider
 func (l FileStateProvider) DeleteState() {
 	if l.Configuration.verbose {
 		log.Println("deleting local copy", l.Configuration.LastMigrationObjectName)
 	}
-	os.Remove(l.Configuration.LastMigrationObjectName)
+	osRemove(l.Configuration.LastMigrationObjectName)
 }
 
 // read it once

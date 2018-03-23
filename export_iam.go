@@ -37,17 +37,15 @@ func (i IAMPolicy) buildMemberToRoles() map[string][]string {
 
 func fetchIAMPolicy(cmdline []string, verbose bool) (IAMPolicy, error) {
 	var p IAMPolicy
-	out := new(bytes.Buffer)
 	if verbose {
 		log.Println(strings.Join(cmdline, " "))
 	}
 	cmd := exec.Command(cmdline[0], cmdline[1:]...)
-	cmd.Stdout = out
-	cmd.Stderr = os.Stderr
-	if err := cmd.Run(); err != nil {
+	combined, err := runCommand(cmd)
+	if err != nil {
 		return p, err
 	}
-	if err := json.Unmarshal(out.Bytes(), &p); err != nil {
+	if err := json.Unmarshal(combined, &p); err != nil {
 		return p, err
 	}
 	return p, nil

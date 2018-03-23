@@ -40,7 +40,7 @@ func cmdMigrationsUp(c *cli.Context) error {
 		printError(err.Error())
 		return errAbort
 	}
-	all, err := LoadMigrationsBetweenAnd(mtx.lastApplied, c.Args().First())
+	all, err := LoadMigrationsBetweenAnd(mtx.migrationsPath, mtx.lastApplied, c.Args().First())
 	if err != nil {
 		printError(err.Error())
 		return errAbort
@@ -69,7 +69,7 @@ func cmdMigrationsDown(c *cli.Context) error {
 		printError(err.Error())
 		return errAbort
 	}
-	all, err := LoadMigrationsBetweenAnd("", mtx.lastApplied)
+	all, err := LoadMigrationsBetweenAnd(mtx.migrationsPath, "", mtx.lastApplied)
 	if err != nil {
 		printError(err.Error())
 		return errAbort
@@ -100,7 +100,7 @@ func cmdMigrationsStatus(c *cli.Context) error {
 		printError(err.Error())
 		return errAbort
 	}
-	all, err := LoadMigrationsBetweenAnd("", "")
+	all, err := LoadMigrationsBetweenAnd(mtx.migrationsPath, "", "")
 	if err != nil {
 		printError(err.Error())
 		return errAbort
@@ -119,23 +119,6 @@ func cmdMigrationsStatus(c *cli.Context) error {
 		last = status
 	}
 	log.Println(logseparator)
-	return nil
-}
-
-func cmdMigrationsSetState(c *cli.Context) error {
-	mtx, err := getMigrationContext(c)
-	if err != nil {
-		printWarning(err.Error())
-	}
-	filename := c.Args().Get(1) // 0=target
-	if err := checkExists(filename); err != nil {
-		printError(err.Error())
-		return errAbort
-	}
-	if err := mtx.stateProvider.SaveState(filename); err != nil {
-		printError(err.Error())
-		return errAbort
-	}
 	return nil
 }
 
@@ -165,7 +148,7 @@ func cmdInit(c *cli.Context) error {
 	cfg := Config{
 		LastMigrationObjectName: "gmig-last-migration",
 	}
-	data, _ := json.Marshal(cfg)
+	data, _ := json.MarshalIndent(cfg, "", "\t")
 	err = ioutil.WriteFile(location, data, os.ModePerm)
 	if err != nil {
 		printError(err.Error())
