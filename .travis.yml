@@ -2,5 +2,4 @@ language: go
 go:
   - 1.x
 script:
-  ls -lr test
-  go test -v && go build
+  ls -lr test && go test -v && go build
