@@ -6,6 +6,7 @@ RUN update-ca-certificates
 WORKDIR /go/src/github.com/emicklei/gmig
 COPY . .
 ARG version
+RUN go test -v -cover
 RUN CGO_ENABLED=0 GOOS=linux go build -ldflags "-X main.version=$version" .
 
 
