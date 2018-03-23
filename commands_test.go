@@ -37,7 +37,7 @@ func TestCmdStatusDemo(t *testing.T) {
 	// capture GC command
 	cc := new(commandCapturer)
 	runCommand = cc.runCommand
-	if err := newApp().Run([]string{"gmig", "status", "test/demo"}); err != nil {
+	if err := newApp().Run([]string{"gmig", "-v", "status", "test/demo"}); err != nil {
 		t.Fatal("unexpected error", err)
 	}
 	if got, want := len(cc.args), 2; got != want {
