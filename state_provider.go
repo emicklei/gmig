@@ -64,9 +64,9 @@ func getStateProvider(c *cli.Context) (StateProvider, error) {
 		return currentStateProvider, nil
 	}
 	verbose := c.GlobalBool("v")
-	target := c.Args().First()
-	// pre: target is already checked by caller
-	location := filepath.Join(target, ConfigFilename)
+	pathToConfig := c.Args().First()
+	// pre: path is already checked by caller
+	location := filepath.Join(pathToConfig, ConfigFilename)
 	if verbose {
 		abs, _ := filepath.Abs(location)
 		log.Println("loading configuration from", abs)
@@ -74,7 +74,8 @@ func getStateProvider(c *cli.Context) (StateProvider, error) {
 	cfg, err := LoadConfig(location)
 	if err != nil {
 		workdir, _ := os.Getwd()
-		return currentStateProvider, tre.New(err, "error loading configuration (did you init?)", "workdir", workdir)
+		abs, _ := filepath.Abs(location)
+		return currentStateProvider, tre.New(err, "error loading configuration (did you init?)", "path", pathToConfig, "workdir", workdir, "location", abs)
 	}
 	cfg.verbose = cfg.verbose || verbose
 	currentStateProvider = NewGCS(cfg)
