@@ -31,7 +31,9 @@ func TestCmdInitMissingConfig(t *testing.T) {
 
 func TestCmdStatusDemo(t *testing.T) {
 	// simulate effect of GS download state
-	ioutil.WriteFile("state", []byte("20180216t120915_one.yaml"), os.ModePerm)
+	if err := ioutil.WriteFile("state", []byte("20180216t120915_one.yaml"), os.ModePerm); err != nil {
+		t.Fatal("unable to write state", err)
+	}
 	defer os.Remove("state")
 
 	// capture GC command
@@ -57,7 +59,9 @@ func TestCmdStatusDemo(t *testing.T) {
 
 func TestCmdForceState(t *testing.T) {
 	// simulate effect of GS download old state
-	ioutil.WriteFile("state", []byte("20180216t120915_one.yaml"), os.ModePerm)
+	if err := ioutil.WriteFile("state", []byte("20180216t120915_one.yaml"), os.ModePerm); err != nil {
+		t.Fatal("unable to write state", err)
+	}
 	defer os.Remove("state")
 
 	// capture GC command
@@ -93,7 +97,9 @@ func TestCmdForceState(t *testing.T) {
 
 func TestCmdUp(t *testing.T) {
 	// simulate effect of GS download old state
-	ioutil.WriteFile("state", []byte("20180216t120915_one.yaml"), os.ModePerm)
+	if err := ioutil.WriteFile("state", []byte("20180216t120915_one.yaml"), os.ModePerm); err != nil {
+		t.Fatal("unable to write state", err)
+	}
 	defer os.Remove("state")
 	// capture GC command
 	cc := new(commandCapturer)
@@ -109,7 +115,9 @@ func TestCmdUp(t *testing.T) {
 
 func TestCmdDown(t *testing.T) {
 	// simulate effect of GS download old state
-	ioutil.WriteFile("state", []byte("20180216t120922_two.yaml"), os.ModePerm)
+	if err := ioutil.WriteFile("state", []byte("20180216t120915_one.yaml"), os.ModePerm); err != nil {
+		t.Fatal("unable to write state", err)
+	}
 	defer os.Remove("state")
 	// capture GC command
 	cc := new(commandCapturer)
