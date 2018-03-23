@@ -8,7 +8,8 @@ import (
 )
 
 func TestCmdInit(t *testing.T) {
-	if err := newApp().Run([]string{"gmig", "init", "test/demo"}); err != nil {
+	defer os.RemoveAll("test/new")
+	if err := newApp().Run([]string{"gmig", "init", "test/new"}); err != nil {
 		t.Fatal("unexpected error", err)
 	}
 }
