@@ -9,6 +9,8 @@ pronounced as `gimmick`.
 Manage Google Cloud Platform (GCP) infrastructure using migrations that describe incremental changes such as additions or deletions of resources.
 This work is inspired by MyBatis migrations for SQL database setup.
 
+[Introduction blog post](http://ernestmicklei.com/2018/03/introducing-gmig-infrastructure-as-code-for-gcp/)
+
 Your `gmig` infrastructure is basically a folder with incremental change files, each with a timestamp prefix (for sort ordering) and readable name.
 
     /20180214t071402_create_some_account.yaml
