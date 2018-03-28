@@ -100,7 +100,6 @@ func LoadMigrationsBetweenAnd(workdir, firstFilename, lastFilename string) (list
 			continue
 		}
 		var m Migration
-		log.Println("load migration", each)
 		m, err = LoadMigration(filepath.Join(workdir, each))
 		if err != nil {
 			return
