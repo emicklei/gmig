@@ -50,10 +50,12 @@ Information about the last applied change to a project is stored as a Google Sto
         up       Runs the do section of all pending migrations in order, one after the other.
         down     Runs the undo section of the last applied migration only.
         status   List all migrations with details compared to the current state.
-        export
+        force    state | do | undo
+        export   project-iam-policy | storage-iam-policy
         help, h  Shows a list of commands or help for one command
 
     GLOBAL OPTIONS:
+    -q                   quiet mode, accept any prompt
     -v                   verbose logging
     --help, -h           show help
     --print-version, -V  print only the version
