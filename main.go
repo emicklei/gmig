@@ -8,7 +8,7 @@ import (
 	"github.com/urfave/cli"
 )
 
-const version = "0.18"
+const version = "0.19"
 
 func main() {
 	if err := newApp().Run(os.Args); err != nil {

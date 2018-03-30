@@ -31,7 +31,7 @@ func cmdCreateMigration(c *cli.Context) error {
 		printError("YAML creation failed")
 		return errAbort
 	}
-	return ioutil.WriteFile(filename, []byte(yaml), os.ModePerm)
+	return ioutil.WriteFile(filename, []byte(yaml), os.FileMode(0644)) // -rw-r--r--, see http://permissions-calculator.org/
 }
 
 func cmdMigrationsUp(c *cli.Context) error {
