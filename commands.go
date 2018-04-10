@@ -11,7 +11,7 @@ import (
 )
 
 // space is right after timestamp
-const logseparator = "~-------------- --------------~"
+const logseparator = "~-------------- ------------------~"
 
 func cmdCreateMigration(c *cli.Context) error {
 
@@ -115,7 +115,7 @@ func cmdMigrationsStatus(c *cli.Context) error {
 				log.Println(logseparator)
 			}
 		}
-		log.Println(status, each.Filename)
+		log.Println(status, pretty(each.Filename))
 		last = status
 	}
 	log.Println(logseparator)

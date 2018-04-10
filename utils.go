@@ -64,3 +64,16 @@ func promptForYes(message string) bool {
 	yn, _ := reader.ReadString('\n')
 	return strings.HasPrefix(yn, "Y") || strings.HasPrefix(yn, "y")
 }
+
+// 20180227t140600_permit_infra_manager_to_deploy_to_gateway_cluster.yaml
+// 2018-02-27 14:06:00 permit infra_manager to deploy to gateway cluster
+func pretty(filename string) string {
+	return fmt.Sprintf("%s-%s-%s %s:%s:%s %s",
+		filename[0:4],
+		filename[4:6],
+		filename[6:8],
+		filename[9:11],
+		filename[11:13],
+		filename[13:15],
+		strings.Replace(strings.TrimSuffix(filename[15:], ".yaml"), "_", " ", -1))
+}
