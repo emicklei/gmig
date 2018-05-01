@@ -64,7 +64,8 @@ Information about the last applied change to a project is stored as a Google Sto
 
 ### Instalation
 
-Currently, no pre-compiled binaries are available for download (or via a package manager) so you need to compile it using the [Go SDK](https://golang.org/dl/).
+Pre-compiled binaries are available for download from the Releases section on this page.
+If you want to create your own version, you need to compile it using the [Go SDK](https://golang.org/dl/).
 
     go get github.com/emicklei/gmig
 
