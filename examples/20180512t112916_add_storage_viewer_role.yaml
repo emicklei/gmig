@@ -1,0 +1,11 @@
+# Add Storage Viewer role
+
+# https://cloud.google.com/iam/docs/understanding-roles#predefined_roles
+
+do:
+- gcloud projects add-iam-policy-binding $PROJECT --member serviceAccount:loadrunner@$PROJECT.iam.gserviceaccount.com
+--role roles/storage.objectViewer
+
+undo:
+- gcloud projects remove-iam-policy-binding $PROJECT --member serviceAccount:loadrunner@$PROJECT.iam.gserviceaccount.com
+--role roles/storage.objectViewer

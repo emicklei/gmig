@@ -1,0 +1,9 @@
+# Create Cloud SQL Database
+
+do:
+# Standard tiers are not working for some reason using the CLI. It works using the UI
+# Note regarding the name. If already used, then cannot be used again for some time: https://github.com/hashicorp/terraform/issues/4557
+- gcloud beta sql instances create my-db --database-version=POSTGRES_9_6 --region=europe-west1 --gce-zone=europe-west1-b --availability-type=REGIONAL --cpu=1 --memory=4GB
+
+undo:
+- gcloud beta sql instances delete my-db
