@@ -164,43 +164,6 @@ Use this command with care!.
 
 ## Examples
 
-### Create Cloud SQL Database
-
-    # Create database
-
-    do:
-    # Standard tiers are not working for some reason using the CLI. It works using the UI
-    # Note regarding the name. If already used, then cannot be used again for some time: https://github.com/hashicorp/terraform/issues/4557
-    - gcloud beta sql instances create my-db --database-version=POSTGRES_9_6 --region=europe-west1 --gce-zone=europe-west1-b --availability-type=REGIONAL --cpu=1 --memory=4GB
-
-    undo:
-    - gcloud beta sql instances delete my-db
-
-### Add Storage Viewer role
-
-    # allow loadrunner to access GCS
-
-    # https://cloud.google.com/iam/docs/understanding-roles#predefined_roles
-
-    do:
-    - gcloud projects add-iam-policy-binding $PROJECT --member serviceAccount:loadrunner@$PROJECT.iam.gserviceaccount.com
-    --role roles/storage.objectViewer
-
-    undo:
-    - gcloud projects remove-iam-policy-binding $PROJECT --member serviceAccount:loadrunner@$PROJECT.iam.gserviceaccount.com
-    --role roles/storage.objectViewer
-
-### Add Cloud KMS CryptoKey Decrypter to cloudbuilder account
-
-    # let cloudbuilder decrypt secrets for deployment
-
-    # https://cloud.google.com/kms/docs/iam
-    # https://cloud.google.com/kms/docs/reference/permissions-and-roles
-
-    do:
-    - gcloud kms keys add-iam-policy-binding CRYPTOKEY --location LOCATION --keyring KEYRING --member serviceAccount:00000000@cloudbuild.gserviceaccount.com --role roles/cloudkms.cryptoKeyDecrypter
-
-    undo:
-    - gcloud kms keys remove-iam-policy-binding CRYPTOKEY --location LOCATION --keyring KEYRING --member serviceAccount:00000000@cloudbuild.gserviceaccount.com --role roles/cloudkms.cryptoKeyDecrypter
+This repository has a number of [examples](https://github.com/emicklei/gmig/tree/master/examples) of migrations.
 
 &copy; 2018, ernestmicklei.com. MIT License. Contributions welcome.

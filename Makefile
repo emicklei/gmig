@@ -13,7 +13,7 @@ build_inside:
 	GOOS=windows go build -o target/windows/gmig.exe && \
 	GOOS=darwin go build -o target/darwin/gmig && \
 	GOOS=linux go build -o target/linux/gmig && \
-	chmod +x -R target &&
+	chmod +x -R target
 
 zip:
 	zip target/darwin/gmig.zip target/darwin/gmig && \
