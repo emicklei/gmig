@@ -1,0 +1,6 @@
+# create static ip for load balancer
+
+do:
+- gcloud compute addresses create my-static-ip --global
+undo:
+- gcloud compute addresses delete my-static-ip --global --quiet
