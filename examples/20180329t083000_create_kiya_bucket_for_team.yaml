@@ -1,0 +1,8 @@
+# create kiya bucket for team
+
+do:
+- gsutil mb -c regional -l europe-west1 gs://my-kiya-secrets
+- gsutil iam ch group:team@hub.com:objectCreator gs://my-kiya-secrets
+undo:
+- gsutil iam ch -d group:team@hub.com:objectCreator gs://my-kiya-secrets
+- gsutil rm -r gs://my-kiya-secrets
