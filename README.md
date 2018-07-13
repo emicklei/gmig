@@ -95,7 +95,7 @@ If you want to apply the same migrations to different regions/zones then choose 
 
 Creates a new migration for you to describe a change to the current state of infrastructure.
 
-    gmig new "add storage view rol to cloudbuild account"
+    gmig new "add storage view role to cloudbuild account"
 
 ### status [path]
 
@@ -141,14 +141,14 @@ Sometimes you need to fix things because you made a mistake or want to reorganis
 
 ### force state [path] [filename]
 
-Explicitly set the state for the target to the last applied filename. This command can be useful if you need to working from existing infrastructure. Effectively, this filename is written to the bucket object.
+Explicitly set the state for the target to the last applied filename. This command can be useful if you need to work from existing infrastructure. Effectively, this filename is written to the bucket object.
 Use this command with care!.
 
     gmig force state my-production-project 20180214t071402_create_some_account.yaml
 
 ### force do [path] [filename]
 
-Explicitly run the commands in de `do` section of a given migration filename.
+Explicitly run the commands in the `do` section of a given migration filename.
 The `gmig-last-migration` object is `not` updated in the bucket.
 Use this command with care!.
 
@@ -156,7 +156,7 @@ Use this command with care!.
 
 ### force undo [path] [filename]
 
-Explicitly run the commands in de `undo` section of a given migration filename.
+Explicitly run the commands in the `undo` section of a given migration filename.
 The `gmig-last-migration` object is `not` updated in the bucket.
 Use this command with care!.
 
