@@ -85,7 +85,7 @@ func LoadMigrationsBetweenAnd(workdir, firstFilename, lastFilename string) (list
 	os.Chdir(workdir)
 	defer os.Chdir(here)
 	filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
-		if info.IsDir() || !strings.HasSuffix(path, ".yaml") {
+		if info.IsDir() || !isYamlFile(path) {
 			return nil
 		}
 		filenames = append(filenames, path)
