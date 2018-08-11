@@ -75,5 +75,10 @@ func pretty(filename string) string {
 		filename[9:11],
 		filename[11:13],
 		filename[13:15],
-		strings.Replace(strings.TrimSuffix(filename[15:], ".yaml"), "_", " ", -1))
+		strings.Replace(strings.TrimSuffix(filename, filepath.Ext(filename)), "_", " ", -1))
+}
+
+func isYamlFile(filename string) bool {
+	ext := filepath.Ext(filename)
+	return ext == ".yaml" || ext == ".yml"
 }
