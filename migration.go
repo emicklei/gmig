@@ -41,6 +41,9 @@ func LoadMigration(filename string) (m Migration, err error) {
 	}
 	m.Filename = filepath.Base(filename)
 	err = yaml.Unmarshal(data, &m)
+	if err != nil {
+		err = fmt.Errorf("%s parsing failed: %v", filename, err)
+	}
 	return
 }
 
