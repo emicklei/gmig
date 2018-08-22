@@ -62,7 +62,8 @@ func cmdMigrationsUp(c *cli.Context) error {
 			break
 		}
 	}
-	if !found {
+	// if lastApplied is after stopAfter then it is also not found but then we don't care
+	if !found && stopAfter > mtx.lastApplied {
 		reportError(mtx.stateProvider.Config(), "up until stop", errors.New("No such migration file: "+stopAfter))
 		return errAbort
 	}
