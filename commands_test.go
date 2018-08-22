@@ -114,6 +114,42 @@ func TestCmdUp(t *testing.T) {
 	}
 }
 
+func TestCmdUpAndStop(t *testing.T) {
+	// simulate effect of GS download old state
+	if err := ioutil.WriteFile("state", []byte("20180216t120915_one.yaml"), os.ModePerm); err != nil {
+		t.Fatal("unable to write state", err)
+	}
+	defer os.Remove("state")
+	// capture GC command
+	cc := new(commandCapturer)
+	runCommand = cc.runCommand
+	if err := newApp().Run([]string{"gmig", "up", "test/demo", "20180216t120922_two.yaml"}); err != nil {
+		wd, _ := os.Getwd()
+		t.Fatal("unexpected error", err, wd)
+	}
+	if got, want := len(cc.args), 3; got != want { // set config, load 1, save 2, stop
+		t.Errorf("got [%v] want [%v]", got, want)
+	}
+}
+
+func TestCmdUpAndStopAfterUnexistingFilename(t *testing.T) {
+	// simulate effect of GS download old state
+	if err := ioutil.WriteFile("state", []byte("20180216t120915_one.yaml"), os.ModePerm); err != nil {
+		t.Fatal("unable to write state", err)
+	}
+	defer os.Remove("state")
+	// capture GC command
+	cc := new(commandCapturer)
+	runCommand = cc.runCommand
+	if err := newApp().Run([]string{"gmig", "up", "test/demo", "missing.yaml"}); err == nil {
+		wd, _ := os.Getwd()
+		t.Fatal("expected error", err, wd)
+	}
+	if got, want := len(cc.args), 2; got != want { // set config, load 1
+		t.Errorf("got [%v] want [%v]", got, want)
+	}
+}
+
 func TestCmdDown(t *testing.T) {
 	// simulate effect of GS download old state
 	if err := ioutil.WriteFile("state", []byte("20180216t120915_one.yaml"), os.ModePerm); err != nil {

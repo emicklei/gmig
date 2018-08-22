@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"log"
 	"os"
@@ -11,7 +12,14 @@ import (
 )
 
 // space is right after timestamp
-const logseparator = "~-------------- ------------------~"
+const (
+	logseparator = "~-------------- ------------------~"
+	applied      = "--- applied ---"
+	pending      = "... pending ..."
+	execDo       = "...      do ..."
+	execUndo     = "...    undo ..."
+	stopped      = "... stopped ..."
+)
 
 func cmdCreateMigration(c *cli.Context) error {
 
@@ -40,15 +48,27 @@ func cmdMigrationsUp(c *cli.Context) error {
 		printError(err.Error())
 		return errAbort
 	}
-	all, err := LoadMigrationsBetweenAnd(mtx.migrationsPath, mtx.lastApplied, c.Args().First())
+	stopAfter := c.Args().Get(1) // empty if not specified
+	all, err := LoadMigrationsBetweenAnd(mtx.migrationsPath, mtx.lastApplied, stopAfter)
 	if err != nil {
 		printError(err.Error())
 		return errAbort
 	}
+	// if stopAfter is specified then it must be one of all
+	found := false
+	for _, each := range all {
+		if stopAfter == each.Filename {
+			found = true
+			break
+		}
+	}
+	if !found {
+		reportError(mtx.stateProvider.Config(), "up until stop", errors.New("No such migration file: "+stopAfter))
+		return errAbort
+	}
 	for _, each := range all {
 		log.Println(logseparator)
-		log.Println(each.Filename)
-		log.Println(logseparator)
+		log.Println(execDo, pretty(each.Filename))
 		if err := ExecuteAll(each.DoSection, mtx.config().shellEnv()); err != nil {
 			reportError(mtx.stateProvider.Config(), "do", err)
 			return errAbort
@@ -59,6 +79,13 @@ func cmdMigrationsUp(c *cli.Context) error {
 			reportError(mtx.stateProvider.Config(), "save state", err)
 			return errAbort
 		}
+		// if not empty then stop after applying this migration
+		if stopAfter == each.Filename {
+			log.Println(stopped)
+			log.Println(logseparator)
+			break
+		}
+		log.Println(logseparator)
 	}
 	return nil
 }
@@ -76,7 +103,7 @@ func cmdMigrationsDown(c *cli.Context) error {
 	}
 	lastMigration := all[len(all)-1]
 	log.Println(logseparator)
-	log.Println(mtx.lastApplied)
+	log.Println(execUndo, pretty(mtx.lastApplied))
 	log.Println(logseparator)
 	if err := ExecuteAll(lastMigration.UndoSection, mtx.config().shellEnv()); err != nil {
 		reportError(mtx.stateProvider.Config(), "undo", err)
@@ -108,9 +135,9 @@ func cmdMigrationsStatus(c *cli.Context) error {
 	log.Println(logseparator)
 	var last string
 	for _, each := range all {
-		status := "--- applied ---"
+		status := applied
 		if each.Filename > mtx.lastApplied {
-			status = "... pending ..."
+			status = pending
 			if len(last) > 0 && last != status {
 				log.Println(logseparator)
 			}
@@ -147,6 +174,9 @@ func cmdInit(c *cli.Context) error {
 	}
 	cfg := Config{
 		LastMigrationObjectName: "gmig-last-migration",
+		EnvironmentVars: map[string]string{
+			"FOO": "bar",
+		},
 	}
 	data, _ := json.MarshalIndent(cfg, "", "\t")
 	err = ioutil.WriteFile(location, data, os.ModePerm)

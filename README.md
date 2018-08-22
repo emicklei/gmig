@@ -48,6 +48,7 @@ Information about the last applied change to a project is stored as a Google Sto
         init     Create the initial configuration, if absent.
         new      Create a new migration file from a template using a generated timestamp and a given title.
         up       Runs the do section of all pending migrations in order, one after the other.
+                 If a migration file is specified then stop after applying that one.
         down     Runs the undo section of the last applied migration only.
         status   List all migrations with details compared to the current state.
         force    state | do | undo
@@ -103,9 +104,10 @@ List all migrations with an indicator (applied,pending) whether is has been appl
 
     gmig status my-production-project/
 
-### up [path]
+### up [path] [|migration file]
 
-Executes the `do` section of each pending migration compared to the last applied change to the infrastructure. 
+Executes the `do` section of each pending migration compared to the last applied change to the infrastructure.
+If `migration file` is given then stop after applying that one.
 Upon each completed migration, the `gmig-last-migration` object is updated in the bucket.
 
     gmig up my-production-project
@@ -137,6 +139,7 @@ Generate a new migration by reading all the IAM policy bindings, per Google Stor
     gmig -v export storage-iam-policy my-project/
 
 ## Working around migrations
+
 Sometimes you need to fix things because you made a mistake or want to reorganise your work. Use the `force` and confirm your action.
 
 ### force state [path] [filename]

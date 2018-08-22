@@ -47,7 +47,8 @@ func newApp() *cli.App {
 				defer started(c, "init")()
 				return cmdInit(c)
 			},
-			ArgsUsage: "[path] name of the folder that contains the configuration of the target project",
+			ArgsUsage: `[path]
+				path - name of the folder that contains the configuration of the target project. The folder name may end with a path separator and can be relative or absolute.`,
 		},
 		{
 			Name:  "new",
@@ -56,7 +57,8 @@ func newApp() *cli.App {
 				defer started(c, "create migration")()
 				return cmdCreateMigration(c)
 			},
-			ArgsUsage: "[title] what the migration achieves",
+			ArgsUsage: `[title]
+				title - what the effect of this migration is on infrastructure.`,
 		},
 		{
 			Name:  "up",
@@ -65,7 +67,9 @@ func newApp() *cli.App {
 				defer started(c, "up = apply pending migrations")()
 				return cmdMigrationsUp(c)
 			},
-			ArgsUsage: "[path] name of the folder that contains the configuration of the target project",
+			ArgsUsage: `[path] [stop] 
+				path - name of the folder that contains the configuration of the target project.
+				stop - (optional) the name of the migration file after which applying migrations will stop.`,
 		},
 		{
 			Name:  "down",
@@ -74,7 +78,8 @@ func newApp() *cli.App {
 				defer started(c, "down = undo last applied migration")()
 				return cmdMigrationsDown(c)
 			},
-			ArgsUsage: "[path] name of the folder that contains the configuration of the target project",
+			ArgsUsage: `[path]
+				path - name of the folder that contains the configuration of the target project.`,
 		},
 		{
 			Name:  "status",
@@ -83,7 +88,8 @@ func newApp() *cli.App {
 				defer started(c, "show status of migrations")()
 				return cmdMigrationsStatus(c)
 			},
-			ArgsUsage: "[path] name of the folder that contains the configuration of the target project",
+			ArgsUsage: `[path]
+				path - name of the folder that contains the configuration of the target project.`,
 		},
 		{
 			Name:  "force",
@@ -96,25 +102,30 @@ func newApp() *cli.App {
 						defer started(c, "force last applied migration (state)")()
 						return cmdMigrationsSetState(c)
 					},
-					ArgsUsage: "[path] [filename] name of the folder that contains the configuration of the target project",
+					ArgsUsage: `[path]
+					path - name of the folder that contains the configuration of the target project.`,
 				},
 				{
 					Name:  "do",
-					Usage: "Explicitly execute the DO section of a migration.",
+					Usage: "Explicitly execute the DO section of a migration. Does not update the state object in the bucket.",
 					Action: func(c *cli.Context) error {
 						defer started(c, "execute DO section")()
 						return cmdRundoOnly(c)
 					},
-					ArgsUsage: "[path] [filename] name of the migration that contains a do: section",
+					ArgsUsage: `[path] [filename]
+						path - name of the folder that contains the configuration of the target project.
+						filename - name of the migration that contains a do: section.`,
 				},
 				{
 					Name:  "undo",
-					Usage: "Explicitly execute the UNDO section of a migration.",
+					Usage: "Explicitly execute the UNDO section of a migration. Does not update the state object in the bucket.",
 					Action: func(c *cli.Context) error {
 						defer started(c, "execute UNDO section")()
 						return cmdRunUndoOnly(c)
 					},
-					ArgsUsage: "[path] [filename] name of the migration that contains an undo: section",
+					ArgsUsage: `[path] [filename]
+					path - name of the folder that contains the configuration of the target project.
+					filename - name of the migration that contains a undo: section.`,
 				},
 			},
 		},
@@ -129,7 +140,8 @@ func newApp() *cli.App {
 						defer started(c, "export project IAM policy")()
 						return cmdExportProjectIAMPolicy(c)
 					},
-					ArgsUsage: "[path] name of the folder that contains the configuration of the target project",
+					ArgsUsage: `[path]
+					path - name of the folder that contains the configuration of the target project.`,
 				},
 				{
 					Name:  "storage-iam-policy",
@@ -138,7 +150,8 @@ func newApp() *cli.App {
 						defer started(c, "export storage IAM policy")()
 						return cmdExportStorageIAMPolicy(c)
 					},
-					ArgsUsage: "[path] name of the folder that contains the configuration of the target project",
+					ArgsUsage: `[path]
+					path - name of the folder that contains the configuration of the target project.`,
 				},
 			},
 		},
