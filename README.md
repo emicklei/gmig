@@ -30,9 +30,10 @@ Each change is a single YAML file with one or more shell commands that change in
     - gcloud iam service-accounts delete loadrunner
 
 A change must have at least a `do` section and optionally an `undo` section.
-The `do` section typically has a list of gcloud commands that create resources. Each line will be executed as a shell command so any available tool can be used.
+The `do` section typically has a list of gcloud commands that create resources but any available tool can be used.
+All lines will be executed at once using a single temporary shell script so you can use shell variables to simplify each section.
 The `undo` section typically has an ordered list of gcloud commands that deletes the same resources (in reverse order if relevant).
-Each command can use the following environment variables: `$PROJECT`,`$REGION`,`$ZONE` and any additional environment variables populated from the target configuration (see `env` section in the configuration below).
+Each command in each section can use the following environment variables: `$PROJECT`,`$REGION`,`$ZONE` and any additional environment variables populated from the target configuration (see `env` section in the configuration below).
 
 Information about the last applied change to a project is stored as a Google Storage Bucket object.
 

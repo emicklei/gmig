@@ -62,7 +62,7 @@ func newApp() *cli.App {
 		},
 		{
 			Name:  "up",
-			Usage: "Runs the do section of all pending migrations in order, one after the other.",
+			Usage: "Runs the do section of all pending migrations in order, one after the other. If a migration file is specified then stop after applying that one.",
 			Action: func(c *cli.Context) error {
 				defer started(c, "up = apply pending migrations")()
 				return cmdMigrationsUp(c)
