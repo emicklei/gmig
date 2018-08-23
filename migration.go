@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -60,20 +61,33 @@ func (m Migration) ToYAML() ([]byte, error) {
 }
 
 // ExecuteAll the commands for this migration.
+// We create a temporary executable file with all commands.
+// This allows for using shell variables in multiple commands.
 func ExecuteAll(commands []string, envs []string) error {
 	if len(commands) == 0 {
 		return nil
 	}
-	for i, each := range commands {
-		log.Println(each)
-		cmd := exec.Command("sh", "-c", each)
-		cmd.Env = append(os.Environ(), envs...) // extend, not replace
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
-		err := cmd.Run()
-		if err != nil {
-			return fmt.Errorf("%d: failed to run :%v", i, err)
+	tempScript := path.Join(os.TempDir(), "gmig.sh")
+	content := new(bytes.Buffer)
+	fmt.Fprintln(content, `#!/bin/bash
+set -e -v`)
+	for _, each := range commands {
+		fmt.Fprintln(content, each)
+	}
+	if err := ioutil.WriteFile(tempScript, content.Bytes(), os.ModePerm); err != nil {
+		return fmt.Errorf("failed to write temporary migration section: %v", err)
+	}
+	defer func() {
+		if err := os.Remove(tempScript); err != nil {
+			log.Printf("warning: failed to remove temporary migration execution script:%s\n", tempScript)
 		}
+	}()
+	cmd := exec.Command("sh", "-c", tempScript)
+	cmd.Env = append(os.Environ(), envs...) // extend, not replace
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("failed to run migration section: %v", err)
 	}
 	return nil
 }
