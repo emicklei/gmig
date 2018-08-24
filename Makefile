@@ -30,7 +30,7 @@ createrelease:
 	github-release release \
 		--user emicklei \
 		--repo gmig \
-		--tag $(shell git tag -l --points-at HEAD) \
+		--tag $(shell git describe --abbrev=0 --tags) \
 		--name "gmig" \
 		--description "gmig - google infrastructure-as-code tool"
 
@@ -39,20 +39,22 @@ uploadrelease:
 	github-release upload \
 		--user emicklei \
 		--repo gmig \
-		--tag $(shell git tag -l --points-at HEAD) \
+		--tag $(shell git describe --abbrev=0 --tags) \
 		--name "gmig-Linux-x86_64.zip" \
 		--file target/linux/gmig.zip
 
 	github-release upload \
 		--user emicklei \
 		--repo gmig \
-		--tag $(shell git tag -l --points-at HEAD) \
+		--tag $(shell git describe --abbrev=0 --tags) \
 		--name "gmig-Darwin-x86_64.zip" \
 		--file target/darwin/gmig.zip
 
 	github-release upload \
 		--user emicklei \
 		--repo gmig \
-		--tag $(shell git tag -l --points-at HEAD) \
+		--tag $(shell git describe --abbrev=0 --tags) \
 		--name "gmig-Windows-x86_64.zip" \
 		--file target/windows/gmig.zip
+
+release: build zip createrelease uploadrelease
