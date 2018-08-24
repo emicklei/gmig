@@ -1,5 +1,10 @@
 # Changelist of gmig releases
 
+## v1.2.2, 2018-08-24
+
+- all commands in a section (do or undo) from a migration is now executed using a temporary shell script.
+  this allows for using shell variables that can be used by other commands within the section.
+
 ## v1.2.0, 2018-08-22
 
 - the up command can now optionally stop after a specified migration filename.
