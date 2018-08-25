@@ -58,6 +58,21 @@ func TestCmdStatusDemo(t *testing.T) {
 	}
 }
 
+func TestCmdStatusDemoWithMigrationsOption(t *testing.T) {
+	// simulate effect of GS download state
+	if err := ioutil.WriteFile("state", []byte("20180216t120915_one.yaml"), os.ModePerm); err != nil {
+		t.Fatal("unable to write state", err)
+	}
+	defer os.Remove("state")
+
+	// capture GC command
+	cc := new(commandCapturer)
+	runCommand = cc.runCommand
+	if err := newApp().Run([]string{"gmig", "-v", "status", "test/demo", "--migrations", "test"}); err != nil {
+		t.Fatal("unexpected error", err)
+	}
+}
+
 func TestCmdForceState(t *testing.T) {
 	// simulate effect of GS download old state
 	if err := ioutil.WriteFile("state", []byte("20180216t120915_one.yaml"), os.ModePerm); err != nil {

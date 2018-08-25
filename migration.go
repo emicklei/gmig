@@ -38,7 +38,8 @@ func NewFilename(desc string) string {
 func LoadMigration(filename string) (m Migration, err error) {
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
-		return m, err
+		wd, _ := os.Getwd()
+		return m, fmt.Errorf("in %s, %s reading failed: %v", wd, filename, err)
 	}
 	m.Filename = filepath.Base(filename)
 	err = yaml.Unmarshal(data, &m)
@@ -93,13 +94,13 @@ set -e -v`)
 }
 
 // LoadMigrationsBetweenAnd returns a list of pending Migration <firstFilename..lastFilename]
-func LoadMigrationsBetweenAnd(workdir, firstFilename, lastFilename string) (list []Migration, err error) {
+func LoadMigrationsBetweenAnd(migrationsPath, firstFilename, lastFilename string) (list []Migration, err error) {
 	// collect all filenames
 	filenames := []string{}
 	// firstFilename and lastFilename are relative to workdir.
 	here, _ := os.Getwd()
 	// change and restore finally
-	os.Chdir(workdir)
+	os.Chdir(migrationsPath)
 	defer os.Chdir(here)
 	filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
 		if info.IsDir() || !isYamlFile(path) {
@@ -117,7 +118,7 @@ func LoadMigrationsBetweenAnd(workdir, firstFilename, lastFilename string) (list
 			continue
 		}
 		var m Migration
-		m, err = LoadMigration(filepath.Join(workdir, each))
+		m, err = LoadMigration(filepath.Join(migrationsPath, each))
 		if err != nil {
 			return
 		}
