@@ -38,6 +38,11 @@ func newApp() *cli.App {
 			Usage: "quiet mode, accept any prompt",
 		},
 	}
+	migrationsFlag := cli.StringFlag{
+		Name: "migrations",
+		Usage: `folder containing the migrations to apply on the target project.
+	If not specified then set it to the parent folder of the configuration file.`,
+	}
 
 	app.Commands = []cli.Command{
 		{
@@ -67,6 +72,7 @@ func newApp() *cli.App {
 				defer started(c, "up = apply pending migrations")()
 				return cmdMigrationsUp(c)
 			},
+			Flags: []cli.Flag{migrationsFlag},
 			ArgsUsage: `[path] [stop] 
 				path - name of the folder that contains the configuration of the target project.
 				stop - (optional) the name of the migration file after which applying migrations will stop.`,
@@ -78,6 +84,7 @@ func newApp() *cli.App {
 				defer started(c, "down = undo last applied migration")()
 				return cmdMigrationsDown(c)
 			},
+			Flags: []cli.Flag{migrationsFlag},
 			ArgsUsage: `[path]
 				path - name of the folder that contains the configuration of the target project.`,
 		},
@@ -88,12 +95,14 @@ func newApp() *cli.App {
 				defer started(c, "show status of migrations")()
 				return cmdMigrationsStatus(c)
 			},
+			Flags: []cli.Flag{migrationsFlag},
 			ArgsUsage: `[path]
 				path - name of the folder that contains the configuration of the target project.`,
 		},
 		{
 			Name:  "force",
 			Usage: "state | do | undo",
+			Flags: []cli.Flag{migrationsFlag},
 			Subcommands: []cli.Command{
 				{
 					Name:  "state",
