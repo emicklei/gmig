@@ -100,7 +100,9 @@ func LoadMigrationsBetweenAnd(migrationsPath, firstFilename, lastFilename string
 	// firstFilename and lastFilename are relative to workdir.
 	here, _ := os.Getwd()
 	// change and restore finally
-	os.Chdir(migrationsPath)
+	if err = os.Chdir(migrationsPath); err != nil {
+		return
+	}
 	defer os.Chdir(here)
 	filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
 		if info.IsDir() || !isYamlFile(path) {
