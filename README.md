@@ -53,6 +53,7 @@ Information about the last applied change to a project is stored as a Google Sto
         down     Runs the undo section of the last applied migration only.
         status   List all migrations with details compared to the current state.
         force    state | do | undo
+        util     create-named-port | delete-named-port
         export   project-iam-policy | storage-iam-policy
         help, h  Shows a list of commands or help for one command
 
@@ -77,7 +78,12 @@ Prepares your setup for working with migrations by creating a `gmig.json` file i
 
     gmig init my-production-project
 
-You must change the file `my-production-project/gmig.json` to set the Bucket name.
+Then your filesystem will have:
+
+    /my-production-project/
+        gmig.json
+
+You must change the file `gmig.json` to set the Bucket name.
 
     {
         "project": "my-production-project",
@@ -91,7 +97,7 @@ You must change the file `my-production-project/gmig.json` to set the Bucket nam
     }
 
 If you decide to store state files of different projects in one Bucket then set the state object name to reflect this, eg. `myproject-gmig-state`.
-If you want to apply the same migrations to different regions/zones then choose a target folder name to reflect this, eg. `my-production-project-us-east`. Values for `region` and `zone` are required if you want to create Compute Engine resources.
+If you want to apply the same migrations to different regions/zones then choose a target folder name to reflect this, eg. `my-production-project-us-east`. Values for `region` and `zone` are required if you want to create Compute Engine resources. The `env` map can be used to parameterize commands in your migrations. All commands will have access to the value of `$FOO`.
 
 ### new [title]
 
@@ -99,13 +105,15 @@ Creates a new migration for you to describe a change to the current state of inf
 
     gmig new "add storage view role to cloudbuild account"
 
-### status [path]
+### status [path] [--migrations folder]
 
 List all migrations with an indicator (applied,pending) whether is has been applied or not.
 
     gmig status my-production-project/
+        
+Run this command in the directory where all migrations are stored. Use `--migrations` for a different location.
 
-### up [path] [|migration file]
+### up [path] [|migration file] [--migrations folder]
 
 Executes the `do` section of each pending migration compared to the last applied change to the infrastructure.
 If `migration file` is given then stop after applying that one.
@@ -113,7 +121,7 @@ Upon each completed migration, the `gmig-last-migration` object is updated in th
 
     gmig up my-production-project
 
-### down [path]
+### down [path] [--migrations folder]
 
 Executes one `undo` section of the last applied change to the infrastructure.
 If completed then update the `gmig-last-migration` object.
@@ -165,6 +173,18 @@ The `gmig-last-migration` object is `not` updated in the bucket.
 Use this command with care!.
 
     gmig force undo my-production-project 20180214t071402_create_some_account.yaml
+
+## GCP utilities
+
+### util create-named-port [instance-group] [name:[port]
+
+The Cloud SDK has a command to [set-named-ports](https://cloud.google.com/sdk/gcloud/reference/compute/instance-groups/set-named-ports) but not a command to add or delete a single name:port mapping. To simplify the migration command for creating a name:port mapping, this gmig util command is added.
+First it calls `get-named-ports` to retrieve all existing mappings. Then it will call `set-named-ports` with the new mapping unless it already exists.
+
+### util delete-named-port [instance-group] [name:[port]
+
+The Cloud SDK has a command to [set-named-ports](https://cloud.google.com/sdk/gcloud/reference/compute/instance-groups/set-named-ports) but not a command to add or delete a single name:port mapping. To simplify the migration command for deleting a name:port mapping, this gmig util command is added.
+First it calls `get-named-ports` to retrieve all existing mappings. Then it will call `set-named-ports` without the mapping.
 
 ## Examples
 

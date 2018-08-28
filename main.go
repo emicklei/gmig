@@ -100,6 +100,34 @@ func newApp() *cli.App {
 				path - name of the folder that contains the configuration of the target project.`,
 		},
 		{
+			Name:  "util",
+			Usage: "create-named-port | delete-named-port",
+			Subcommands: []cli.Command{
+				{
+					Name:  "create-named-port",
+					Usage: "add a new name->port mapping to a compute instance group. ignore if exists.",
+					Action: func(c *cli.Context) error {
+						defer started(c, "create-named-port")()
+						return cmdCreateNamedPort(c)
+					},
+					ArgsUsage: `[instance-group] [name:port]
+					instance-group - identifier of the compute instance group
+					name:port      - mapping of a name to a port, e.g  http-port:80`,
+				},
+				{
+					Name:  "delete-named-port",
+					Usage: "delete a name->port mapping from a compute instance group. ignore if not exists.",
+					Action: func(c *cli.Context) error {
+						defer started(c, "delete-named-port")()
+						return cmdDeleteNamedPort(c)
+					},
+					ArgsUsage: `[instance-group] [name:port]
+					instance-group - identifier of the compute instance group
+					name:port      - mapping of a name to a port, e.g  http-port:80`,
+				},
+			},
+		},
+		{
 			Name:  "force",
 			Usage: "state | do | undo",
 			Flags: []cli.Flag{migrationsFlag},
