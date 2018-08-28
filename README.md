@@ -53,6 +53,7 @@ Information about the last applied change to a project is stored as a Google Sto
         down     Runs the undo section of the last applied migration only.
         status   List all migrations with details compared to the current state.
         force    state | do | undo
+        util     create-named-port | delete-named-port
         export   project-iam-policy | storage-iam-policy
         help, h  Shows a list of commands or help for one command
 
@@ -172,6 +173,18 @@ The `gmig-last-migration` object is `not` updated in the bucket.
 Use this command with care!.
 
     gmig force undo my-production-project 20180214t071402_create_some_account.yaml
+
+## GCP utilities
+
+### util create-named-port [instance-group] [name:[port]
+
+The Cloud SDK has a command to [set-named-ports](https://cloud.google.com/sdk/gcloud/reference/compute/instance-groups/set-named-ports) but not command to add or delete a single name:port mapping. To simplify the migration command for creating a name:port mapping, this gmig util command is added.
+First it calls `get-named-ports` to retrieve all existing mappings. Then it will call `set-named-ports` with the new mapping unless it already exists.
+
+### util delete-named-port [instance-group] [name:[port]
+
+The Cloud SDK has a command to [set-named-ports](https://cloud.google.com/sdk/gcloud/reference/compute/instance-groups/set-named-ports) but not command to add or delete a single name:port mapping. To simplify the migration command for deleting a name:port mapping, this gmig util command is added.
+First it calls `get-named-ports` to retrieve all existing mappings. Then it will call `set-named-ports` without the mapping.
 
 ## Examples
 
