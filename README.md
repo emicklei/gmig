@@ -178,12 +178,12 @@ Use this command with care!.
 
 ### util create-named-port [instance-group] [name:[port]
 
-The Cloud SDK has a command to [set-named-ports](https://cloud.google.com/sdk/gcloud/reference/compute/instance-groups/set-named-ports) but not command to add or delete a single name:port mapping. To simplify the migration command for creating a name:port mapping, this gmig util command is added.
+The Cloud SDK has a command to [set-named-ports](https://cloud.google.com/sdk/gcloud/reference/compute/instance-groups/set-named-ports) but not a command to add or delete a single name:port mapping. To simplify the migration command for creating a name:port mapping, this gmig util command is added.
 First it calls `get-named-ports` to retrieve all existing mappings. Then it will call `set-named-ports` with the new mapping unless it already exists.
 
 ### util delete-named-port [instance-group] [name:[port]
 
-The Cloud SDK has a command to [set-named-ports](https://cloud.google.com/sdk/gcloud/reference/compute/instance-groups/set-named-ports) but not command to add or delete a single name:port mapping. To simplify the migration command for deleting a name:port mapping, this gmig util command is added.
+The Cloud SDK has a command to [set-named-ports](https://cloud.google.com/sdk/gcloud/reference/compute/instance-groups/set-named-ports) but not a command to add or delete a single name:port mapping. To simplify the migration command for deleting a name:port mapping, this gmig util command is added.
 First it calls `get-named-ports` to retrieve all existing mappings. Then it will call `set-named-ports` without the mapping.
 
 ## Examples
