@@ -1,5 +1,13 @@
 # Changelist of gmig releases
 
+## v1.4.0
+
+- add util functions to update named-ports for an instance group
+
+## v1.3.0
+
+- added --migrations option for up,down,status,force
+
 ## v1.2.2, 2018-08-24
 
 - all commands in a section (do or undo) from a migration is now executed using a temporary shell script.
