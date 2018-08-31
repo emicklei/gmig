@@ -66,16 +66,21 @@ func promptForYes(message string) bool {
 }
 
 // 20180227t140600_permit_infra_manager_to_deploy_to_gateway_cluster.yaml
-// 2018-02-27 14:06:00 permit infra_manager to deploy to gateway cluster
+// 2018-02-27 14:06:00 permit infra manager to deploy to gateway cluster (20180227t140600_permit_infra_manager_to_deploy_to_gateway_cluster.yaml)
 func pretty(filename string) string {
-	return fmt.Sprintf("%s-%s-%s %s:%s:%s %s",
+
+	// remove date prefix and file extension postfix
+	fn := strings.Replace(strings.TrimPrefix(filename, filename[0:16]), "_", " ", -1)
+	fn = strings.Replace(strings.TrimSuffix(fn, filepath.Ext(fn)), "", "", -1)
+
+	return fmt.Sprintf("%s-%s-%s %s:%s:%s %s (%s)",
 		filename[0:4],
 		filename[4:6],
 		filename[6:8],
 		filename[9:11],
 		filename[11:13],
 		filename[13:15],
-		strings.Replace(strings.TrimSuffix(filename, filepath.Ext(filename)), "_", " ", -1))
+		fn, filename)
 }
 
 func isYamlFile(filename string) bool {
