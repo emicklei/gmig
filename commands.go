@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strconv"
 
 	"github.com/urfave/cli"
 )
@@ -135,6 +136,13 @@ func cmdMigrationsStatus(c *cli.Context) error {
 	}
 	log.Println(logseparator)
 	var last string
+	prettyWidth := 0
+	for _, each := range all {
+		pf := pretty(each.Filename)
+		if len(pf) > prettyWidth {
+			prettyWidth = len(pf)
+		}
+	}
 	for _, each := range all {
 		status := applied
 		if each.Filename > mtx.lastApplied {
@@ -143,7 +151,7 @@ func cmdMigrationsStatus(c *cli.Context) error {
 				log.Println(logseparator)
 			}
 		}
-		log.Println(status, pretty(each.Filename))
+		log.Printf("%s %-"+strconv.Itoa(prettyWidth)+"s (%s)\n", status, pretty(each.Filename), each.Filename)
 		last = status
 	}
 	log.Println(logseparator)
