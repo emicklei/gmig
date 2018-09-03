@@ -71,7 +71,7 @@ func pretty(filename string) string {
 
 	fn := strings.Replace(strings.TrimSuffix(filename, filepath.Ext(filename)), "_", " ", -1)
 
-	if len(fn) < 15 {
+	if len(fn) < 16 {
 		return fmt.Sprintf("%s (%s)", fn, filename)
 	}
 
@@ -81,7 +81,7 @@ func pretty(filename string) string {
 		return fmt.Sprintf("%s (%s)", fn, filename)
 	}
 
-	fn = strings.Replace(strings.TrimPrefix(fn, fn[0:16]), "", "", -1)
+	fn = fn[16:]
 
 	return fmt.Sprintf("%s-%s-%s %s:%s:%s %s (%s)",
 		filename[0:4],
