@@ -81,8 +81,6 @@ func pretty(filename string) string {
 		return fmt.Sprintf("%s (%s)", fn, filename)
 	}
 
-	fn = fn[16:]
-
 	return fmt.Sprintf("%s-%s-%s %s:%s:%s %s (%s)",
 		filename[0:4],
 		filename[4:6],
@@ -90,7 +88,7 @@ func pretty(filename string) string {
 		filename[9:11],
 		filename[11:13],
 		filename[13:15],
-		fn, filename)
+		fn[16:], filename)
 }
 
 func isYamlFile(filename string) bool {
