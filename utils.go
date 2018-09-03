@@ -66,16 +66,29 @@ func promptForYes(message string) bool {
 }
 
 // 20180227t140600_permit_infra_manager_to_deploy_to_gateway_cluster.yaml
-// 2018-02-27 14:06:00 permit infra_manager to deploy to gateway cluster
+// 2018-02-27 14:06:00 permit infra manager to deploy to gateway cluster (20180227t140600_permit_infra_manager_to_deploy_to_gateway_cluster.yaml)
 func pretty(filename string) string {
-	return fmt.Sprintf("%s-%s-%s %s:%s:%s %s",
+
+	fn := strings.Replace(strings.TrimSuffix(filename, filepath.Ext(filename)), "_", " ", -1)
+
+	if len(fn) < 16 {
+		return fmt.Sprintf("%s (%s)", fn, filename)
+	}
+
+	// 20060102t150405 is used as a sample format, see https://golang.org/pkg/time/#Parse
+	_, err := time.Parse("20060102t150405", fn[0:15])
+	if err != nil {
+		return fmt.Sprintf("%s (%s)", fn, filename)
+	}
+
+	return fmt.Sprintf("%s-%s-%s %s:%s:%s %s (%s)",
 		filename[0:4],
 		filename[4:6],
 		filename[6:8],
 		filename[9:11],
 		filename[11:13],
 		filename[13:15],
-		strings.Replace(strings.TrimSuffix(filename, filepath.Ext(filename)), "_", " ", -1))
+		fn[16:], filename)
 }
 
 func isYamlFile(filename string) bool {
