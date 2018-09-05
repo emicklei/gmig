@@ -22,6 +22,7 @@ type Migration struct {
 	Description string   `yaml:"-"`
 	DoSection   []string `yaml:"do"`
 	UndoSection []string `yaml:"undo"`
+	ViewSection []string `yaml:"view"`
 }
 
 // for testing

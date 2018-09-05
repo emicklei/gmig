@@ -100,6 +100,17 @@ func newApp() *cli.App {
 				path - name of the folder that contains the configuration of the target project.`,
 		},
 		{
+			Name:  "view",
+			Usage: "Show infrastructure information for the current state.",
+			Action: func(c *cli.Context) error {
+				defer started(c, "show status of infrastructure")()
+				return cmdView(c)
+			},
+			Flags: []cli.Flag{migrationsFlag},
+			ArgsUsage: `[path]
+				path - name of the folder that contains the configuration of the target project.`,
+		},
+		{
 			Name:  "util",
 			Usage: "create-named-port | delete-named-port",
 			Subcommands: []cli.Command{

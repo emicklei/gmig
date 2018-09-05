@@ -158,6 +158,26 @@ func cmdMigrationsStatus(c *cli.Context) error {
 	return nil
 }
 
+func cmdView(c *cli.Context) error {
+	mtx, err := getMigrationContext(c)
+	if err != nil {
+		printError(err.Error())
+		return errAbort
+	}
+	all, err := LoadMigrationsBetweenAnd(mtx.migrationsPath, "", "")
+	if err != nil {
+		printError(err.Error())
+		return errAbort
+	}
+	for _, each := range all {
+		log.Println(logseparator)
+		log.Println("View:", each.Filename)
+		log.Println(logseparator)
+		ExecuteAll(each.ViewSection, mtx.config().shellEnv())
+	}
+	return nil
+}
+
 func cmdInit(c *cli.Context) error {
 	target := c.Args().First()
 	if len(target) == 0 {
