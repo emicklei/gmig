@@ -36,16 +36,16 @@ func NewFilename(desc string) string {
 }
 
 // LoadMigration reads and parses a migration from a named file.
-func LoadMigration(filename string) (m Migration, err error) {
-	data, err := ioutil.ReadFile(filename)
+func LoadMigration(absFilename string) (m Migration, err error) {
+	data, err := ioutil.ReadFile(absFilename)
 	if err != nil {
 		wd, _ := os.Getwd()
-		return m, fmt.Errorf("in %s, %s reading failed: %v", wd, filename, err)
+		return m, fmt.Errorf("in %s, %s reading failed: %v", wd, absFilename, err)
 	}
-	m.Filename = filepath.Base(filename)
+	m.Filename = filepath.Base(absFilename)
 	err = yaml.Unmarshal(data, &m)
 	if err != nil {
-		err = fmt.Errorf("%s parsing failed: %v", filename, err)
+		err = fmt.Errorf("%s parsing failed: %v", absFilename, err)
 	}
 	return
 }
