@@ -14,9 +14,8 @@ This work is inspired by MyBatis migrations for SQL database setup.
 Your `gmig` infrastructure is basically a folder with incremental change files, each with a timestamp prefix (for sort ordering) and readable name.
 
     /20180214t071402_create_some_account.yaml
-    /my-staging-project
-        gmig.json
-    /my-production-project
+    /20180214t071522_add_permissions_to_some_account.yaml
+    /my-gcp-production-project
         gmig.json
 
 Each change is a single YAML file with one or more shell commands that change infrastructure for a project.
@@ -35,7 +34,23 @@ All lines will be executed at once using a single temporary shell script so you 
 The `undo` section typically has an ordered list of gcloud commands that deletes the same resources (in reverse order if relevant).
 Each command in each section can use the following environment variables: `$PROJECT`,`$REGION`,`$ZONE` and any additional environment variables populated from the target configuration (see `env` section in the configuration below).
 
-Information about the last applied change to a project is stored as a Google Storage Bucket object.
+## State
+
+Information about the last applied migration to a project is stored as a Google Storage Bucket object.
+Therefore, usage of this tool requires you to have create a Bucket and set the permissions (Storage Writer) accordingly. 
+To view the current state of your infrastructure related to each migration, you can add another section to the YAML file:
+
+    # add loadrunner service account
+
+    do:
+    - gcloud iam service-accounts create loadrunner --display-name "LoadRunner"
+    undo:
+    - gcloud iam service-accounts delete loadrunner
+    view:
+    - gcloud iam service-accounts describe loadrunner
+
+and use the `view` subcommand.
+
 
 ## Help
 
@@ -52,6 +67,7 @@ Information about the last applied change to a project is stored as a Google Sto
                  If a migration file is specified then stop after applying that one.
         down     Runs the undo section of the last applied migration only.
         status   List all migrations with details compared to the current state.
+        view     Runs the view section of all applied migrations to see the current state reported by your infrastructure.
         force    state | do | undo
         util     create-named-port | delete-named-port
         export   project-iam-policy | storage-iam-policy
@@ -76,17 +92,17 @@ If you want to create your own version, you need to compile it using the [Go SDK
 
 Prepares your setup for working with migrations by creating a `gmig.json` file in a target folder.
 
-    gmig init my-production-project
+    gmig init my-gcp-production-project
 
 Then your filesystem will have:
 
-    /my-production-project/
+    /my-gcp-production-project/
         gmig.json
 
 You must change the file `gmig.json` to set the Bucket name.
 
     {
-        "project": "my-production-project",
+        "project": "my-gcp-production-project",
         "region": "europe-west1",
         "zone": "europe-west1-b",
         "bucket":"mycompany-gmig-states",
@@ -97,7 +113,7 @@ You must change the file `gmig.json` to set the Bucket name.
     }
 
 If you decide to store state files of different projects in one Bucket then set the state object name to reflect this, eg. `myproject-gmig-state`.
-If you want to apply the same migrations to different regions/zones then choose a target folder name to reflect this, eg. `my-production-project-us-east`. Values for `region` and `zone` are required if you want to create Compute Engine resources. The `env` map can be used to parameterize commands in your migrations. All commands will have access to the value of `$FOO`.
+If you want to apply the same migrations to different regions/zones then choose a target folder name to reflect this, eg. `my-gcp-production-project-us-east`. Values for `region` and `zone` are required if you want to create Compute Engine resources. The `env` map can be used to parameterize commands in your migrations. All commands will have access to the value of `$FOO`.
 
 ### new [title]
 
@@ -109,7 +125,7 @@ Creates a new migration for you to describe a change to the current state of inf
 
 List all migrations with an indicator (applied,pending) whether is has been applied or not.
 
-    gmig status my-production-project/
+    gmig status my-gcp-production-project/
         
 Run this command in the directory where all migrations are stored. Use `--migrations` for a different location.
 
@@ -119,14 +135,21 @@ Executes the `do` section of each pending migration compared to the last applied
 If `migration file` is given then stop after applying that one.
 Upon each completed migration, the `gmig-last-migration` object is updated in the bucket.
 
-    gmig up my-production-project
+    gmig up my-gcp-production-project
 
 ### down [path] [--migrations folder]
 
 Executes one `undo` section of the last applied change to the infrastructure.
 If completed then update the `gmig-last-migration` object.
 
-    gmig down my-production-project
+    gmig down my-gcp-production-project
+
+### view [path] [|migration file]  [--migrations folder]
+
+Executes the `view` section of each applied migration to the infrastructure.
+If `migration file` is given then stop after viewing that one.
+
+    gmig view my-gcp-production-project
 
 ## Export existing infrastructure
 
@@ -156,7 +179,7 @@ Sometimes you need to fix things because you made a mistake or want to reorganis
 Explicitly set the state for the target to the last applied filename. This command can be useful if you need to work from existing infrastructure. Effectively, this filename is written to the bucket object.
 Use this command with care!.
 
-    gmig force state my-production-project 20180214t071402_create_some_account.yaml
+    gmig force state my-gcp-production-project 20180214t071402_create_some_account.yaml
 
 ### force do [path] [filename]
 
@@ -164,7 +187,7 @@ Explicitly run the commands in the `do` section of a given migration filename.
 The `gmig-last-migration` object is `not` updated in the bucket.
 Use this command with care!.
 
-    gmig force do my-production-project 20180214t071402_create_some_account.yaml
+    gmig force do my-gcp-production-project 20180214t071402_create_some_account.yaml
 
 ### force undo [path] [filename]
 
@@ -172,7 +195,7 @@ Explicitly run the commands in the `undo` section of a given migration filename.
 The `gmig-last-migration` object is `not` updated in the bucket.
 Use this command with care!.
 
-    gmig force undo my-production-project 20180214t071402_create_some_account.yaml
+    gmig force undo my-gcp-production-project 20180214t071402_create_some_account.yaml
 
 ## GCP utilities
 
