@@ -167,9 +167,9 @@ func cmdView(c *cli.Context) error {
 		return errAbort
 	}
 	var all []Migration
-	theOne := c.Args().Get(1)
-	if len(theOne) > 0 {
-		one, err := LoadMigration(filepath.Join(mtx.migrationsPath, theOne))
+	localMigrationFilename := filepath.Base(c.Args().Get(1))
+	if len(localMigrationFilename) > 0 {
+		one, err := LoadMigration(filepath.Join(mtx.migrationsPath, localMigrationFilename))
 		if err != nil {
 			printError(err.Error())
 			return errAbort
