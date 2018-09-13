@@ -38,7 +38,7 @@ Each command in each section can use the following environment variables: `$PROJ
 
 Information about the last applied migration to a project is stored as a Google Storage Bucket object.
 Therefore, usage of this tool requires you to have create a Bucket and set the permissions (Storage Writer) accordingly. 
-To view the current state of your infrastructure related to each migration, you can add another section to the YAML file:
+To view the current state of your infrastructure related to each migration, you can add another section to the YAML file, such as:
 
     # add loadrunner service account
 
@@ -126,7 +126,7 @@ Creates a new migration for you to describe a change to the current state of inf
 List all migrations with an indicator (applied,pending) whether is has been applied or not.
 
     gmig status my-gcp-production-project/
-        
+
 Run this command in the directory where all migrations are stored. Use `--migrations` for a different location.
 
 ### up [path] [|migration file] [--migrations folder]
@@ -147,7 +147,7 @@ If completed then update the `gmig-last-migration` object.
 ### view [path] [|migration file]  [--migrations folder]
 
 Executes the `view` section of each applied migration to the infrastructure.
-If `migration file` is given then stop after viewing that one.
+If `migration file` is given then run that view only.
 
     gmig view my-gcp-production-project
 
