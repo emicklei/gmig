@@ -77,7 +77,7 @@ set -e -v`)
 		fmt.Fprintln(content, each)
 	}
 	if err := ioutil.WriteFile(tempScript, content.Bytes(), os.ModePerm); err != nil {
-		return fmt.Errorf("failed to write temporary migration section: %v", err)
+		return fmt.Errorf("failed to write temporary migration section:%v", err)
 	}
 	defer func() {
 		if err := os.Remove(tempScript); err != nil {
@@ -88,8 +88,8 @@ set -e -v`)
 	cmd.Env = append(os.Environ(), envs...) // extend, not replace
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("failed to run migration section: %v", err)
+	if out, err := runCommand(cmd); err != nil {
+		return fmt.Errorf("failed to run migration section:\n%s\nerror:%v", string(out), err)
 	}
 	return nil
 }

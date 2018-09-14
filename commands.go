@@ -167,14 +167,16 @@ func cmdView(c *cli.Context) error {
 		return errAbort
 	}
 	var all []Migration
-	localMigrationFilename := filepath.Base(c.Args().Get(1))
-	if len(localMigrationFilename) > 0 {
-		one, err := LoadMigration(filepath.Join(mtx.migrationsPath, localMigrationFilename))
-		if err != nil {
-			printError(err.Error())
-			return errAbort
+	if len(c.Args()) == 2 {
+		localMigrationFilename := filepath.Base(c.Args().Get(1))
+		if len(localMigrationFilename) > 0 {
+			one, err := LoadMigration(filepath.Join(mtx.migrationsPath, localMigrationFilename))
+			if err != nil {
+				printError(err.Error())
+				return errAbort
+			}
+			all = append(all, one)
 		}
-		all = append(all, one)
 	} else {
 		all, err = LoadMigrationsBetweenAnd(mtx.migrationsPath, "", "")
 		if err != nil {

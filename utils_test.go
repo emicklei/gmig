@@ -8,11 +8,12 @@ import (
 type commandCapturer struct {
 	args   [][]string
 	output []byte
+	err    error
 }
 
 func (c *commandCapturer) runCommand(cmd *exec.Cmd) ([]byte, error) {
 	c.args = append(c.args, cmd.Args)
-	return c.output, nil
+	return c.output, c.err
 }
 
 var dateTests = []struct {
