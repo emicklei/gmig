@@ -195,7 +195,13 @@ func cmdView(c *cli.Context) error {
 		if len(each.ViewSection) == 0 {
 			log.Println(" ** this migration has no commands to describe its change on infrastructure.")
 		}
-		ExecuteAll(each.ViewSection, mtx.config().shellEnv())
+		if mtx.config().verbose {
+			log.Printf("executing view section (%d commands)\n", len(each.ViewSection))
+		}
+		if err := ExecuteAll(each.ViewSection, mtx.config().shellEnv()); err != nil {
+			printError(err.Error())
+			return errAbort
+		}
 	}
 	return nil
 }

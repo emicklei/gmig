@@ -86,10 +86,10 @@ set -e -v`)
 	}()
 	cmd := exec.Command("sh", "-c", tempScript)
 	cmd.Env = append(os.Environ(), envs...) // extend, not replace
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
 	if out, err := runCommand(cmd); err != nil {
 		return fmt.Errorf("failed to run migration section:\n%s\nerror:%v", string(out), err)
+	} else {
+		fmt.Println(string(out))
 	}
 	return nil
 }
