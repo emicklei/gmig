@@ -15,8 +15,8 @@ import (
 // space is right after timestamp
 const (
 	statusSeparator     = "~-------------- ------------------~"
-	viewSeparatorTop    = "[--------------------------------------------------------------------------------]"
-	viewSeparatorBottom = " -------------------------------------------------------------------------------- "
+	viewSeparatorTop    = "~---------------------------------------------------------------~"
+	viewSeparatorBottom = " --------------------------------------------------------------- "
 	applied             = "--- applied ---"
 	pending             = "... pending ..."
 	execDo              = "...      do ..."
@@ -186,7 +186,7 @@ func cmdView(c *cli.Context) error {
 	}
 	for _, each := range all {
 		log.Println(viewSeparatorTop)
-		log.Println(" ", pretty(each.Filename))
+		log.Printf(" %s (%s)\n", pretty(each.Filename), each.Filename)
 		log.Println(viewSeparatorBottom)
 		if each.Filename > mtx.lastApplied {
 			log.Println(" ** this migration is pending...")
