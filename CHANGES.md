@@ -1,5 +1,9 @@
 # Changelist of gmig releases
 
+## v1.5.0
+
+- add "view" command to show the status of infrastructure, per migration.
+
 ## v1.4.0
 
 - add util functions to update named-ports for an instance group

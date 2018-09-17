@@ -44,8 +44,10 @@ To view the current state of your infrastructure related to each migration, you 
 
     do:
     - gcloud iam service-accounts create loadrunner --display-name "LoadRunner"
+    
     undo:
     - gcloud iam service-accounts delete loadrunner
+    
     view:
     - gcloud iam service-accounts describe loadrunner
 
