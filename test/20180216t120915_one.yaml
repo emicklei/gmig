@@ -4,3 +4,5 @@ do:
 - echo "one up"
 undo:
 - echo "one down"
+view:
+- echo "one view"

@@ -22,6 +22,7 @@ type Migration struct {
 	Description string   `yaml:"-"`
 	DoSection   []string `yaml:"do"`
 	UndoSection []string `yaml:"undo"`
+	ViewSection []string `yaml:"view"`
 }
 
 // for testing
@@ -35,16 +36,16 @@ func NewFilename(desc string) string {
 }
 
 // LoadMigration reads and parses a migration from a named file.
-func LoadMigration(filename string) (m Migration, err error) {
-	data, err := ioutil.ReadFile(filename)
+func LoadMigration(absFilename string) (m Migration, err error) {
+	data, err := ioutil.ReadFile(absFilename)
 	if err != nil {
 		wd, _ := os.Getwd()
-		return m, fmt.Errorf("in %s, %s reading failed: %v", wd, filename, err)
+		return m, fmt.Errorf("in %s, %s reading failed: %v", wd, absFilename, err)
 	}
-	m.Filename = filepath.Base(filename)
+	m.Filename = filepath.Base(absFilename)
 	err = yaml.Unmarshal(data, &m)
 	if err != nil {
-		err = fmt.Errorf("%s parsing failed: %v", filename, err)
+		err = fmt.Errorf("%s parsing failed: %v", absFilename, err)
 	}
 	return
 }
@@ -76,7 +77,7 @@ set -e -v`)
 		fmt.Fprintln(content, each)
 	}
 	if err := ioutil.WriteFile(tempScript, content.Bytes(), os.ModePerm); err != nil {
-		return fmt.Errorf("failed to write temporary migration section: %v", err)
+		return fmt.Errorf("failed to write temporary migration section:%v", err)
 	}
 	defer func() {
 		if err := os.Remove(tempScript); err != nil {
@@ -85,10 +86,10 @@ set -e -v`)
 	}()
 	cmd := exec.Command("sh", "-c", tempScript)
 	cmd.Env = append(os.Environ(), envs...) // extend, not replace
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("failed to run migration section: %v", err)
+	if out, err := runCommand(cmd); err != nil {
+		return fmt.Errorf("failed to run migration section:\n%s\nerror:%v", string(out), err)
+	} else {
+		fmt.Println(string(out))
 	}
 	return nil
 }

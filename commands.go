@@ -14,12 +14,14 @@ import (
 
 // space is right after timestamp
 const (
-	logseparator = "~-------------- ------------------~"
-	applied      = "--- applied ---"
-	pending      = "... pending ..."
-	execDo       = "...      do ..."
-	execUndo     = "...    undo ..."
-	stopped      = "... stopped ..."
+	statusSeparator     = "~-------------- ------------------~"
+	viewSeparatorTop    = "~---------------------------------------------------------------~"
+	viewSeparatorBottom = " --------------------------------------------------------------- "
+	applied             = "--- applied ---"
+	pending             = "... pending ..."
+	execDo              = "...      do ..."
+	execUndo            = "...    undo ..."
+	stopped             = "... stopped ..."
 )
 
 func cmdCreateMigration(c *cli.Context) error {
@@ -69,7 +71,7 @@ func cmdMigrationsUp(c *cli.Context) error {
 		return errAbort
 	}
 	for _, each := range all {
-		log.Println(logseparator)
+		log.Println(statusSeparator)
 		log.Println(execDo, pretty(each.Filename))
 		if err := ExecuteAll(each.DoSection, mtx.config().shellEnv()); err != nil {
 			reportError(mtx.stateProvider.Config(), "do", err)
@@ -84,10 +86,10 @@ func cmdMigrationsUp(c *cli.Context) error {
 		// if not empty then stop after applying this migration
 		if stopAfter == each.Filename {
 			log.Println(stopped)
-			log.Println(logseparator)
+			log.Println(statusSeparator)
 			break
 		}
-		log.Println(logseparator)
+		log.Println(statusSeparator)
 	}
 	return nil
 }
@@ -104,9 +106,9 @@ func cmdMigrationsDown(c *cli.Context) error {
 		return errAbort
 	}
 	lastMigration := all[len(all)-1]
-	log.Println(logseparator)
+	log.Println(statusSeparator)
 	log.Println(execUndo, pretty(mtx.lastApplied))
-	log.Println(logseparator)
+	log.Println(statusSeparator)
 	if err := ExecuteAll(lastMigration.UndoSection, mtx.config().shellEnv()); err != nil {
 		reportError(mtx.stateProvider.Config(), "undo", err)
 		return errAbort
@@ -134,7 +136,7 @@ func cmdMigrationsStatus(c *cli.Context) error {
 		printError(err.Error())
 		return errAbort
 	}
-	log.Println(logseparator)
+	log.Println(statusSeparator)
 	var last string
 	prettyWidth := 0
 	for _, each := range all {
@@ -148,13 +150,59 @@ func cmdMigrationsStatus(c *cli.Context) error {
 		if each.Filename > mtx.lastApplied {
 			status = pending
 			if len(last) > 0 && last != status {
-				log.Println(logseparator)
+				log.Println(statusSeparator)
 			}
 		}
 		log.Printf("%s %-"+strconv.Itoa(prettyWidth)+"s (%s)\n", status, pretty(each.Filename), each.Filename)
 		last = status
 	}
-	log.Println(logseparator)
+	log.Println(statusSeparator)
+	return nil
+}
+
+func cmdView(c *cli.Context) error {
+	mtx, err := getMigrationContext(c)
+	if err != nil {
+		printError(err.Error())
+		return errAbort
+	}
+	var all []Migration
+	if len(c.Args()) == 2 {
+		localMigrationFilename := filepath.Base(c.Args().Get(1))
+		if len(localMigrationFilename) > 0 {
+			one, err := LoadMigration(filepath.Join(mtx.migrationsPath, localMigrationFilename))
+			if err != nil {
+				printError(err.Error())
+				return errAbort
+			}
+			all = append(all, one)
+		}
+	} else {
+		all, err = LoadMigrationsBetweenAnd(mtx.migrationsPath, "", "")
+		if err != nil {
+			printError(err.Error())
+			return errAbort
+		}
+	}
+	for _, each := range all {
+		log.Println(viewSeparatorTop)
+		log.Printf(" %s (%s)\n", pretty(each.Filename), each.Filename)
+		log.Println(viewSeparatorBottom)
+		if each.Filename > mtx.lastApplied {
+			log.Println(" ** this migration is pending...")
+			break
+		}
+		if len(each.ViewSection) == 0 {
+			log.Println(" ** this migration has no commands to describe its change on infrastructure.")
+		}
+		if mtx.config().verbose {
+			log.Printf("executing view section (%d commands)\n", len(each.ViewSection))
+		}
+		if err := ExecuteAll(each.ViewSection, mtx.config().shellEnv()); err != nil {
+			printError(err.Error())
+			return errAbort
+		}
+	}
 	return nil
 }
 
