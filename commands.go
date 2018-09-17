@@ -73,7 +73,7 @@ func cmdMigrationsUp(c *cli.Context) error {
 	for _, each := range all {
 		log.Println(statusSeparator)
 		log.Println(execDo, pretty(each.Filename))
-		if err := ExecuteAll(each.DoSection, mtx.config().shellEnv()); err != nil {
+		if err := ExecuteAll(each.DoSection, mtx.config().shellEnv(), c.GlobalBool("v")); err != nil {
 			reportError(mtx.stateProvider.Config(), "do", err)
 			return errAbort
 		}
@@ -109,7 +109,7 @@ func cmdMigrationsDown(c *cli.Context) error {
 	log.Println(statusSeparator)
 	log.Println(execUndo, pretty(mtx.lastApplied))
 	log.Println(statusSeparator)
-	if err := ExecuteAll(lastMigration.UndoSection, mtx.config().shellEnv()); err != nil {
+	if err := ExecuteAll(lastMigration.UndoSection, mtx.config().shellEnv(), c.GlobalBool("v")); err != nil {
 		reportError(mtx.stateProvider.Config(), "undo", err)
 		return errAbort
 	}
@@ -198,7 +198,7 @@ func cmdView(c *cli.Context) error {
 		if mtx.config().verbose {
 			log.Printf("executing view section (%d commands)\n", len(each.ViewSection))
 		}
-		if err := ExecuteAll(each.ViewSection, mtx.config().shellEnv()); err != nil {
+		if err := ExecuteAll(each.ViewSection, mtx.config().shellEnv(), c.GlobalBool("v")); err != nil {
 			printError(err.Error())
 			return errAbort
 		}

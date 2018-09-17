@@ -49,3 +49,23 @@ func readConfig() Config {
 		Zone:    gc.Compute.Zone,
 	}
 }
+
+func TestGetShellScriptHeaderNotVerbose(t *testing.T) {
+
+	want := `#!/bin/bash
+set -e -v`
+
+	if got := getShellScriptHeader(false); got != want {
+		t.Errorf("got [%v] want [%v]", got, want)
+	}
+}
+
+func TestGetShellScriptHeaderVerbose(t *testing.T) {
+
+	want := `#!/bin/bash
+set -e -x`
+
+	if got := getShellScriptHeader(true); got != want {
+		t.Errorf("got [%v] want [%v]", got, want)
+	}
+}
