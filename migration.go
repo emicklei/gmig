@@ -65,14 +65,14 @@ func (m Migration) ToYAML() ([]byte, error) {
 // ExecuteAll the commands for this migration.
 // We create a temporary executable file with all commands.
 // This allows for using shell variables in multiple commands.
-func ExecuteAll(commands []string, envs []string) error {
+func ExecuteAll(commands []string, envs []string, verbose bool) error {
 	if len(commands) == 0 {
 		return nil
 	}
 	tempScript := path.Join(os.TempDir(), "gmig.sh")
 	content := new(bytes.Buffer)
-	fmt.Fprintln(content, `#!/bin/bash
-set -e -v`)
+	fmt.Fprintf(content, setupShellScript(verbose))
+
 	for _, each := range commands {
 		fmt.Fprintln(content, each)
 	}
@@ -92,6 +92,15 @@ set -e -v`)
 		fmt.Println(string(out))
 	}
 	return nil
+}
+
+func setupShellScript(verbose bool) string {
+	flag := "-v"
+	if verbose {
+		flag = "-x"
+	}
+	return fmt.Sprintf(`#!/bin/bash
+set -e %s`, flag)
 }
 
 // LoadMigrationsBetweenAnd returns a list of pending Migration <firstFilename..lastFilename]

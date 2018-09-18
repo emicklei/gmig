@@ -66,7 +66,7 @@ func runSectionOnly(c *cli.Context, isDo bool) error {
 	if !isDo {
 		lines = m.UndoSection
 	}
-	if err := ExecuteAll(lines, mtx.config().shellEnv()); err != nil {
+	if err := ExecuteAll(lines, mtx.config().shellEnv(), c.GlobalBool("v")); err != nil {
 		reportError(mtx.stateProvider.Config(), section, err)
 		return errAbort
 	}

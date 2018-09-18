@@ -49,3 +49,23 @@ func readConfig() Config {
 		Zone:    gc.Compute.Zone,
 	}
 }
+
+func TestSetupShellScriptNotVerbose(t *testing.T) {
+
+	want := `#!/bin/bash
+set -e -v`
+
+	if got := setupShellScript(false); got != want {
+		t.Errorf("got [%v] want [%v]", got, want)
+	}
+}
+
+func TestSetupShellScriptVerbose(t *testing.T) {
+
+	want := `#!/bin/bash
+set -e -x`
+
+	if got := setupShellScript(true); got != want {
+		t.Errorf("got [%v] want [%v]", got, want)
+	}
+}
