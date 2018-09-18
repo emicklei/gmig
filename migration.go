@@ -71,7 +71,7 @@ func ExecuteAll(commands []string, envs []string, verbose bool) error {
 	}
 	tempScript := path.Join(os.TempDir(), "gmig.sh")
 	content := new(bytes.Buffer)
-	fmt.Fprintf(content, getShellScriptHeader(verbose))
+	fmt.Fprintf(content, setupShellScript(verbose))
 
 	for _, each := range commands {
 		fmt.Fprintln(content, each)
@@ -94,15 +94,13 @@ func ExecuteAll(commands []string, envs []string, verbose bool) error {
 	return nil
 }
 
-func getShellScriptHeader(verbose bool) string {
-	var verboseFlag string
+func setupShellScript(verbose bool) string {
+	flag := "-v"
 	if verbose {
-		verboseFlag = "-x"
-	} else {
-		verboseFlag = "-v"
+		flag = "-x"
 	}
 	return fmt.Sprintf(`#!/bin/bash
-set -e %s`, verboseFlag)
+set -e %s`, flag)
 }
 
 // LoadMigrationsBetweenAnd returns a list of pending Migration <firstFilename..lastFilename]
