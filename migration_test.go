@@ -50,22 +50,22 @@ func readConfig() Config {
 	}
 }
 
-func TestGetShellScriptHeaderNotVerbose(t *testing.T) {
+func TestSetupShellScriptNotVerbose(t *testing.T) {
 
 	want := `#!/bin/bash
 set -e -v`
 
-	if got := getShellScriptHeader(false); got != want {
+	if got := setupShellScript(false); got != want {
 		t.Errorf("got [%v] want [%v]", got, want)
 	}
 }
 
-func TestGetShellScriptHeaderVerbose(t *testing.T) {
+func TestSetupShellScriptVerbose(t *testing.T) {
 
 	want := `#!/bin/bash
 set -e -x`
 
-	if got := getShellScriptHeader(true); got != want {
+	if got := setupShellScript(true); got != want {
 		t.Errorf("got [%v] want [%v]", got, want)
 	}
 }
