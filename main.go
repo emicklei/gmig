@@ -62,6 +62,20 @@ func newApp() *cli.App {
 				defer started(c, "create migration")()
 				return cmdCreateMigration(c)
 			},
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:  "do",
+					Usage: "commands to run in the 'do' section of this migration. Multiple commands need to be separated by a newline.",
+				},
+				cli.StringFlag{
+					Name:  "undo",
+					Usage: "commands to run in the 'undo' section of this migration. Multiple commands need to be separated by a newline.",
+				},
+				cli.StringFlag{
+					Name:  "view",
+					Usage: "commands to run in the 'view' section of this migration. Multiple commands need to be separated by a newline.",
+				},
+			},
 			ArgsUsage: `[title]
 				title - what the effect of this migration is on infrastructure.`,
 		},

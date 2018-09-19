@@ -69,3 +69,18 @@ set -e -x`
 		t.Errorf("got [%v] want [%v]", got, want)
 	}
 }
+
+func TestNewMigrationToYaml(t *testing.T) {
+	m := &Migration{
+		Filename:    NewFilename("do not worry"),
+		Description: "do not worry",
+		DoSection:   []string{"cmd1", "cmd2"},
+		UndoSection: []string{"undo_cmd2", "undo_cmd1"},
+		ViewSection: []string{"view1", "view2"},
+	}
+	data, err := m.ToYAML()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(string(data))
+}
