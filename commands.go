@@ -34,7 +34,7 @@ func cmdCreateMigration(c *cli.Context) error {
 	}
 	filename := NewFilename(desc)
 	defaultCommands := []string{"gcloud config list"}
-	doSection, undoSection, viewSection := defaultCommands, defaultCommands, defaultCommands
+	doSection, undoSection, viewSection := defaultCommands, defaultCommands, []string{}
 	if doValue := c.String("do"); len(doValue) > 0 {
 		doSection = strings.Split(doValue, "\n")
 	}

@@ -76,7 +76,7 @@ func ExecuteAll(commands []string, envs []string, verbose bool) error {
 	}
 	tempScript := path.Join(os.TempDir(), "gmig.sh")
 	content := new(bytes.Buffer)
-	fmt.Fprintf(content, setupShellScript(verbose))
+	fmt.Fprintln(content, setupShellScript(verbose))
 
 	for _, each := range commands {
 		fmt.Fprintln(content, each)
