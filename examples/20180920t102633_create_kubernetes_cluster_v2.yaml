@@ -1,0 +1,33 @@
+
+# create kubernetes cluster v2
+#
+# file: 20180920t102633_create_kubernetes_cluster_v2.yaml
+
+do:
+- gcloud beta container clusters create "valentio-cluster-v2"
+  --verbosity $GCLOUD_VERBOSITY
+  --cluster-version $GKE_VERSION
+  --project $PROJECT
+  --zone $ZONE
+  --username "admin"
+  --machine-type "n1-standard-2"
+  --image-type "COS"
+  --disk-type "pd-standard"
+  --disk-size "100"
+  --scopes "https://www.googleapis.com/auth/devstorage.read_only","https://www.googleapis.com/auth/logging.write","https://www.googleapis.com/auth/monitoring","https://www.googleapis.com/auth/servicecontrol","https://www.googleapis.com/auth/service.management.readonly","https://www.googleapis.com/auth/trace.append"
+  --num-nodes "3"
+  --enable-stackdriver-kubernetes
+  --enable-ip-alias
+  --network "projects/$PROJECT/global/networks/default"
+  --subnetwork "projects/$PROJECT/regions/europe-west1/subnetworks/default"
+  --enable-autoscaling --min-nodes "3" --max-nodes "10"
+  --addons HorizontalPodAutoscaling
+  --enable-autoupgrade
+  --enable-autorepair
+
+undo:
+- gcloud beta container clusters delete "valentio-cluster-v2" --quiet
+
+view:
+- gcloud beta container clusters list
+- gcloud beta container clusters describe valentio-cluster-v2
