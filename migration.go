@@ -13,6 +13,8 @@ import (
 	"strings"
 	"time"
 
+	"text/template"
+
 	"github.com/go-yaml/yaml"
 )
 
@@ -53,13 +55,8 @@ func LoadMigration(absFilename string) (m Migration, err error) {
 // ToYAML returns the contents of a YAML encoded fixture.
 func (m Migration) ToYAML() ([]byte, error) {
 	out := new(bytes.Buffer)
-	fmt.Fprintf(out, "# %s\n\n", m.Description)
-	data, err := yaml.Marshal(m)
-	if err != nil {
-		return data, err
-	}
-	out.Write(data)
-	return out.Bytes(), nil
+	err := migrationTemplate.Execute(out, m)
+	return out.Bytes(), err
 }
 
 // ExecuteAll the commands for this migration.
@@ -71,7 +68,7 @@ func ExecuteAll(commands []string, envs []string, verbose bool) error {
 	}
 	tempScript := path.Join(os.TempDir(), "gmig.sh")
 	content := new(bytes.Buffer)
-	fmt.Fprintf(content, setupShellScript(verbose))
+	fmt.Fprintln(content, setupShellScript(verbose))
 
 	for _, each := range commands {
 		fmt.Fprintln(content, each)
@@ -145,3 +142,18 @@ func LoadMigrationsBetweenAnd(migrationsPath, firstFilename, lastFilename string
 	}
 	return
 }
+
+var migrationTemplate = template.Must(template.New("gen").Parse(`
+# {{.Description}}
+#
+# file: {{.Filename}}
+
+do:{{range .DoSection}}
+- {{.}}{{end}}
+
+undo:{{range .UndoSection}}
+- {{.}}{{end}}
+
+view:{{range .ViewSection}}
+- {{.}}{{end}}
+`))

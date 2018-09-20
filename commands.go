@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 
 	"github.com/urfave/cli"
 )
@@ -32,10 +33,23 @@ func cmdCreateMigration(c *cli.Context) error {
 		return errAbort
 	}
 	filename := NewFilename(desc)
+	defaultCommands := []string{"gcloud config list"}
+	doSection, undoSection, viewSection := defaultCommands, defaultCommands, []string{}
+	if doValue := c.String("do"); len(doValue) > 0 {
+		doSection = strings.Split(doValue, "\n")
+	}
+	if undoValue := c.String("undo"); len(undoValue) > 0 {
+		undoSection = strings.Split(undoValue, "\n")
+	}
+	if viewValue := c.String("view"); len(viewValue) > 0 {
+		viewSection = strings.Split(viewValue, "\n")
+	}
 	m := Migration{
 		Description: desc,
-		DoSection:   []string{"gcloud config list"},
-		UndoSection: []string{"gcloud config list"},
+		Filename:    filename,
+		DoSection:   doSection,
+		UndoSection: undoSection,
+		ViewSection: viewSection,
 	}
 	yaml, err := m.ToYAML()
 	if err != nil {
