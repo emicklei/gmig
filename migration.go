@@ -55,14 +55,6 @@ func LoadMigration(absFilename string) (m Migration, err error) {
 // ToYAML returns the contents of a YAML encoded fixture.
 func (m Migration) ToYAML() ([]byte, error) {
 	out := new(bytes.Buffer)
-	/**
-	fmt.Fprintf(out, "# %s\n\n", m.Description)
-	data, err := yaml.Marshal(m)
-	if err != nil {
-		return data, err
-	}
-	out.Write(data)
-	**/
 	err := migrationTemplate.Execute(out, m)
 	return out.Bytes(), err
 }

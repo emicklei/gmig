@@ -38,7 +38,7 @@ Each command in each section can use the following environment variables: `$PROJ
 
 Information about the last applied migration to a project is stored as a Google Storage Bucket object.
 Therefore, usage of this tool requires you to have create a Bucket and set the permissions (Storage Writer) accordingly. 
-To view the current state of your infrastructure related to each migration, you can add another section to the YAML file, such as:
+To view the current state of your infrastructure related to each migration, you can add the `view` section to the YAML file, such as:
 
     # add loadrunner service account
 
@@ -122,6 +122,8 @@ If you want to apply the same migrations to different regions/zones then choose 
 Creates a new migration for you to describe a change to the current state of infrastructure.
 
     gmig new "add storage view role to cloudbuild account"
+
+Using a combination of the options `--do`, `--undo` and `--view`, you can set the commands directly for the new migration.
 
 ### status [path] [--migrations folder]
 
