@@ -1,5 +1,10 @@
 # Changelist of gmig releases
 
+## v1.6.0
+
+- add options to new to set the commands for the do,undo,view section directly
+- use verbose flag to echo expanded environment variables in commands
+
 ## v1.5.0
 
 - add "view" command to show the status of infrastructure, per migration.
