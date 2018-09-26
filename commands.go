@@ -22,6 +22,7 @@ const (
 	pending             = "... pending ..."
 	execDo              = "...      do ..."
 	execUndo            = "...    undo ..."
+	execPlan            = "...    plan ..."
 	stopped             = "... stopped ..."
 )
 
@@ -60,6 +61,14 @@ func cmdCreateMigration(c *cli.Context) error {
 }
 
 func cmdMigrationsUp(c *cli.Context) error {
+	return runMigrations(c, !true)
+}
+
+func cmdMigrationsPlan(c *cli.Context) error {
+	return runMigrations(c, true)
+}
+
+func runMigrations(c *cli.Context, isSimulating bool) error {
 	mtx, err := getMigrationContext(c)
 	if err != nil {
 		printError(err.Error())
@@ -86,16 +95,28 @@ func cmdMigrationsUp(c *cli.Context) error {
 	}
 	for _, each := range all {
 		log.Println(statusSeparator)
-		log.Println(execDo, pretty(each.Filename))
-		if err := ExecuteAll(each.DoSection, mtx.config().shellEnv(), c.GlobalBool("v")); err != nil {
-			reportError(mtx.stateProvider.Config(), "do", err)
-			return errAbort
+		leadingTitle := execDo
+		if isSimulating {
+			leadingTitle = execPlan
 		}
-		mtx.lastApplied = each.Filename
-		// save after each succesful migration
-		if err := mtx.stateProvider.SaveState(mtx.lastApplied); err != nil {
-			reportError(mtx.stateProvider.Config(), "save state", err)
-			return errAbort
+		log.Println(leadingTitle, pretty(each.Filename))
+		if isSimulating {
+			log.Println(statusSeparator)
+			if SimulateAll(each.DoSection, mtx.config().shellEnv(), true); err != nil {
+				reportError(mtx.stateProvider.Config(), "plan do", err)
+				return errAbort
+			}
+		} else {
+			if err := ExecuteAll(each.DoSection, mtx.config().shellEnv(), c.GlobalBool("v")); err != nil {
+				reportError(mtx.stateProvider.Config(), "do", err)
+				return errAbort
+			}
+			mtx.lastApplied = each.Filename
+			// save after each succesful migration
+			if err := mtx.stateProvider.SaveState(mtx.lastApplied); err != nil {
+				reportError(mtx.stateProvider.Config(), "save state", err)
+				return errAbort
+			}
 		}
 		// if not empty then stop after applying this migration
 		if stopAfter == each.Filename {
