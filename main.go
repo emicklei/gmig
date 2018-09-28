@@ -80,6 +80,18 @@ func newApp() *cli.App {
 				title - what the effect of this migration is on infrastructure.`,
 		},
 		{
+			Name:  "plan",
+			Usage: "Log commands of the do section of all pending migrations in order, one after the other. If a migration file is specified then stop after applying that one.",
+			Action: func(c *cli.Context) error {
+				defer started(c, "plan = log commands of pending migrations")()
+				return cmdMigrationsPlan(c)
+			},
+			Flags: []cli.Flag{migrationsFlag},
+			ArgsUsage: `[path] [stop] 
+				path - name of the folder that contains the configuration of the target project.
+				stop - (optional) the name of the migration file after which applying migrations will stop.`,
+		},
+		{
 			Name:  "up",
 			Usage: "Runs the do section of all pending migrations in order, one after the other. If a migration file is specified then stop after applying that one.",
 			Action: func(c *cli.Context) error {

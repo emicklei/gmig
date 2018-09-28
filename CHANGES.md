@@ -1,5 +1,9 @@
 # Changelist of gmig releases
 
+## v1.7.0, 2018-09-28
+
+- add "plan" command that logs all commands that would be executed on "up".
+
 ## v1.6.0
 
 - add options to new to set the commands for the do,undo,view section directly

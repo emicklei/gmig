@@ -22,6 +22,7 @@ const (
 	pending             = "... pending ..."
 	execDo              = "...      do ..."
 	execUndo            = "...    undo ..."
+	execPlan            = "...    plan ..."
 	stopped             = "... stopped ..."
 )
 
@@ -60,6 +61,14 @@ func cmdCreateMigration(c *cli.Context) error {
 }
 
 func cmdMigrationsUp(c *cli.Context) error {
+	return runMigrations(c, !true)
+}
+
+func cmdMigrationsPlan(c *cli.Context) error {
+	return runMigrations(c, true)
+}
+
+func runMigrations(c *cli.Context, isLogOnly bool) error {
 	mtx, err := getMigrationContext(c)
 	if err != nil {
 		printError(err.Error())
@@ -84,18 +93,31 @@ func cmdMigrationsUp(c *cli.Context) error {
 		reportError(mtx.stateProvider.Config(), "up until stop", errors.New("No such migration file: "+stopAfter))
 		return errAbort
 	}
+	prettyWidth := largestWithOf(all)
 	for _, each := range all {
 		log.Println(statusSeparator)
-		log.Println(execDo, pretty(each.Filename))
-		if err := ExecuteAll(each.DoSection, mtx.config().shellEnv(), c.GlobalBool("v")); err != nil {
-			reportError(mtx.stateProvider.Config(), "do", err)
-			return errAbort
+		leadingTitle := execDo
+		if isLogOnly {
+			leadingTitle = execPlan
 		}
-		mtx.lastApplied = each.Filename
-		// save after each succesful migration
-		if err := mtx.stateProvider.SaveState(mtx.lastApplied); err != nil {
-			reportError(mtx.stateProvider.Config(), "save state", err)
-			return errAbort
+		log.Printf("%s %-"+strconv.Itoa(prettyWidth)+"s (%s)\n", leadingTitle, pretty(each.Filename), each.Filename)
+		if isLogOnly {
+			log.Println("")
+			if LogAll(each.DoSection, mtx.config().shellEnv(), true); err != nil {
+				reportError(mtx.stateProvider.Config(), "plan do", err)
+				return errAbort
+			}
+		} else {
+			if err := ExecuteAll(each.DoSection, mtx.config().shellEnv(), c.GlobalBool("v")); err != nil {
+				reportError(mtx.stateProvider.Config(), "do", err)
+				return errAbort
+			}
+			mtx.lastApplied = each.Filename
+			// save after each succesful migration
+			if err := mtx.stateProvider.SaveState(mtx.lastApplied); err != nil {
+				reportError(mtx.stateProvider.Config(), "save state", err)
+				return errAbort
+			}
 		}
 		// if not empty then stop after applying this migration
 		if stopAfter == each.Filename {
@@ -103,7 +125,6 @@ func cmdMigrationsUp(c *cli.Context) error {
 			log.Println(statusSeparator)
 			break
 		}
-		log.Println(statusSeparator)
 	}
 	return nil
 }
@@ -139,6 +160,17 @@ func cmdMigrationsDown(c *cli.Context) error {
 	return nil
 }
 
+func largestWithOf(list []Migration) int {
+	prettyWidth := 0
+	for _, each := range list {
+		pf := pretty(each.Filename)
+		if len(pf) > prettyWidth {
+			prettyWidth = len(pf)
+		}
+	}
+	return prettyWidth
+}
+
 func cmdMigrationsStatus(c *cli.Context) error {
 	mtx, err := getMigrationContext(c)
 	if err != nil {
@@ -152,13 +184,7 @@ func cmdMigrationsStatus(c *cli.Context) error {
 	}
 	log.Println(statusSeparator)
 	var last string
-	prettyWidth := 0
-	for _, each := range all {
-		pf := pretty(each.Filename)
-		if len(pf) > prettyWidth {
-			prettyWidth = len(pf)
-		}
-	}
+	prettyWidth := largestWithOf(all)
 	for _, each := range all {
 		status := applied
 		if each.Filename > mtx.lastApplied {

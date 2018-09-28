@@ -91,6 +91,38 @@ func ExecuteAll(commands []string, envs []string, verbose bool) error {
 	return nil
 }
 
+// LogAll logs expanded commands using the environment variables of both the config and the OS.
+func LogAll(commands []string, envs []string, verbose bool) error {
+	allEnv := append(os.Environ(), envs...)
+	envMap := map[string]string{}
+	for _, each := range allEnv {
+		kv := strings.Split(each, "=")
+		envMap[kv[0]] = kv[1]
+	}
+	for _, each := range commands {
+		log.Println(expandVarsIn(envMap, each))
+	}
+	return nil
+}
+
+// expandVarsIn returns a command with all occurrences of environment variables replaced by known values.
+func expandVarsIn(envs map[string]string, command string) string {
+	// assume no recurse expand
+	expanded := command
+	for k, v := range envs {
+		// if the value itself is a known variable then skip it
+		if strings.HasPrefix(v, "$") {
+			if _, ok := envs[v]; ok {
+				log.Printf("Warning, skipping non-expandable environment var %s=%v\n", k, v)
+				continue
+			}
+		}
+		varName := "$" + k
+		expanded = strings.Replace(expanded, varName, v, -1)
+	}
+	return expanded
+}
+
 func setupShellScript(verbose bool) string {
 	flag := "-v"
 	if verbose {
