@@ -93,7 +93,7 @@ func runMigrations(c *cli.Context, isLogOnly bool) error {
 		reportError(mtx.stateProvider.Config(), "up until stop", errors.New("No such migration file: "+stopAfter))
 		return errAbort
 	}
-	prettyWidth := largestWithOf(all)
+	prettyWidth := largestWidthOf(all)
 	for _, each := range all {
 		log.Println(statusSeparator)
 		leadingTitle := execDo
@@ -160,7 +160,7 @@ func cmdMigrationsDown(c *cli.Context) error {
 	return nil
 }
 
-func largestWithOf(list []Migration) int {
+func largestWidthOf(list []Migration) int {
 	prettyWidth := 0
 	for _, each := range list {
 		pf := pretty(each.Filename)
@@ -184,7 +184,7 @@ func cmdMigrationsStatus(c *cli.Context) error {
 	}
 	log.Println(statusSeparator)
 	var last string
-	prettyWidth := largestWithOf(all)
+	prettyWidth := largestWidthOf(all)
 	for _, each := range all {
 		status := applied
 		if each.Filename > mtx.lastApplied {
