@@ -68,7 +68,7 @@ func cmdMigrationsPlan(c *cli.Context) error {
 	return runMigrations(c, true)
 }
 
-func runMigrations(c *cli.Context, isSimulating bool) error {
+func runMigrations(c *cli.Context, isLogOnly bool) error {
 	mtx, err := getMigrationContext(c)
 	if err != nil {
 		printError(err.Error())
@@ -93,15 +93,16 @@ func runMigrations(c *cli.Context, isSimulating bool) error {
 		reportError(mtx.stateProvider.Config(), "up until stop", errors.New("No such migration file: "+stopAfter))
 		return errAbort
 	}
+	prettyWidth := largestWithOf(all)
 	for _, each := range all {
 		log.Println(statusSeparator)
 		leadingTitle := execDo
-		if isSimulating {
+		if isLogOnly {
 			leadingTitle = execPlan
 		}
-		log.Println(leadingTitle, pretty(each.Filename))
-		if isSimulating {
-			log.Println(statusSeparator)
+		log.Printf("%s %-"+strconv.Itoa(prettyWidth)+"s (%s)\n", leadingTitle, pretty(each.Filename), each.Filename)
+		if isLogOnly {
+			log.Println("")
 			if SimulateAll(each.DoSection, mtx.config().shellEnv(), true); err != nil {
 				reportError(mtx.stateProvider.Config(), "plan do", err)
 				return errAbort
@@ -124,7 +125,6 @@ func runMigrations(c *cli.Context, isSimulating bool) error {
 			log.Println(statusSeparator)
 			break
 		}
-		log.Println(statusSeparator)
 	}
 	return nil
 }
@@ -160,6 +160,17 @@ func cmdMigrationsDown(c *cli.Context) error {
 	return nil
 }
 
+func largestWithOf(list []Migration) int {
+	prettyWidth := 0
+	for _, each := range list {
+		pf := pretty(each.Filename)
+		if len(pf) > prettyWidth {
+			prettyWidth = len(pf)
+		}
+	}
+	return prettyWidth
+}
+
 func cmdMigrationsStatus(c *cli.Context) error {
 	mtx, err := getMigrationContext(c)
 	if err != nil {
@@ -173,13 +184,7 @@ func cmdMigrationsStatus(c *cli.Context) error {
 	}
 	log.Println(statusSeparator)
 	var last string
-	prettyWidth := 0
-	for _, each := range all {
-		pf := pretty(each.Filename)
-		if len(pf) > prettyWidth {
-			prettyWidth = len(pf)
-		}
-	}
+	prettyWidth := largestWithOf(all)
 	for _, each := range all {
 		status := applied
 		if each.Filename > mtx.lastApplied {

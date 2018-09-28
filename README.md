@@ -68,6 +68,7 @@ and use the `view` subcommand.
         up       Runs the do section of all pending migrations in order, one after the other.
                  If a migration file is specified then stop after applying that one.
         down     Runs the undo section of the last applied migration only.
+        plan     Log commands of the do section of all pending migrations in order, one after the other.
         status   List all migrations with details compared to the current state.
         view     Runs the view section of all applied migrations to see the current state reported by your infrastructure.
         force    state | do | undo
@@ -132,6 +133,11 @@ List all migrations with an indicator (applied,pending) whether is has been appl
     gmig status my-gcp-production-project/
 
 Run this command in the directory where all migrations are stored. Use `--migrations` for a different location.
+
+### plan  [path] [|migration file] [--migrations folder]
+
+Log commands of the `do` section of all pending migrations in order, one after the other.
+If `migration file` is given then stop after applying that one.
 
 ### up [path] [|migration file] [--migrations folder]
 

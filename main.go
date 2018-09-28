@@ -81,9 +81,9 @@ func newApp() *cli.App {
 		},
 		{
 			Name:  "plan",
-			Usage: "Simulates the do section of all pending migrations in order, one after the other. If a migration file is specified then stop after applying that one.",
+			Usage: "Log commands of the do section of all pending migrations in order, one after the other. If a migration file is specified then stop after applying that one.",
 			Action: func(c *cli.Context) error {
-				defer started(c, "plan = simulate pending migrations")()
+				defer started(c, "plan = log commands of pending migrations")()
 				return cmdMigrationsPlan(c)
 			},
 			Flags: []cli.Flag{migrationsFlag},
