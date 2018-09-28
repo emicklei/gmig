@@ -91,8 +91,8 @@ func ExecuteAll(commands []string, envs []string, verbose bool) error {
 	return nil
 }
 
-// SimulateAll logs expanded commands using the environment variables of both the config and the OS.
-func SimulateAll(commands []string, envs []string, verbose bool) error {
+// LogAll logs expanded commands using the environment variables of both the config and the OS.
+func LogAll(commands []string, envs []string, verbose bool) error {
 	allEnv := append(os.Environ(), envs...)
 	envMap := map[string]string{}
 	for _, each := range allEnv {
