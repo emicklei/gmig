@@ -73,7 +73,7 @@ func (c Config) Validate() error {
 }
 
 func (c Config) shellEnv() (envs []string) {
-	envs = append(envs, "PROJECT="+c.Project, "REGION="+c.Project, "ZONE="+c.Zone)
+	envs = append(envs, "PROJECT="+c.Project, "REGION="+c.Region, "ZONE="+c.Zone)
 	// now (override) with any custom values ; do not check values
 	for k, v := range c.EnvironmentVars {
 		envs = append(envs, fmt.Sprintf("%s=%s", k, v))
