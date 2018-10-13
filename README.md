@@ -134,12 +134,12 @@ List all migrations with an indicator (applied,pending) whether is has been appl
 
 Run this command in the directory where all migrations are stored. Use `--migrations` for a different location.
 
-### plan  [path] [|migration file] [--migrations folder]
+### plan  [path] [migration file] [--migrations folder]
 
 Log commands of the `do` section of all pending migrations in order, one after the other.
 If `migration file` is given then stop after applying that one.
 
-### up [path] [|migration file] [--migrations folder]
+### up [path] [migration file] [--migrations folder]
 
 Executes the `do` section of each pending migration compared to the last applied change to the infrastructure.
 If `migration file` is given then stop after applying that one.
@@ -154,7 +154,7 @@ If completed then update the `gmig-last-migration` object.
 
     gmig down my-gcp-production-project
 
-### view [path] [|migration file]  [--migrations folder]
+### view [path] [migration file]  [--migrations folder]
 
 Executes the `view` section of each applied migration to the infrastructure.
 If `migration file` is given then run that view only.
