@@ -52,7 +52,7 @@ func newApp() *cli.App {
 				defer started(c, "init")()
 				return cmdInit(c)
 			},
-			ArgsUsage: `[path]
+			ArgsUsage: `<path>
 				path - name of the folder that contains the configuration of the target project. The folder name may end with a path separator and can be relative or absolute.`,
 		},
 		{
@@ -76,7 +76,7 @@ func newApp() *cli.App {
 					Usage: "commands to run in the 'view' section of this migration. Multiple commands need to be separated by a newline.",
 				},
 			},
-			ArgsUsage: `[title]
+			ArgsUsage: `<title>
 				title - what the effect of this migration is on infrastructure.`,
 		},
 		{
@@ -87,7 +87,7 @@ func newApp() *cli.App {
 				return cmdMigrationsPlan(c)
 			},
 			Flags: []cli.Flag{migrationsFlag},
-			ArgsUsage: `[path] [stop] 
+			ArgsUsage: `<path> [stop] 
 				path - name of the folder that contains the configuration of the target project.
 				stop - (optional) the name of the migration file after which applying migrations will stop.`,
 		},
@@ -99,19 +99,19 @@ func newApp() *cli.App {
 				return cmdMigrationsUp(c)
 			},
 			Flags: []cli.Flag{migrationsFlag},
-			ArgsUsage: `[path] [stop] 
+			ArgsUsage: `<path> [stop] 
 				path - name of the folder that contains the configuration of the target project.
 				stop - (optional) the name of the migration file after which applying migrations will stop.`,
 		},
 		{
 			Name:  "down",
-			Usage: "Runs the undo section of the last applied migration only.",
+			Usage: "Runs the undo section of only the last applied migration.",
 			Action: func(c *cli.Context) error {
 				defer started(c, "down = undo last applied migration")()
 				return cmdMigrationsDown(c)
 			},
 			Flags: []cli.Flag{migrationsFlag},
-			ArgsUsage: `[path]
+			ArgsUsage: `<path>
 				path - name of the folder that contains the configuration of the target project.`,
 		},
 		{
@@ -122,7 +122,7 @@ func newApp() *cli.App {
 				return cmdMigrationsStatus(c)
 			},
 			Flags: []cli.Flag{migrationsFlag},
-			ArgsUsage: `[path]
+			ArgsUsage: `<path>
 				path - name of the folder that contains the configuration of the target project.`,
 		},
 		{
@@ -133,12 +133,12 @@ func newApp() *cli.App {
 				return cmdView(c)
 			},
 			Flags: []cli.Flag{migrationsFlag},
-			ArgsUsage: `[path]
+			ArgsUsage: `<path>
 				path - name of the folder that contains the configuration of the target project.`,
 		},
 		{
 			Name:  "util",
-			Usage: "create-named-port | delete-named-port",
+			Usage: "{create-named-port|delete-named-port}",
 			Subcommands: []cli.Command{
 				{
 					Name:  "create-named-port",
@@ -147,7 +147,7 @@ func newApp() *cli.App {
 						defer started(c, "create-named-port")()
 						return cmdCreateNamedPort(c)
 					},
-					ArgsUsage: `[instance-group] [name:port]
+					ArgsUsage: `<instance-group> <name:port>
 					instance-group - identifier of the compute instance group
 					name:port      - mapping of a name to a port, e.g  http-port:80`,
 				},
@@ -158,7 +158,7 @@ func newApp() *cli.App {
 						defer started(c, "delete-named-port")()
 						return cmdDeleteNamedPort(c)
 					},
-					ArgsUsage: `[instance-group] [name:port]
+					ArgsUsage: `<instance-group> <name:port>
 					instance-group - identifier of the compute instance group
 					name:port      - mapping of a name to a port, e.g  http-port:80`,
 				},
@@ -166,7 +166,7 @@ func newApp() *cli.App {
 		},
 		{
 			Name:  "force",
-			Usage: "state | do | undo",
+			Usage: "{state|do|undo}",
 			Flags: []cli.Flag{migrationsFlag},
 			Subcommands: []cli.Command{
 				{
@@ -176,7 +176,7 @@ func newApp() *cli.App {
 						defer started(c, "force last applied migration (state)")()
 						return cmdMigrationsSetState(c)
 					},
-					ArgsUsage: `[path]
+					ArgsUsage: `<path>
 					path - name of the folder that contains the configuration of the target project.`,
 				},
 				{
@@ -186,7 +186,7 @@ func newApp() *cli.App {
 						defer started(c, "execute DO section")()
 						return cmdRundoOnly(c)
 					},
-					ArgsUsage: `[path] [filename]
+					ArgsUsage: `<path> <filename>
 						path - name of the folder that contains the configuration of the target project.
 						filename - name of the migration that contains a do: section.`,
 				},
@@ -197,7 +197,7 @@ func newApp() *cli.App {
 						defer started(c, "execute UNDO section")()
 						return cmdRunUndoOnly(c)
 					},
-					ArgsUsage: `[path] [filename]
+					ArgsUsage: `<path> <filename>
 					path - name of the folder that contains the configuration of the target project.
 					filename - name of the migration that contains a undo: section.`,
 				},
@@ -205,7 +205,7 @@ func newApp() *cli.App {
 		},
 		{
 			Name:  "export",
-			Usage: "project-iam-policy | storage-iam-policy",
+			Usage: "{project-iam-policy|storage-iam-policy}",
 			Subcommands: []cli.Command{
 				{
 					Name:  "project-iam-policy",
@@ -214,7 +214,7 @@ func newApp() *cli.App {
 						defer started(c, "export project IAM policy")()
 						return cmdExportProjectIAMPolicy(c)
 					},
-					ArgsUsage: `[path]
+					ArgsUsage: `<path>
 					path - name of the folder that contains the configuration of the target project.`,
 				},
 				{
@@ -224,7 +224,7 @@ func newApp() *cli.App {
 						defer started(c, "export storage IAM policy")()
 						return cmdExportStorageIAMPolicy(c)
 					},
-					ArgsUsage: `[path]
+					ArgsUsage: `<path>
 					path - name of the folder that contains the configuration of the target project.`,
 				},
 			},
