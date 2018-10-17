@@ -138,7 +138,7 @@ func newApp() *cli.App {
 		},
 		{
 			Name:  "util",
-			Usage: "{create-named-port|delete-named-port}",
+			Usage: "Handle named ports {create-named-port|delete-named-port}",
 			Subcommands: []cli.Command{
 				{
 					Name:  "create-named-port",
@@ -166,12 +166,12 @@ func newApp() *cli.App {
 		},
 		{
 			Name:  "force",
-			Usage: "{state|do|undo}",
+			Usage: "Force an action {state|do|undo}",
 			Flags: []cli.Flag{migrationsFlag},
 			Subcommands: []cli.Command{
 				{
 					Name:  "state",
-					Usage: "Explicitly set the current state; filename of the last applied migration.",
+					Usage: "Explicitly set the state to a specified migration filename.",
 					Action: func(c *cli.Context) error {
 						defer started(c, "force last applied migration (state)")()
 						return cmdMigrationsSetState(c)
@@ -181,7 +181,7 @@ func newApp() *cli.App {
 				},
 				{
 					Name:  "do",
-					Usage: "Explicitly execute the DO section of a migration. Does not update the state object in the bucket.",
+					Usage: "Force run the DO section of a migration. State will not be updated.",
 					Action: func(c *cli.Context) error {
 						defer started(c, "execute DO section")()
 						return cmdRundoOnly(c)
@@ -192,7 +192,7 @@ func newApp() *cli.App {
 				},
 				{
 					Name:  "undo",
-					Usage: "Explicitly execute the UNDO section of a migration. Does not update the state object in the bucket.",
+					Usage: "Force run the UNDO section of a migration. State will not be updated.",
 					Action: func(c *cli.Context) error {
 						defer started(c, "execute UNDO section")()
 						return cmdRunUndoOnly(c)
@@ -205,7 +205,7 @@ func newApp() *cli.App {
 		},
 		{
 			Name:  "export",
-			Usage: "{project-iam-policy|storage-iam-policy}",
+			Usage: "Export existing infrastructure {project-iam-policy|storage-iam-policy}",
 			Subcommands: []cli.Command{
 				{
 					Name:  "project-iam-policy",
