@@ -84,7 +84,7 @@ and use the `view` subcommand.
 
 ## Getting started
 
-### Instalation
+### Installation
 
 Pre-compiled binaries are available for download from the Releases section on this page.
 If you want to create your own version, you need to compile it using the [Go SDK](https://golang.org/dl/).
