@@ -135,6 +135,10 @@ func cmdMigrationsDown(c *cli.Context) error {
 		printError(err.Error())
 		return errAbort
 	}
+	if mtx.lastApplied == "" {
+		printWarning("There are no migrations to undo")
+		return errAbort
+	}
 	all, err := LoadMigrationsBetweenAnd(mtx.migrationsPath, "", mtx.lastApplied)
 	if err != nil {
 		printError(err.Error())
