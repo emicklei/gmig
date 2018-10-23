@@ -144,7 +144,7 @@ func LoadMigrationsBetweenAnd(migrationsPath, firstFilename, lastFilename string
 	}
 	defer os.Chdir(here)
 	filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
-		if info.IsDir() || !isYamlFile(path) {
+		if !isValidMigrationFilename(&path, &info) {
 			return nil
 		}
 		filenames = append(filenames, path)

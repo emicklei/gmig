@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"time"
 
@@ -94,4 +95,19 @@ func pretty(filename string) string {
 func isYamlFile(filename string) bool {
 	ext := filepath.Ext(filename)
 	return ext == ".yaml" || ext == ".yml"
+}
+
+var regexpIndex, _ = regexp.Compile("^[0-9]{3}_")
+var regexpTimestamp, _ = regexp.Compile("^[0-9]{8}t[0-9]{6}_")
+
+func isValidMigrationFilename(path *string, info *os.FileInfo) bool {
+	if (*info).IsDir() || !isYamlFile(*path) {
+		return false
+	}
+	hasIndex := regexpIndex.MatchString(*path)
+	hasTimestamp := regexpTimestamp.MatchString(*path)
+	if !hasIndex && !hasTimestamp {
+		return false
+	}
+	return true
 }
