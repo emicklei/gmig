@@ -202,6 +202,23 @@ func TestCmdDown(t *testing.T) {
 	}
 }
 
+func TestCmdDownWhenNoLastMigration(t *testing.T) {
+	// simulate effect of GS download old state
+	if err := ioutil.WriteFile("state", []byte(""), os.ModePerm); err != nil {
+		t.Fatal("unable to write state", err)
+	}
+	defer os.Remove("state")
+	// capture GC command
+	cc := new(commandCapturer)
+	runCommand = cc.runCommand
+	if err := newApp().Run([]string{"gmig", "down", "test/demo"}); err != nil {
+		expected := "gmig aborted"
+		if err.Error() != expected {
+			t.Errorf("got [%v] want [%v]", err, expected)
+		}
+	}
+}
+
 func TestCmdView(t *testing.T) {
 	// simulate effect of GS download old state
 	if err := ioutil.WriteFile("state", []byte("20180216t120915_one.yaml"), os.ModePerm); err != nil {
