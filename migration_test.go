@@ -2,7 +2,11 @@ package main
 
 import (
 	"encoding/json"
+	"io/ioutil"
+	"log"
+	"os"
 	"os/exec"
+	"path/filepath"
 	"testing"
 
 	"github.com/go-yaml/yaml"
@@ -93,5 +97,51 @@ func TestNewMigrationToYaml(t *testing.T) {
 	}
 	if got, want := len(back.ViewSection), 1; got != want {
 		t.Errorf("got [%v] want [%v]", got, want)
+	}
+}
+
+func TestNewFilenameWithIndex(t *testing.T) {
+	wd, _ := os.Getwd()
+	dir, err := ioutil.TempDir("", "testing")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer os.RemoveAll(dir) // clean up
+	// change and restore finally
+	if err := os.Chdir(dir); err != nil {
+		return
+	}
+	defer os.Chdir(wd)
+	desc := "first migration"
+	want := "010_first_migration.yaml"
+	if got := NewFilenameWithIndex(desc); got != want {
+		t.Errorf("NewFilenameWithIndex(%s) = %v, want %v", desc, got, want)
+	}
+	tmpfn := filepath.Join(dir, "20181026t183700_starts_with_timestamp.yaml")
+	if err := ioutil.WriteFile(tmpfn, []byte(""), 0444); err != nil {
+		log.Fatal(err)
+	}
+	desc = "first after timestamp"
+	want = "300_first_after_timestamp.yaml"
+	if got := NewFilenameWithIndex(desc); got != want {
+		t.Errorf("NewFilenameWithIndex(%s) = %v, want %v", desc, got, want)
+	}
+	tmpfn = filepath.Join(dir, "400_starts_with_high_index.yaml")
+	if err := ioutil.WriteFile(tmpfn, []byte(""), 0444); err != nil {
+		log.Fatal(err)
+	}
+	desc = "first after high index"
+	want = "405_first_after_high_index.yaml"
+	if got := NewFilenameWithIndex(desc); got != want {
+		t.Errorf("NewFilenameWithIndex(%s) = %v, want %v", desc, got, want)
+	}
+	tmpfn = filepath.Join(dir, "unexpected_yaml_in_directory.yaml")
+	if err := ioutil.WriteFile(tmpfn, []byte(""), 0444); err != nil {
+		log.Fatal(err)
+	}
+	desc = "potentially unexpected naming"
+	want = "010_potentially_unexpected_naming.yaml"
+	if got := NewFilenameWithIndex(desc); got != want {
+		t.Errorf("NewFilenameWithIndex(%s) = %v, want %v", desc, got, want)
 	}
 }
