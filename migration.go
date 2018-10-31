@@ -10,6 +10,7 @@ import (
 	"path"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -35,6 +36,34 @@ func NewFilename(desc string) string {
 	now := timeNow()
 	sanitized := strings.Replace(strings.ToLower(desc), " ", "_", -1)
 	return fmt.Sprintf("%d%02d%02dt%02d%02d%02d_%s.yaml", now.Year(), now.Month(), now.Day(), now.Hour(), now.Minute(), now.Second(), sanitized)
+}
+
+// NewFilenameWithIndex generates a filename using an index for storing
+// a new migration.
+func NewFilenameWithIndex(desc string) string {
+	all, err := LoadMigrationsBetweenAnd(".", "", "")
+	if err != nil {
+		printError(err.Error())
+		return ""
+	}
+	sanitized := strings.Replace(strings.ToLower(desc), " ", "_", -1)
+	if len(all) == 0 {
+		return fmt.Sprintf("010_%s.yaml", sanitized)
+	}
+	lastFilename := all[len(all)-1].Filename
+	hasTimestamp := regexpTimestamp.MatchString(lastFilename)
+	hasIndex := regexpIndex.MatchString(lastFilename)
+	if hasIndex {
+		i, err := strconv.Atoi(lastFilename[:3])
+		if err != nil {
+			fmt.Printf("%T, %v", i, i)
+		}
+		return fmt.Sprintf("%03d_%s.yaml", i+5, sanitized)
+	}
+	if hasTimestamp {
+		return fmt.Sprintf("300_%s.yaml", sanitized)
+	}
+	return fmt.Sprintf("010_%s.yaml", sanitized)
 }
 
 // LoadMigration reads and parses a migration from a named file.

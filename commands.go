@@ -33,7 +33,7 @@ func cmdCreateMigration(c *cli.Context) error {
 		printError("missing migration title")
 		return errAbort
 	}
-	filename := NewFilename(desc)
+	filename := NewFilenameWithIndex(desc)
 	defaultCommands := []string{"gcloud config list"}
 	doSection, undoSection, viewSection := defaultCommands, defaultCommands, []string{}
 	if doValue := c.String("do"); len(doValue) > 0 {
