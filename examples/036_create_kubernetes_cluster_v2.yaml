@@ -1,7 +1,7 @@
 
 # create kubernetes cluster v2
 #
-# file: 20180920t102633_create_kubernetes_cluster_v2.yaml
+# file: 036_create_kubernetes_cluster_v2.yaml
 
 do:
 - gcloud beta container clusters create "valentio-cluster-v2"

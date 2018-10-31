@@ -1,5 +1,10 @@
 # Changelist of gmig releases
 
+## v1.8.0
+
+- replace timestamps in migration files by indices. (010,015,...)
+
+
 ## v1.7.0, 2018-09-28
 
 - add "plan" command that logs all commands that would be executed on "up".

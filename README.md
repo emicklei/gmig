@@ -13,8 +13,8 @@ This work is inspired by MyBatis migrations for SQL database setup.
 
 Your `gmig` infrastructure is basically a folder with incremental change files, each with a timestamp prefix (for sort ordering) and readable name.
 
-    /20180214t071402_create_some_account.yaml
-    /20180214t071522_add_permissions_to_some_account.yaml
+    /010_create_some_account.yaml
+    /015_add_permissions_to_some_account.yaml
     /my-gcp-production-project
         gmig.json
 
@@ -189,7 +189,7 @@ Sometimes you need to fix things because you made a mistake or want to reorganis
 Explicitly set the state for the target to the last applied filename. This command can be useful if you need to work from existing infrastructure. Effectively, this filename is written to the bucket object.
 Use this command with care!.
 
-    gmig force state my-gcp-production-project 20180214t071402_create_some_account.yaml
+    gmig force state my-gcp-production-project 010_create_some_account.yaml
 
 ### force do \<path> \<filename>
 
@@ -197,7 +197,7 @@ Explicitly run the commands in the `do` section of a given migration filename.
 The `gmig-last-migration` object is `not` updated in the bucket.
 Use this command with care!.
 
-    gmig force do my-gcp-production-project 20180214t071402_create_some_account.yaml
+    gmig force do my-gcp-production-project 010_create_some_account.yaml
 
 ### force undo \<path> \<filename>
 
@@ -205,7 +205,7 @@ Explicitly run the commands in the `undo` section of a given migration filename.
 The `gmig-last-migration` object is `not` updated in the bucket.
 Use this command with care!.
 
-    gmig force undo my-gcp-production-project 20180214t071402_create_some_account.yaml
+    gmig force undo my-gcp-production-project 010_create_some_account.yaml
 
 ## GCP utilities
 

@@ -57,7 +57,7 @@ func newApp() *cli.App {
 		},
 		{
 			Name:  "new",
-			Usage: "Create a new migration file from a template using a generated timestamp and a given title.",
+			Usage: "Create a new migration file from a template using an index prefix and a given title.",
 			Action: func(c *cli.Context) error {
 				defer started(c, "create migration")()
 				return cmdCreateMigration(c)
