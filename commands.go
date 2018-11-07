@@ -7,7 +7,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 
 	"github.com/urfave/cli"
@@ -93,14 +92,13 @@ func runMigrations(c *cli.Context, isLogOnly bool) error {
 		reportError(mtx.stateProvider.Config(), "up until stop", errors.New("No such migration file: "+stopAfter))
 		return errAbort
 	}
-	prettyWidth := largestWidthOf(all)
 	for _, each := range all {
 		log.Println(statusSeparator)
 		leadingTitle := execDo
 		if isLogOnly {
 			leadingTitle = execPlan
 		}
-		log.Printf("%s %-"+strconv.Itoa(prettyWidth)+"s (%s)\n", leadingTitle, pretty(each.Filename), each.Filename)
+		log.Printf("%s %s\n", leadingTitle, each.Filename)
 		if isLogOnly {
 			log.Println("")
 			if LogAll(each.DoSection, mtx.config().shellEnv(), true); err != nil {
@@ -164,17 +162,6 @@ func cmdMigrationsDown(c *cli.Context) error {
 	return nil
 }
 
-func largestWidthOf(list []Migration) int {
-	prettyWidth := 0
-	for _, each := range list {
-		pf := pretty(each.Filename)
-		if len(pf) > prettyWidth {
-			prettyWidth = len(pf)
-		}
-	}
-	return prettyWidth
-}
-
 func cmdMigrationsStatus(c *cli.Context) error {
 	mtx, err := getMigrationContext(c)
 	if err != nil {
@@ -186,9 +173,7 @@ func cmdMigrationsStatus(c *cli.Context) error {
 		printError(err.Error())
 		return errAbort
 	}
-	log.Println(statusSeparator)
 	var last string
-	prettyWidth := largestWidthOf(all)
 	for _, each := range all {
 		status := applied
 		if each.Filename > mtx.lastApplied {
@@ -197,10 +182,9 @@ func cmdMigrationsStatus(c *cli.Context) error {
 				log.Println(statusSeparator)
 			}
 		}
-		log.Printf("%s %-"+strconv.Itoa(prettyWidth)+"s (%s)\n", status, pretty(each.Filename), each.Filename)
+		log.Printf("%s %s\n", status, each.Filename)
 		last = status
 	}
-	log.Println(statusSeparator)
 	return nil
 }
 
