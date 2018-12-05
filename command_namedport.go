@@ -64,7 +64,11 @@ func cmdChangeNamedPort(c *cli.Context, action int) error {
 	if err := json.NewDecoder(bytes.NewReader(data)).Decode(&list); err != nil {
 		return fmt.Errorf("parsing JSON output failed:%v", err)
 	}
+	if verbose {
+		log.Println("current list of named ports", list)
+	}
 	if create == action {
+		log.Printf("ensure named port exists %s:%d\n", name, port)
 		// only append if not exists, update otherwise or abort
 		updated := false
 		for _, each := range list {
@@ -73,6 +77,7 @@ func cmdChangeNamedPort(c *cli.Context, action int) error {
 					log.Printf("named-port [%s:%d] already exists\n", name, port)
 					return nil
 				}
+				log.Printf("change named port from [%s:%d] to [%s:%d]\n", each.Name, each.Port, each.Name, port)
 				each.Port = port
 				updated = true
 				break
@@ -83,11 +88,15 @@ func cmdChangeNamedPort(c *cli.Context, action int) error {
 		}
 	}
 	if delete == action {
+		log.Printf("ensure named port no longer exists %s:%d\n", name, port)
 		// only delete if exists, update otherwise
 		deleted := false
 		copyWithout := []namedPort{}
 		for _, each := range list {
 			if each.Name == name {
+				if verbose {
+					log.Printf("deleted named port %s=%d\n", each.Name, each.Port)
+				}
 				deleted = true
 			} else {
 				copyWithout = append(copyWithout, each)
@@ -110,9 +119,7 @@ func cmdChangeNamedPort(c *cli.Context, action int) error {
 	// set named ports using new list
 	args = []string{"compute", "instance-groups", "set-named-ports", instanceGroup, "--named-ports", newList.String()}
 	cmd = exec.Command("gcloud", args...)
-	if verbose {
-		log.Println(strings.Join(append([]string{"gcloud"}, args...), " "))
-	}
+	log.Println(strings.Join(append([]string{"gcloud"}, args...), " "))
 	if data, err := runCommand(cmd); err != nil {
 		log.Println(string(data)) // stderr
 		return fmt.Errorf("failed to run gcloud set-named-ports: %v", err)
