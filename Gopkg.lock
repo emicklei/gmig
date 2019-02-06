@@ -11,7 +11,7 @@
   branch = "v2"
   name = "github.com/go-yaml/yaml"
   packages = ["."]
-  revision = "d670f9405373e636a5a2765eea47fac0c9bc91a4"
+  revision = "51d6538a90f86fe93ac480b35f37b2be17fef232"
 
 [[projects]]
   name = "github.com/urfave/cli"

@@ -172,13 +172,17 @@ func LoadMigrationsBetweenAnd(migrationsPath, firstFilename, lastFilename string
 		return
 	}
 	defer os.Chdir(here)
-	filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
-		if info.IsDir() || !isYamlFile(path) {
-			return nil
+	files, err := ioutil.ReadDir(".")
+	if err != nil {
+		log.Println("unable to read migrations from folder", err)
+		return
+	}
+	for _, each := range files {
+		if each.IsDir() || !isYamlFile(each.Name()) {
+			continue
 		}
-		filenames = append(filenames, path)
-		return nil
-	})
+		filenames = append(filenames, each.Name())
+	}
 	// old -> new
 	sort.StringSlice(filenames).Sort()
 	// load only pending migrations
