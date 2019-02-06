@@ -1,5 +1,9 @@
 # Changelist of gmig releases
 
+## v1.8.1
+
+- fixes bug in collecting migration files: it should not do recurse into subdirectories
+
 ## v1.8.0
 
 - replace timestamps in migration files by indices. (010,015,...)

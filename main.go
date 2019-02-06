@@ -4,11 +4,12 @@ import (
 	"log"
 	"os"
 	"sort"
+	"time"
 
 	"github.com/urfave/cli"
 )
 
-const version = "latest"
+var version = time.Now().String()
 
 func main() {
 	if err := newApp().Run(os.Args); err != nil {
