@@ -1,6 +1,6 @@
 # Changelist of gmig releases
 
-## v1.8.1
+## v1.8.2
 
 - fixes bug in collecting migration files: it should not do recurse into subdirectories
 
