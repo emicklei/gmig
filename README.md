@@ -161,7 +161,6 @@ If `migration file` is given then run that view only.
 
     gmig view my-gcp-production-project
 
-
 ### template [-w] source-file
 
 Processes the source-file as a Go template and write the result to stdout.
@@ -171,9 +170,9 @@ The following functions are available:
 #### env
 
 This function takes the first argument and does a lookup in the available OS environment values.
-Example:
+Example of a configuration snippet that needs the environment dependent value for $PROJECT.
 
-    {{ env "HOME" }}
+    project: {{ env "PROJECT" }}
 
 ## Export existing infrastructure
 

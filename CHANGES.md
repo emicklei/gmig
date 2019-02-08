@@ -1,5 +1,9 @@
 # Changelist of gmig releases
 
+## v1.9.0
+
+- add the "template" command for simple configuration transformation.
+
 ## v1.8.2
 
 - fixes bug in collecting migration files: it should not do recurse into subdirectories
