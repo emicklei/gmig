@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"text/template"
 
@@ -16,17 +15,20 @@ func cmdTemplate(c *cli.Context) error {
 	isRewrite := c.Bool("w")
 	data, err := ioutil.ReadFile(source)
 	if err != nil {
-		return err
+		printError(err.Error())
+		return errAbort
 	}
 	funcs := template.FuncMap{"env": os.Getenv}
 	tmpl, err := template.New("tmpl").Funcs(funcs).Parse(string(data))
 	if err != nil {
-		log.Fatal(err)
+		printError(err.Error())
+		return errAbort
 	}
 	output := new(bytes.Buffer)
 	err = tmpl.Execute(output, "")
 	if err != nil {
-		log.Fatal(err)
+		printError(err.Error())
+		return errAbort
 	}
 	if isRewrite {
 		return ioutil.WriteFile(source, output.Bytes(), os.FileMode(0644)) // -rw-r--r--, see http://permissions-calculator.org/
