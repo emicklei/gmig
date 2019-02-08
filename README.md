@@ -161,6 +161,18 @@ If `migration file` is given then run that view only.
 
     gmig view my-gcp-production-project
 
+
+### template [-w] source-file
+
+Processes the source-file as a Go template and write the result to stdout (unless -w is given).
+The following functions are available:
+
+#### env
+
+Example:
+
+    {{ env "HOME" }}
+
 ## Export existing infrastructure
 
 Exporting migrations from existing infrastructure is useful when you start working with `gmig` but do not want to start from scratch.
