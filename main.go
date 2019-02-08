@@ -138,6 +138,20 @@ func newApp() *cli.App {
 				path - name of the folder that contains the configuration of the target project.`,
 		},
 		{
+			Name:  "template",
+			Usage: "Process a template file (Go syntax)",
+			Action: func(c *cli.Context) error {
+				defer started(c, "process a template file")()
+				return cmdTemplate(c)
+			},
+			Flags: []cli.Flag{cli.BoolFlag{
+				Name:  "w",
+				Usage: `write result back to the source file instead of stdout.`,
+			}},
+			ArgsUsage: `<source>
+				source - name of the template file to process.`,
+		},
+		{
 			Name:  "util",
 			Usage: "Handle named ports {create-named-port|delete-named-port}",
 			Subcommands: []cli.Command{
