@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"errors"
 	"io/ioutil"
 	"log"
@@ -260,18 +259,15 @@ func cmdInit(c *cli.Context) error {
 		printError(err.Error())
 		return errAbort
 	}
-	location := filepath.Join(target, ConfigFilename)
-	_, err := os.Stat(location)
-	if err == nil {
-		log.Println("config file [", location, "] already present.")
-		cfg, err := LoadConfig(location)
-		if err != nil {
-			printError(err.Error())
-			return errAbort
-		}
+	config, err := TryToLoadConfig(target)
+	if config != nil && err == nil {
+		log.Println("config file [", config.filename, "] already present.")
 		// TODO move to Config
-		log.Println("config [ bucket=", cfg.Bucket, ",state=", cfg.LastMigrationObjectName, ",verbose=", cfg.verbose, "]")
+		log.Println("config [ bucket=", config.Bucket, ",state=", config.LastMigrationObjectName, ",verbose=", config.verbose, "]")
 		return nil
+	} else if config != nil && err != nil {
+		printError(err.Error())
+		return errAbort
 	}
 	cfg := Config{
 		LastMigrationObjectName: "gmig-last-migration",
@@ -279,8 +275,9 @@ func cmdInit(c *cli.Context) error {
 			"FOO": "bar",
 		},
 	}
-	data, _ := json.MarshalIndent(cfg, "", "\t")
-	err = ioutil.WriteFile(location, data, os.ModePerm)
+	data := cfg.ToYAML()
+	location := filepath.Join(target, YAMLConfigFilename)
+	err = ioutil.WriteFile(location, []byte(data), os.ModePerm)
 	if err != nil {
 		printError(err.Error())
 		return errAbort
