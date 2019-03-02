@@ -73,7 +73,8 @@ func loadJSONConfig(location string) (*Config, error) {
 	return loadAndUnmarshalConfig(location, json.Unmarshal)
 }
 
-// LoadConfig reads from gmig.json and validates it.
+// TryToLoadConfig reads configuration from path first looking for gmig.yaml,
+// if not exists fallback to gmig.yml and gmig.json then validates it.
 func TryToLoadConfig(pathToConfig string) (*Config, error) {
 	yamlLocation := filepath.Join(pathToConfig, YAMLConfigFilename)
 	ymlLocation := filepath.Join(pathToConfig, ymlConfigFilename)
