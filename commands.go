@@ -249,42 +249,6 @@ func cmdView(c *cli.Context) error {
 	return nil
 }
 
-func cmdInit(c *cli.Context) error {
-	target := c.Args().First()
-	if len(target) == 0 {
-		printError("missing target name in command line")
-		return errAbort
-	}
-	if err := os.MkdirAll(target, os.ModePerm|os.ModeDir); err != nil {
-		printError(err.Error())
-		return errAbort
-	}
-	config, err := TryToLoadConfig(target)
-	if config != nil && err == nil {
-		log.Println("config file [", config.filename, "] already present.")
-		// TODO move to Config
-		log.Println("config [ bucket=", config.Bucket, ",state=", config.LastMigrationObjectName, ",verbose=", config.verbose, "]")
-		return nil
-	} else if config != nil && err != nil {
-		printError(err.Error())
-		return errAbort
-	}
-	cfg := Config{
-		LastMigrationObjectName: "gmig-last-migration",
-		EnvironmentVars: map[string]string{
-			"FOO": "bar",
-		},
-	}
-	data := cfg.ToYAML()
-	location := filepath.Join(target, YAMLConfigFilename)
-	err = ioutil.WriteFile(location, []byte(data), os.ModePerm)
-	if err != nil {
-		printError(err.Error())
-		return errAbort
-	}
-	return nil
-}
-
 func cmdExportProjectIAMPolicy(c *cli.Context) error {
 	mtx, err := getMigrationContext(c)
 	if err != nil {

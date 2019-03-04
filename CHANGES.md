@@ -1,12 +1,16 @@
 # Changelist of gmig releases
 
+## v1.10.0
+
+- switch to YAML for configuration (JSON is fallback)
+
 ## v1.9.0
 
 - add the "template" command for simple configuration transformation.
 
 ## v1.8.2
 
-- fixes bug in collecting migration files: it should not do recurse into subdirectories
+- fixes bug in collecting migration files: it should not recurse into subdirectories
 
 ## v1.8.0
 
