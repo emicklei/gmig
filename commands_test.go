@@ -23,11 +23,11 @@ func TestCmdInitMissingConfig(t *testing.T) {
 	if _, err := os.Stat("test/missing"); err != nil {
 		t.Fatal("unexpected error", err)
 	}
-	if _, err := os.Stat("test/missing/gmig.json"); err != nil {
+	if _, err := os.Stat("test/missing/gmig.yaml"); err != nil {
 		t.Fatal("unexpected error", err)
 	}
-	if err := newApp().Run([]string{"gmig", "init", "test/missing"}); err != errAbort {
-		t.Fatal("expected abort")
+	if err := newApp().Run([]string{"gmig", "init", "test/missing"}); err != nil {
+		t.Fatal("unexpected error", err)
 	}
 }
 

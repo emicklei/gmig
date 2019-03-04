@@ -4,3 +4,5 @@ do:
 - gcloud compute addresses create my-static-ip --global
 undo:
 - gcloud compute addresses delete my-static-ip --global --quiet
+view:
+- gcloud compute addresses list | grep my-static-ip
