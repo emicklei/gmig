@@ -4,57 +4,106 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/go-yaml/yaml"
 	"io/ioutil"
+	"path/filepath"
 )
 
 // ConfigFilename is for reading bucket info
-const ConfigFilename = "gmig.json"
+const jsonConfigFilename = "gmig.json"
+const YAMLConfigFilename = "gmig.yaml"
+const ymlConfigFilename = "gmig.yml"
 
 // Config holds gmig program config
 type Config struct {
 	// Project is a GCP project name.
-	Project string `json:"project"`
+	Project string `json:"project" yaml:"project"`
 
 	// Region is a GCP region. Optional, use the default one if absent.
-	Region string `json:"region,omitempty"`
+	Region string `json:"region,omitempty" yaml:"region,omitempty"`
 
 	// Region is a GCP zone. Optional, use the default one if absent.
-	Zone string `json:"zone,omitempty"`
+	Zone string `json:"zone,omitempty" yaml:"zone,omitempty"`
 
 	// Bucket is the name of the Google Storage Bucket.
-	Bucket string `json:"bucket"`
+	Bucket string `json:"bucket" yaml:"bucket"`
 
 	//LastMigrationObjectName is the name of the bucket object and the local (temporary) file.
-	LastMigrationObjectName string `json:"state"`
+	LastMigrationObjectName string `json:"state" yaml:"state"`
 
 	// EnvironmentVars hold additional environment values
 	// that can be accessed by each command line in the Do & Undo section.
 	// Note that PROJECT,REGION and ZONE are already available.
-	EnvironmentVars map[string]string `json:"env,omitempty"`
+	EnvironmentVars map[string]string `json:"env,omitempty" yaml:"env,omitempty"`
 
 	// verbose if true then produce more logging.
 	verbose bool
+
+	// source filename
+	filename string
 }
 
-// LoadConfig reads from gmig.json and validates it.
-func LoadConfig(location string) (Config, error) {
+func loadAndUnmarshalConfig(location string, unmarshaller func(in []byte, out interface{}) (err error)) (*Config, error) {
 	data, err := ioutil.ReadFile(location)
+
 	if err != nil {
-		return Config{}, err
+		return nil, err
 	}
-	var c Config
-	if err := json.Unmarshal(data, &c); err != nil {
-		return c, err
+
+	c := &Config{
+		filename: location,
 	}
+
+	if err := unmarshaller(data, &c); err != nil {
+		return nil, err
+	}
+
 	if err := c.Validate(); err != nil {
-		return c, err
+		return nil, err
 	}
+
 	return c, nil
+}
+
+func loadYAMLConfig(location string) (*Config, error) {
+	return loadAndUnmarshalConfig(location, yaml.Unmarshal)
+}
+
+func loadJSONConfig(location string) (*Config, error) {
+	return loadAndUnmarshalConfig(location, json.Unmarshal)
+}
+
+// TryToLoadConfig reads configuration from path first looking for gmig.yaml,
+// if not exists fallback to gmig.yml and gmig.json then validates it.
+func TryToLoadConfig(pathToConfig string) (*Config, error) {
+	yamlLocation := filepath.Join(pathToConfig, YAMLConfigFilename)
+	ymlLocation := filepath.Join(pathToConfig, ymlConfigFilename)
+	jsonLocation := filepath.Join(pathToConfig, jsonConfigFilename)
+
+	if checkExists(yamlLocation) == nil {
+		return loadYAMLConfig(yamlLocation)
+	} else if checkExists(ymlLocation) == nil {
+		return loadYAMLConfig(ymlLocation)
+	} else if checkExists(jsonLocation) == nil {
+		config, err := loadJSONConfig(jsonLocation)
+
+		printWarning(fmt.Printf("json configuration is deprecated, your configuration in YAML\n========\n%s========\n", config.ToYAML()))
+
+		return config, err
+	}
+
+	return nil, errors.New("can not find any configuration")
 }
 
 // ToJSON returns the JSON representation.
 func (c Config) ToJSON() string {
 	data, _ := json.MarshalIndent(c, "", "\t")
+	return string(data)
+}
+
+// ToYAML returns the YAML representation.
+func (c Config) ToYAML() string {
+	data, _ := yaml.Marshal(c)
 	return string(data)
 }
 
