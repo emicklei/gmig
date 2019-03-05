@@ -15,18 +15,21 @@ var initialYAMLConfig = `
 # Google Cloud Platform migrations tool for infrastructure-as-code. See https://github.com/emicklei/gmig .
 
 # [project] must be the Google Cloud Project ID where the infrastructure is created.
+# Its value is available as $PROJECT in your migrations.
 #
 # Required by gmig.
 project: my-project
 
 # [region] must be a valid GCP region. See https://cloud.google.com/compute/docs/regions-zones/
 # A region is a specific geographical location where you can run your resources.
+# Its value is available as $REGION in your migrations.
 #
 # Not required by gmig but some gcloud and gsutil commands do require it.
 # region: europe-west1
 
 # [zone] must be a valid GCP zone. See https://cloud.google.com/compute/docs/regions-zones/
 # Each region has one or more zones; most regions have three or more zones.
+# Its value is available as $ZONE in your migrations.
 #
 # Not required by gmig but some gcloud and gsutil commands do require it.
 # zone: europe-west1-b
@@ -44,6 +47,7 @@ state: myapp-gmig-last-migration
 # [env] are additional environment values that are available to each section of a migration file.
 # This can be used to create migrations that are independent of the target project.
 # By convention, use capitalized words for keys.
+# In the example, "myapp-cluster" is available as $K8S_CLUSTER in your migrations.
 #
 # Not required by gmig.
 env:
