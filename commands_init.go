@@ -41,6 +41,8 @@ project: my-project
 # Required by gmig.
 bucket: my-bucket
 
+# [state] is the name of the object that hold information about the last applied migration.
+#
 # Required by gmig.
 state: myapp-gmig-last-migration
 
@@ -50,8 +52,8 @@ state: myapp-gmig-last-migration
 # In the example, "myapp-cluster" is available as $K8S_CLUSTER in your migrations.
 #
 # Not required by gmig.
-env:
-  K8S_CLUSTER: myapp-cluster
+#env:
+#  K8S_CLUSTER: myapp-cluster
 `
 
 func cmdInit(c *cli.Context) error {
