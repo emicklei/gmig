@@ -128,7 +128,7 @@ You must change the file `gmig.yaml` to set the Project and Bucket name.
     # Not required by gmig but some gcloud and gsutil commands do require it.
     # zone: europe-west1-b
     
-    # [bucket] must be a valid GPC bucket.
+    # [bucket] must be a valid GCP Storage bucket.
     # A Google Storage Bucket is used to store information (object) about the last applied migration.
     # Bucket can contain multiple objects from multiple applications. Make sure the [state] is different for each app.
     #
