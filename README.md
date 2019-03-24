@@ -149,7 +149,7 @@ You must change the file `gmig.yaml` to set the Project and Bucket name.
       K8S_CLUSTER: myapp-cluster
 
 If you decide to store state files of different projects in one Bucket then set the state object name to reflect this, eg. `myproject-gmig-state`.
-If you want to apply the same migrations to different regions/zones then choose a target folder name to reflect this, eg. `my-gcp-production-project-us-east`. Values for `region` and `zone` are required if you want to create Compute Engine resources. The `env` map can be used to parameterize commands in your migrations. All commands will have access to the value of `$FOO`.
+If you want to apply the same migrations to different regions/zones then choose a target folder name to reflect this, eg. `my-gcp-production-project-us-east`. Values for `region` and `zone` are required if you want to create Compute Engine resources. The `env` map can be used to parameterize commands in your migrations. In the example, all commands will have access to the value of `$K8S_CLUSTER`.
 
 ### new \<title>
 
