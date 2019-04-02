@@ -1,5 +1,9 @@
 # Changelist of gmig releases
 
+## v1.10.1
+
+- fix warning message, remove vendor folder in favor of go modules.
+
 ## v1.10.0
 
 - switch to YAML for configuration (JSON is fallback)

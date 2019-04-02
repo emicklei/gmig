@@ -4,9 +4,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/go-yaml/yaml"
 	"io/ioutil"
 	"path/filepath"
+
+	"github.com/go-yaml/yaml"
 )
 
 // ConfigFilename is for reading bucket info
@@ -86,9 +87,7 @@ func TryToLoadConfig(pathToConfig string) (*Config, error) {
 		return loadYAMLConfig(ymlLocation)
 	} else if checkExists(jsonLocation) == nil {
 		config, err := loadJSONConfig(jsonLocation)
-
-		printWarning(fmt.Printf("json configuration is deprecated, your configuration in YAML\n========\n%s========\n", config.ToYAML()))
-
+		printWarning(fmt.Sprintf("JSON configuration (gmig.json) is deprecated, your configuration in YAML\n========\n%s========\n", config.ToYAML()))
 		return config, err
 	}
 
