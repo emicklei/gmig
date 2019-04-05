@@ -36,3 +36,11 @@ func TestConfig(t *testing.T) {
 		t.Logf("got [%v] want [%v]", got, want)
 	}
 }
+
+func TestTryToLoadConfig(t *testing.T) {
+	c, err := TryToLoadConfig("bogus")
+	if err == nil {
+		t.Error("should return error about non existing bogus folder/file")
+	}
+	t.Log(c, err)
+}

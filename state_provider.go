@@ -72,7 +72,10 @@ func getStateProvider(c *cli.Context) (StateProvider, error) {
 	}
 	if err != nil {
 		workdir, _ := os.Getwd()
-		abs, _ := filepath.Abs(cfg.filename)
+		abs := "?"
+		if cfg != nil {
+			abs, _ = filepath.Abs(cfg.filename)
+		}
 		return currentStateProvider, tre.New(err, "error loading configuration (did you init?)", "path", pathToConfig, "workdir", workdir, "location", abs)
 	}
 	cfg.verbose = cfg.verbose || verbose
