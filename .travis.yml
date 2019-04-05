@@ -1,5 +1,7 @@
 language: go
-go:
-  - 1.x
+go: 
+ - 1.10.x
 script:
-  ls -lr test && go test -v && go build
+ - ls -lr test
+ - env GO111MODULE=on go build
+ - env GO111MODULE=on go test
