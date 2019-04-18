@@ -16,7 +16,7 @@ import (
 
 	"text/template"
 
-	"github.com/go-yaml/yaml"
+	"gopkg.in/yaml.v2"
 )
 
 // Migration holds shell commands for applying or reverting a change.
