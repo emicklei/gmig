@@ -16,7 +16,7 @@ Your `gmig` infrastructure is basically a folder with incremental change files, 
     /010_create_some_account.yaml
     /015_add_permissions_to_some_account.yaml
     /my-gcp-production-project
-        gmig.json
+        gmig.yaml
 
 Each change is a single YAML file with one or more shell commands that change infrastructure for a project.
 
@@ -100,7 +100,7 @@ Prepares your setup for working with migrations by creating a `gmig.json` file i
 Then your filesystem will have:
 
     /my-gcp-production-project/
-        gmig.json
+        gmig.yaml
 
 You must change the file `gmig.yaml` to set the Project and Bucket name.
 
