@@ -1,5 +1,11 @@
 # Changelist of gmig releases
 
+## v1.10.4
+
+- simplify list, fix export iam policy
+- use yaml v2
+- fix handling invalid config folder
+
 ## v1.10.1
 
 - fix warning message, remove vendor folder in favor of go modules.
