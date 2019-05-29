@@ -31,13 +31,6 @@ type Migration struct {
 // for testing
 var timeNow = time.Now
 
-// NewFilename generates a filename for storing a new migration.
-func NewFilename(desc string) string {
-	now := timeNow()
-	sanitized := strings.Replace(strings.ToLower(desc), " ", "_", -1)
-	return fmt.Sprintf("%d%02d%02dt%02d%02d%02d_%s.yaml", now.Year(), now.Month(), now.Day(), now.Hour(), now.Minute(), now.Second(), sanitized)
-}
-
 // NewFilenameWithIndex generates a filename using an index for storing
 // a new migration.
 func NewFilenameWithIndex(desc string) string {

@@ -16,7 +16,7 @@ func TestExportProjectsIAMPolicy(t *testing.T) {
 	timeNow = func() time.Time { return time.Time{} }
 
 	// cleanup generated migration
-	generated := "10101t000000_exported_project_iam_policy.yaml"
+	generated := "010_exported_project_iam_policy.yaml"
 	defer os.Remove(generated)
 
 	// capture GC command

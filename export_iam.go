@@ -78,7 +78,7 @@ func ExportProjectsIAMPolicy(cfg Config) error {
 			fmt.Fprintf(content, cmd)
 		}
 	}
-	filename := NewFilename("exported project iam policy")
+	filename := NewFilenameWithIndex("exported project iam policy")
 	if cfg.verbose {
 		log.Println("writing", filename)
 	}

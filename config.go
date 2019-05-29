@@ -87,7 +87,7 @@ func TryToLoadConfig(pathToConfig string) (*Config, error) {
 		return loadYAMLConfig(ymlLocation)
 	} else if checkExists(jsonLocation) == nil {
 		config, err := loadJSONConfig(jsonLocation)
-		printWarning(fmt.Sprintf("JSON configuration (gmig.json) is deprecated, your configuration in YAML\n========\n%s========\n", config.ToYAML()))
+		printWarning(fmt.Sprintf("JSON configuration (gmig.json) is deprecated, your configuration (gmig.yaml) in YAML\n========\n%s========\n", config.ToYAML()))
 		return config, err
 	}
 

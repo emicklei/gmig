@@ -83,7 +83,7 @@ func ExportStorageIAMPolicy(cfg Config) error {
 	}
 
 	// write the migration
-	filename := NewFilename("exported buckets iam policy")
+	filename := NewFilenameWithIndex("exported buckets iam policy")
 	if cfg.verbose {
 		log.Println("writing", filename)
 	}

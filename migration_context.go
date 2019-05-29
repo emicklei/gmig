@@ -19,7 +19,7 @@ type migrationContext struct {
 func getMigrationContext(c *cli.Context) (ctx migrationContext, err error) {
 	pathToConfig := c.Args().First()
 	if len(pathToConfig) == 0 {
-		err = fmt.Errorf("missing path containing gmig.json in command line")
+		err = fmt.Errorf("missing path containing gmig.yaml in command line")
 		return
 	}
 	stateProvider, err := getStateProvider(c)

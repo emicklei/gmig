@@ -187,7 +187,6 @@ func cmdMigrationsStatus(c *cli.Context) error {
 	}
 	log.Println(statusSeparator)
 	var last string
-	prettyWidth := largestWidthOf(all)
 	for _, each := range all {
 		status := applied
 		if each.Filename > mtx.lastApplied {
@@ -196,7 +195,7 @@ func cmdMigrationsStatus(c *cli.Context) error {
 				log.Println(statusSeparator)
 			}
 		}
-		log.Printf("%s %-"+strconv.Itoa(prettyWidth)+"s (%s)\n", status, pretty(each.Filename), each.Filename)
+		log.Printf("%s %s\n", status, pretty(each.Filename))
 		last = status
 	}
 	log.Println(statusSeparator)
