@@ -4,10 +4,10 @@ clean:
 	rm -rf target
 
 build:
-	docker run --rm -it -v "${PWD}":/go/src/github.com/emicklei/gmig -w /go/src/github.com/emicklei/gmig golang:1.10 make build_inside
+	docker run --rm -it -v "${PWD}":/src -w /src golang make build_inside
 
 build_inside:
-	cd /go/src/github.com/emicklei/gmig && \
+	cd /src && \
 	rm -rf target && \
 	mkdir -p target/windows && \
 	mkdir -p target/darwin && \
