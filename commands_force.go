@@ -11,6 +11,7 @@ func cmdMigrationsSetState(c *cli.Context) error {
 	mtx, err := getMigrationContext(c)
 	if err != nil {
 		printWarning(err.Error())
+		return nil
 	}
 	filename := c.Args().Get(1) // 0=path, 1=relative filename
 	if !c.GlobalBool("q") {     // be quiet
