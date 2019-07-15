@@ -31,7 +31,7 @@ func checkExists(filename string) error {
 		return nil
 	}
 	abs, _ := filepath.Abs(filename)
-	return fmt.Errorf("no such migration (wrong project?, git pull?):%s", abs)
+	return fmt.Errorf("no such migration (wrong project?, git pull?) [%s]", abs)
 }
 
 // runCommand is wrapper for CombinedOutput to make this package easy testable.

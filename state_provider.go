@@ -66,7 +66,7 @@ func getStateProvider(c *cli.Context) (StateProvider, error) {
 	verbose := c.GlobalBool("v")
 	pathToConfig := c.Args().First()
 	cfg, err := TryToLoadConfig(pathToConfig)
-	if verbose {
+	if verbose && err == nil {
 		abs, _ := filepath.Abs(cfg.filename)
 		log.Println("loading configuration from", abs)
 	}
