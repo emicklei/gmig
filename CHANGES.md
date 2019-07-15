@@ -1,5 +1,11 @@
 # Changelist of gmig releases
 
+## v1.10.6
+
+- better error message when migration is not found
+- fix panic when config folder is misspelled or missing
+- fix panic when force command is wrongly used
+
 ## v1.10.4
 
 - simplify list, fix export iam policy
