@@ -9,3 +9,5 @@ require (
 	github.com/voxelbrain/goptions v0.0.0-20180630082107-58cddc247ea2 // indirect
 	gopkg.in/yaml.v2 v2.2.2
 )
+
+go 1.13

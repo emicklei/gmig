@@ -253,6 +253,12 @@ Use this command with care!.
 
     gmig force undo my-gcp-production-project 010_create_some_account.yaml
 
+## export-env \<path>
+Export all available environment variable from the configuration file and also export $PROJECT, $REGION and $ZONE
+Use this command with care!.
+
+    eval $(gmig export-env my-gcp-production-project)
+
 ## GCP utilities
 
 ### util create-named-port \<instance-group> \<name:port>

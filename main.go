@@ -138,6 +138,17 @@ func newApp() *cli.App {
 				path - name of the folder that contains the configuration of the target project.`,
 		},
 		{
+			Name:  "export-env",
+			Usage: "print export for each environment variable.",
+			Action: func(c *cli.Context) error {
+				defer started(c, "export environment variables")()
+				return cmdExportEnv(c)
+			},
+			Flags: []cli.Flag{migrationsFlag},
+			ArgsUsage: `<path>
+				path - name of the folder that contains the configuration of the target project.`,
+		},
+		{
 			Name:  "template",
 			Usage: "Process a template file (Go syntax)",
 			Action: func(c *cli.Context) error {

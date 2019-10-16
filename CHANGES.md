@@ -1,5 +1,8 @@
 # Changelist of gmig releases
 
+## v1.11.0
+- added functionality to quickly get all environment variable from a gmig config and also $PROJECT, $REGION and $ZONE
+
 ## v1.10.6
 
 - better error message when migration is not found
