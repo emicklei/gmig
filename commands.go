@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -270,6 +271,24 @@ func cmdExportStorageIAMPolicy(c *cli.Context) error {
 	if err := ExportStorageIAMPolicy(mtx.stateProvider.Config()); err != nil {
 		printError(err.Error())
 		return errAbort
+	}
+	return nil
+}
+
+func cmdExportEnv(c *cli.Context) error {
+	pathToConfig := c.Args().First()
+	config, err := TryToLoadConfig(pathToConfig)
+	if err != nil {
+		printError(err.Error())
+		return errAbort
+	}
+
+	tmpl := "export %s=%s\n"
+	fmt.Printf(tmpl, "PROJECT", config.Project)
+	fmt.Printf(tmpl, "REGION", config.Region)
+	fmt.Printf(tmpl, "ZONE", config.Zone)
+	for key, value := range config.EnvironmentVars {
+		fmt.Printf(tmpl, key, value)
 	}
 	return nil
 }
