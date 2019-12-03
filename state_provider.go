@@ -24,10 +24,13 @@ type FileStateProvider struct {
 	tempDir       string
 }
 
+// for testing
+var osTempDir = os.TempDir
+
 func NewFileStateProvider(c Config) FileStateProvider {
 	return FileStateProvider{
 		Configuration: c,
-		tempDir:       os.TempDir(),
+		tempDir:       osTempDir(),
 	}
 }
 

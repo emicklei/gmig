@@ -32,6 +32,7 @@ func TestCmdInitMissingConfig(t *testing.T) {
 }
 
 func TestCmdStatusDemo(t *testing.T) {
+	osTempDir = func() string { return "." }
 	// simulate effect of GS download state
 	if err := ioutil.WriteFile("state", []byte("20180216t120915_one.yaml"), os.ModePerm); err != nil {
 		t.Fatal("unable to write state", err)
@@ -60,6 +61,7 @@ func TestCmdStatusDemo(t *testing.T) {
 }
 
 func TestCmdStatusDemoWithMigrationsOption(t *testing.T) {
+	osTempDir = func() string { return "." }
 	// simulate effect of GS download state
 	if err := ioutil.WriteFile("state", []byte("20180216t120915_one.yaml"), os.ModePerm); err != nil {
 		t.Fatal("unable to write state", err)
@@ -75,6 +77,7 @@ func TestCmdStatusDemoWithMigrationsOption(t *testing.T) {
 }
 
 func TestCmdForceState(t *testing.T) {
+	osTempDir = func() string { return "." }
 	// simulate effect of GS download old state
 	if err := ioutil.WriteFile("state", []byte("20180216t120915_one.yaml"), os.ModePerm); err != nil {
 		t.Fatal("unable to write state", err)

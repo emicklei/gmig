@@ -1,6 +1,13 @@
 # Changelist of gmig releases
 
+## v1.12.0
+
+- fix handling failure when force do has invalid config
+- improve printing error message
+- last migration state is now temporary stored in OS temp directory
+
 ## v1.11.0
+
 - added functionality to quickly get all environment variable from a gmig config and also $PROJECT, $REGION and $ZONE
 
 ## v1.10.6
