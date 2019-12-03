@@ -21,23 +21,35 @@ type StateProvider interface {
 // FileStateProvider use a local file to store state (last migration applied).
 type FileStateProvider struct {
 	Configuration Config
+	tempDir       string
+}
+
+func NewFileStateProvider(c Config) FileStateProvider {
+	return FileStateProvider{
+		Configuration: c,
+		tempDir:       os.TempDir(),
+	}
+}
+
+func (l FileStateProvider) stateFilename() string {
+	return filepath.Join(l.tempDir, l.Configuration.LastMigrationObjectName)
 }
 
 // LoadState implements StateProvider
 func (l FileStateProvider) LoadState() (string, error) {
 	if l.Configuration.verbose {
-		log.Println("reading local copy", l.Configuration.LastMigrationObjectName)
+		log.Println("reading local copy", l.stateFilename())
 	}
-	data, err := ioutil.ReadFile(l.Configuration.LastMigrationObjectName)
-	return string(data), tre.New(err, "error reading state", "file", l.Configuration.LastMigrationObjectName)
+	data, err := ioutil.ReadFile(l.stateFilename())
+	return string(data), tre.New(err, "error reading state", "file", l.stateFilename())
 }
 
 // SaveState implements StateProvider
 func (l FileStateProvider) SaveState(filename string) error {
 	if l.Configuration.verbose {
-		log.Println("writing local copy", l.Configuration.LastMigrationObjectName)
+		log.Println("writing local copy", l.stateFilename())
 	}
-	return ioutil.WriteFile(l.Configuration.LastMigrationObjectName, []byte(filename), os.ModePerm)
+	return ioutil.WriteFile(l.stateFilename(), []byte(filename), os.ModePerm)
 }
 
 // Config implements StateProvider
@@ -51,9 +63,9 @@ var osRemove = os.Remove
 // DeleteState implements StateProvider
 func (l FileStateProvider) DeleteState() {
 	if l.Configuration.verbose {
-		log.Println("deleting local copy", l.Configuration.LastMigrationObjectName)
+		log.Println("deleting local copy", l.stateFilename())
 	}
-	osRemove(l.Configuration.LastMigrationObjectName)
+	osRemove(l.stateFilename())
 }
 
 // read it once

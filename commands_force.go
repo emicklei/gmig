@@ -42,6 +42,7 @@ func runSectionOnly(c *cli.Context, isDo bool) error {
 	mtx, err := getMigrationContext(c)
 	if err != nil {
 		printWarning(err.Error())
+		return nil
 	}
 	section := "do"
 	if !isDo {
@@ -49,7 +50,7 @@ func runSectionOnly(c *cli.Context, isDo bool) error {
 	}
 	filename := c.Args().Get(1) // 0=path, 1=relative filename
 	if !c.GlobalBool("q") {     // be quiet
-		if !promptForYes(fmt.Sprintf("Are you sure to run the [%s] section of migration [%s] (y/N)? ", section, filename)) {
+		if !promptForYes(fmt.Sprintf("Are you sure to run the [%s] section of migration [%s] for config [%s] (y/N)? ", section, filename, c.Args().Get(0))) {
 			return errAbort
 		}
 	}

@@ -16,7 +16,7 @@ type GCS struct {
 
 // NewGCS returns a new GCS
 func NewGCS(cfg Config) GCS {
-	return GCS{onDiskAccess: FileStateProvider{Configuration: cfg}}
+	return GCS{onDiskAccess: NewFileStateProvider(cfg)}
 }
 
 // LoadState implements StateProvider
@@ -24,7 +24,7 @@ func (g GCS) LoadState() (string, error) {
 	defer g.onDiskAccess.DeleteState()
 	cmdline := []string{"gsutil", "-q", "cp",
 		"gs://" + filepath.Join(g.Config().Bucket, g.Config().LastMigrationObjectName),
-		g.Config().LastMigrationObjectName}
+		g.onDiskAccess.stateFilename()}
 	if err := g.gsutil(cmdline); err != nil {
 		// see if there was no last applied state
 		if strings.Contains(err.Error(), "No URLs matched") { // lame detection method TODO
