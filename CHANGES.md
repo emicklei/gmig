@@ -1,5 +1,9 @@
 # Changelist of gmig releases
 
+## v1.12.2
+
+- fix bug introduced with 1.12.0/1 when saving state in GCS
+
 ## v1.12.0
 
 - fix handling failure when force do has invalid config
