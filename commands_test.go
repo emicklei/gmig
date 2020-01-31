@@ -135,6 +135,7 @@ func TestCmdUp(t *testing.T) {
 }
 
 func TestCmdUpAndStop(t *testing.T) {
+	keepState()
 	// simulate effect of GS download old state
 	if err := ioutil.WriteFile("state", []byte("20180216t120915_one.yaml"), os.ModePerm); err != nil {
 		t.Fatal("unable to write state", err)
@@ -148,7 +149,7 @@ func TestCmdUpAndStop(t *testing.T) {
 		wd, _ := os.Getwd()
 		t.Fatal("unexpected error", err, wd)
 	}
-	if got, want := len(cc.args), 4; got != want { // set config, load 1, do, save 2, stop
+	if got, want := len(cc.args), 6; got != want { // set config, load 1, do, save 2, stop
 		t.Errorf("got [%v] want [%v]", got, want)
 	}
 }
@@ -174,7 +175,6 @@ func TestCmdUpAndStopAfterUnexistingFilename(t *testing.T) {
 	if err := ioutil.WriteFile("state", []byte("20180216t120915_one.yaml"), os.ModePerm); err != nil {
 		t.Fatal("unable to write state", err)
 	}
-	defer os.Remove("state")
 	// capture GC command
 	cc := new(commandCapturer)
 	runCommand = cc.runCommand
@@ -187,16 +187,21 @@ func TestCmdUpAndStopAfterUnexistingFilename(t *testing.T) {
 	}
 }
 
+func keepState() {
+	osTempDir = func() string { return "." }
+	osRemove = func(s string) error { return nil } // do not remove because we run status after up
+}
+
 func TestCmdDown(t *testing.T) {
+	keepState()
 	// simulate effect of GS download old state
 	if err := ioutil.WriteFile("state", []byte("20180216t120915_one.yaml"), os.ModePerm); err != nil {
 		t.Fatal("unable to write state", err)
 	}
-	defer os.Remove("state")
 	// capture GC command
 	cc := new(commandCapturer)
 	runCommand = cc.runCommand
-	if err := newApp().Run([]string{"gmig", "down", "test/demo"}); err != nil {
+	if err := newApp().Run([]string{"gmig", "-v", "down", "test/demo"}); err != nil {
 		wd, _ := os.Getwd()
 		t.Fatal("unexpected error", err, wd)
 	}
@@ -210,7 +215,6 @@ func TestCmdDownWhenNoLastMigration(t *testing.T) {
 	if err := ioutil.WriteFile("state", []byte(""), os.ModePerm); err != nil {
 		t.Fatal("unable to write state", err)
 	}
-	defer os.Remove("state")
 	// capture GC command
 	cc := new(commandCapturer)
 	runCommand = cc.runCommand
@@ -223,6 +227,7 @@ func TestCmdDownWhenNoLastMigration(t *testing.T) {
 }
 
 func TestCmdView(t *testing.T) {
+	osTempDir = func() string { return "." }
 	// simulate effect of GS download old state
 	if err := ioutil.WriteFile("state", []byte("20180216t120915_one.yaml"), os.ModePerm); err != nil {
 		t.Fatal("unable to write state", err)
