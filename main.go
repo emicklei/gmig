@@ -97,7 +97,10 @@ func newApp() *cli.App {
 			Usage: "Runs the do section of all pending migrations in order, one after the other. If a migration file is specified then stop after applying that one.",
 			Action: func(c *cli.Context) error {
 				defer started(c, "up = apply pending migrations")()
-				return cmdMigrationsUp(c)
+				if err := cmdMigrationsUp(c); err != nil {
+					return err
+				}
+				return cmdMigrationsStatus(c)
 			},
 			Flags: []cli.Flag{migrationsFlag},
 			ArgsUsage: `<path> [stop] 
@@ -109,7 +112,10 @@ func newApp() *cli.App {
 			Usage: "Runs the undo section of only the last applied migration.",
 			Action: func(c *cli.Context) error {
 				defer started(c, "down = undo last applied migration")()
-				return cmdMigrationsDown(c)
+				if err := cmdMigrationsDown(c); err != nil {
+					return err
+				}
+				return cmdMigrationsStatus(c)
 			},
 			Flags: []cli.Flag{migrationsFlag},
 			ArgsUsage: `<path>
@@ -200,7 +206,10 @@ func newApp() *cli.App {
 					Usage: "Explicitly set the state to a specified migration filename.",
 					Action: func(c *cli.Context) error {
 						defer started(c, "force last applied migration (state)")()
-						return cmdMigrationsSetState(c)
+						if err := cmdMigrationsSetState(c); err != nil {
+							return err
+						}
+						return cmdMigrationsStatus(c)
 					},
 					ArgsUsage: `<path>
 					path - name of the folder that contains the configuration of the target project.`,
