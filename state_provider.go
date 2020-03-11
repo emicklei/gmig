@@ -41,16 +41,18 @@ func (l FileStateProvider) stateFilename() string {
 // LoadState implements StateProvider
 func (l FileStateProvider) LoadState() (string, error) {
 	if l.Configuration.verbose {
-		log.Println("reading local copy", l.stateFilename())
+		d, _ := os.Getwd()
+		log.Println("reading local copy", l.stateFilename(), ",cwd=", d)
 	}
 	data, err := ioutil.ReadFile(l.stateFilename())
-	return string(data), tre.New(err, "error reading state", "file", l.stateFilename())
+	return string(data), tre.New(err, "error reading state", "tempDir", l.tempDir, "lastMigration", l.Configuration.LastMigrationObjectName)
 }
 
 // SaveState implements StateProvider
 func (l FileStateProvider) SaveState(filename string) error {
 	if l.Configuration.verbose {
-		log.Println("writing local copy", l.stateFilename())
+		d, _ := os.Getwd()
+		log.Println("writing local copy", l.stateFilename(), ",cwd=", d)
 	}
 	return ioutil.WriteFile(l.stateFilename(), []byte(filename), os.ModePerm)
 }
@@ -66,7 +68,8 @@ var osRemove = os.Remove
 // DeleteState implements StateProvider
 func (l FileStateProvider) DeleteState() {
 	if l.Configuration.verbose {
-		log.Println("deleting local copy", l.stateFilename())
+		d, _ := os.Getwd()
+		log.Println("deleting local copy", l.stateFilename(), ",cwd=", d)
 	}
 	osRemove(l.stateFilename())
 }
