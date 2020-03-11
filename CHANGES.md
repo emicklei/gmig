@@ -1,5 +1,9 @@
 # Changelist of gmig releases
 
+## v1.13.0 [2020-03-11]
+
+- show status after up,down and force state
+
 ## v1.12.2
 
 - fix bug introduced with 1.12.0/1 when saving state in GCS
