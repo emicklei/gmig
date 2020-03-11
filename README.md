@@ -53,6 +53,14 @@ To view the current state of your infrastructure related to each migration, you 
 
 and use the `view` subcommand.
 
+## Condition migration
+
+Sometimes environments do not need to be setup exactly the same way.
+Commands (do,undo,view) can be made conditional by adding an `if` section.
+
+  if:
+    env: PROJECT
+    matches: your-project-id
 
 ## Help
 

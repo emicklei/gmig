@@ -9,6 +9,7 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strconv"
 	"strings"
@@ -21,11 +22,44 @@ import (
 
 // Migration holds shell commands for applying or reverting a change.
 type Migration struct {
-	Filename    string   `yaml:"-"`
-	Description string   `yaml:"-"`
-	DoSection   []string `yaml:"do"`
-	UndoSection []string `yaml:"undo"`
-	ViewSection []string `yaml:"view"`
+	Filename     string             `yaml:"-"`
+	Description  string             `yaml:"-"`
+	IfExpression ExecutionCondition `yaml:"if"`
+	DoSection    []string           `yaml:"do"`
+	UndoSection  []string           `yaml:"undo"`
+	ViewSection  []string           `yaml:"view"`
+}
+
+// ExecutionCondition models the if condition in a migration.
+type ExecutionCondition struct {
+	EnvironmentVariable string `yaml:"env"`
+	MatchesPattern      string `yaml:"matches"`
+}
+
+// Evaluate return true if value.matches(any env).
+func (e ExecutionCondition) Evaluate(envs []string) bool {
+	if len(e.EnvironmentVariable) == 0 {
+		return true
+	}
+	for _, each := range envs {
+		kv := strings.Split(each, "=")
+		if len(kv) != 2 {
+			continue
+		}
+		k := strings.TrimSpace(kv[0])
+		v := strings.TrimSpace(kv[1])
+		if k != e.EnvironmentVariable {
+			continue
+		}
+		if ok, _ := regexp.Match(e.MatchesPattern, []byte(v)); ok {
+			return true
+		}
+	}
+	return false
+}
+
+func (e ExecutionCondition) String() string {
+	return fmt.Sprintf(`"$%s".match(%q)`, e.EnvironmentVariable, e.MatchesPattern)
 }
 
 // for testing
@@ -81,10 +115,16 @@ func (m Migration) ToYAML() ([]byte, error) {
 	return out.Bytes(), err
 }
 
-// ExecuteAll the commands for this migration.
+// ExecuteAll the commands for this migration unless the condition evaluates to false
 // We create a temporary executable file with all commands.
 // This allows for using shell variables in multiple commands.
-func ExecuteAll(commands []string, envs []string, verbose bool) error {
+func ExecuteAll(ifExpression ExecutionCondition, commands []string, envs []string, verbose bool) error {
+	// check condition
+	if !ifExpression.Evaluate(envs) {
+		log.Printf(".. skipping ... (%d) commands because %s is false.\n", len(commands), ifExpression.String())
+		return nil
+	}
+
 	if len(commands) == 0 {
 		return nil
 	}
@@ -97,6 +137,9 @@ func ExecuteAll(commands []string, envs []string, verbose bool) error {
 	}
 	if err := ioutil.WriteFile(tempScript, content.Bytes(), os.ModePerm); err != nil {
 		return fmt.Errorf("failed to write temporary migration section:%v", err)
+	}
+	if verbose {
+		log.Println("--- BEGIN gmig.sh:\n", content.String(), "--- END gmig.sh")
 	}
 	defer func() {
 		if err := os.Remove(tempScript); err != nil {
@@ -151,6 +194,7 @@ func setupShellScript(verbose bool) string {
 		flag = "-x"
 	}
 	return fmt.Sprintf(`#!/bin/bash
+# temporary gmig execution script
 set -e %s`, flag)
 }
 
