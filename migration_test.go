@@ -57,6 +57,7 @@ func readConfig() Config {
 func TestSetupShellScriptNotVerbose(t *testing.T) {
 
 	want := `#!/bin/bash
+# temporary gmig execution script
 set -e -v`
 
 	if got := setupShellScript(false); got != want {
@@ -67,6 +68,7 @@ set -e -v`
 func TestSetupShellScriptVerbose(t *testing.T) {
 
 	want := `#!/bin/bash
+# temporary gmig execution script
 set -e -x`
 
 	if got := setupShellScript(true); got != want {

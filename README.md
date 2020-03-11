@@ -53,14 +53,15 @@ To view the current state of your infrastructure related to each migration, you 
 
 and use the `view` subcommand.
 
-## Condition migration
+## Conditional migration
 
-Sometimes environments do not need to be setup exactly the same way.
+Sometimes environments do `not` need to be setup exactly the same way.
 Commands (do,undo,view) can be made conditional by adding an `if` section.
+You can only use custom environment variables and configuration parameters (PROJECT,ZONE,REGION).
 
-  if:
-    env: PROJECT
-    matches: your-project-id
+  if: (PROJECT == "your-project-id") && (ZONE == "my-zone")
+
+See [Language-Definition](https://github.com/antonmedv/expr/blob/master/docs/Language-Definition.md)
 
 ## Help
 
