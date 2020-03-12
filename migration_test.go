@@ -121,3 +121,14 @@ func TestNewFilenameWithIndex(t *testing.T) {
 		t.Errorf("NewFilenameWithIndex(%s) = %v, want %v", desc, got, want)
 	}
 }
+
+func TestEvaluateCondition(t *testing.T) {
+	envs := []string{"ZONE=A", "PROJECT=B"}
+	ok, err := evaluateCondition(`PROJECT == "B"`, envs)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if got, want := ok, true; got != want {
+		t.Errorf("got [%v] want [%v]", got, want)
+	}
+}
