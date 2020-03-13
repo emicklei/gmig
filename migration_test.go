@@ -57,6 +57,7 @@ func readConfig() Config {
 func TestSetupShellScriptNotVerbose(t *testing.T) {
 
 	want := `#!/bin/bash
+# temporary gmig execution script
 set -e -v`
 
 	if got := setupShellScript(false); got != want {
@@ -67,6 +68,7 @@ set -e -v`
 func TestSetupShellScriptVerbose(t *testing.T) {
 
 	want := `#!/bin/bash
+# temporary gmig execution script
 set -e -x`
 
 	if got := setupShellScript(true); got != want {
@@ -117,5 +119,16 @@ func TestNewFilenameWithIndex(t *testing.T) {
 	want = "010_potentially_unexpected_naming.yaml"
 	if got := NewFilenameWithIndex(desc); got != want {
 		t.Errorf("NewFilenameWithIndex(%s) = %v, want %v", desc, got, want)
+	}
+}
+
+func TestEvaluateCondition(t *testing.T) {
+	envs := []string{"ZONE=A", "PROJECT=B"}
+	ok, err := evaluateCondition(`PROJECT == "B"`, envs)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if got, want := ok, true; got != want {
+		t.Errorf("got [%v] want [%v]", got, want)
 	}
 }

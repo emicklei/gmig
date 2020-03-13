@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -16,16 +17,47 @@ import (
 
 	"text/template"
 
+	"github.com/antonmedv/expr"
 	"gopkg.in/yaml.v2"
 )
 
 // Migration holds shell commands for applying or reverting a change.
 type Migration struct {
-	Filename    string   `yaml:"-"`
-	Description string   `yaml:"-"`
-	DoSection   []string `yaml:"do"`
-	UndoSection []string `yaml:"undo"`
-	ViewSection []string `yaml:"view"`
+	Filename     string   `yaml:"-"`
+	Description  string   `yaml:"-"`
+	IfExpression string   `yaml:"if"`
+	DoSection    []string `yaml:"do"`
+	UndoSection  []string `yaml:"undo"`
+	ViewSection  []string `yaml:"view"`
+}
+
+// evaluateCondition evaluates the expression to a bool ; report error otherwise.
+func evaluateCondition(ifExpression string, envs []string) (bool, error) {
+	if len(ifExpression) == 0 {
+		return true, nil
+	}
+	envMap := map[string]string{}
+	for _, each := range envs {
+		kv := strings.Split(each, "=")
+		if len(kv) != 2 {
+			continue
+		}
+		k := strings.TrimSpace(kv[0])
+		v := strings.TrimSpace(kv[1])
+		envMap[k] = v
+	}
+	program, err := expr.Compile(ifExpression, expr.Env(envMap))
+	if err != nil {
+		return false, err
+	}
+	output, err := expr.Run(program, envMap)
+	if err != nil {
+		return false, err
+	}
+	if b, ok := output.(bool); ok {
+		return b, nil
+	}
+	return false, errors.New("expression does not evaluate to a boolean")
 }
 
 // for testing
@@ -81,10 +113,20 @@ func (m Migration) ToYAML() ([]byte, error) {
 	return out.Bytes(), err
 }
 
-// ExecuteAll the commands for this migration.
+// ExecuteAll the commands for this migration unless the condition evaluates to false
 // We create a temporary executable file with all commands.
 // This allows for using shell variables in multiple commands.
-func ExecuteAll(commands []string, envs []string, verbose bool) error {
+func ExecuteAll(ifExpression string, commands []string, envs []string, verbose bool) error {
+	// check condition
+	pass, err := evaluateCondition(ifExpression, envs)
+	if err != nil {
+		log.Printf("unable to evaluate condition [%s] because:%v\n", ifExpression, err)
+		return errAbort
+	}
+	if !pass {
+		log.Printf(".. skipping ... (%d) commands because %s is false.\n", len(commands), ifExpression)
+		return nil
+	}
 	if len(commands) == 0 {
 		return nil
 	}
@@ -97,6 +139,9 @@ func ExecuteAll(commands []string, envs []string, verbose bool) error {
 	}
 	if err := ioutil.WriteFile(tempScript, content.Bytes(), os.ModePerm); err != nil {
 		return fmt.Errorf("failed to write temporary migration section:%v", err)
+	}
+	if verbose {
+		log.Println("--- BEGIN gmig.sh:\n", content.String(), "--- END gmig.sh")
 	}
 	defer func() {
 		if err := os.Remove(tempScript); err != nil {
@@ -114,7 +159,20 @@ func ExecuteAll(commands []string, envs []string, verbose bool) error {
 }
 
 // LogAll logs expanded commands using the environment variables of both the config and the OS.
-func LogAll(commands []string, envs []string, verbose bool) error {
+func LogAll(ifExpression string, commands []string, envs []string, verbose bool) error {
+	// check condition
+	pass, err := evaluateCondition(ifExpression, envs)
+	if err != nil {
+		log.Printf("unable to evaluate condition [%s] because:%v\n", ifExpression, err)
+		return errAbort
+	}
+	if !pass {
+		log.Printf(".. skipping ... (%d) commands because %s is false.\n", len(commands), ifExpression)
+		return nil
+	}
+	if len(commands) == 0 {
+		return nil
+	}
 	allEnv := append(os.Environ(), envs...)
 	envMap := map[string]string{}
 	for _, each := range allEnv {
@@ -151,6 +209,7 @@ func setupShellScript(verbose bool) string {
 		flag = "-x"
 	}
 	return fmt.Sprintf(`#!/bin/bash
+# temporary gmig execution script
 set -e %s`, flag)
 }
 

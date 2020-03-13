@@ -53,6 +53,23 @@ To view the current state of your infrastructure related to each migration, you 
 
 and use the `view` subcommand.
 
+## Conditional migration
+
+Commands (do,undo,view) can be made conditional by adding an `if` section.
+You can only use custom environment variables and configuration parameters (PROJECT,ZONE,REGION) in expressions.
+If the expression evaluates to true then the `do` (up), `undo` (down) and `view` (view) commands are executed.
+
+    if: PROJECT == "your-project-id"
+    do:
+    - gcloud condig list
+
+or with combinations:
+
+    if: (PROJECT == "your-project-id") && (ZONE == "my-zone")
+    do:
+    - gcloud condig list
+
+For available operators, see [Language-Definition](https://github.com/antonmedv/expr/blob/master/docs/Language-Definition.md)
 
 ## Help
 
@@ -206,6 +223,10 @@ This function takes the first argument and does a lookup in the available OS env
 Example of a configuration snippet that needs the environment dependent value for $PROJECT.
 
     project: {{ env "PROJECT" }}
+
+Example:
+
+    gmig template some-config.template.yaml > some-config.yaml
 
 ## Export existing infrastructure
 

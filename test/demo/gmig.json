@@ -1,5 +1,8 @@
 {
     "project":"demo",
     "bucket":"bucket",
-    "state": "state"
+    "state": "state",
+    "env": {
+        "ENV": "A"
+    }
 }

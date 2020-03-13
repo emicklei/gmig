@@ -103,12 +103,12 @@ func runMigrations(c *cli.Context, isLogOnly bool) error {
 		log.Printf("%s %-"+strconv.Itoa(prettyWidth)+"s (%s)\n", leadingTitle, pretty(each.Filename), each.Filename)
 		if isLogOnly {
 			log.Println("")
-			if LogAll(each.DoSection, mtx.config().shellEnv(), true); err != nil {
+			if LogAll(each.IfExpression, each.DoSection, mtx.config().shellEnv(), true); err != nil {
 				reportError(mtx.stateProvider.Config(), "plan do", err)
 				return errAbort
 			}
 		} else {
-			if err := ExecuteAll(each.DoSection, mtx.config().shellEnv(), c.GlobalBool("v")); err != nil {
+			if err := ExecuteAll(each.IfExpression, each.DoSection, mtx.config().shellEnv(), c.GlobalBool("v")); err != nil {
 				reportError(mtx.stateProvider.Config(), "do", err)
 				return errAbort
 			}
@@ -148,7 +148,7 @@ func cmdMigrationsDown(c *cli.Context) error {
 	log.Println(statusSeparator)
 	log.Println(execUndo, pretty(mtx.lastApplied))
 	log.Println(statusSeparator)
-	if err := ExecuteAll(lastMigration.UndoSection, mtx.config().shellEnv(), c.GlobalBool("v")); err != nil {
+	if err := ExecuteAll(lastMigration.IfExpression, lastMigration.UndoSection, mtx.config().shellEnv(), c.GlobalBool("v")); err != nil {
 		reportError(mtx.stateProvider.Config(), "undo", err)
 		return errAbort
 	}
@@ -241,7 +241,7 @@ func cmdView(c *cli.Context) error {
 		if mtx.config().verbose {
 			log.Printf("executing view section (%d commands)\n", len(each.ViewSection))
 		}
-		if err := ExecuteAll(each.ViewSection, mtx.config().shellEnv(), c.GlobalBool("v")); err != nil {
+		if err := ExecuteAll(each.IfExpression, each.ViewSection, mtx.config().shellEnv(), c.GlobalBool("v")); err != nil {
 			printError(err.Error())
 			return errAbort
 		}

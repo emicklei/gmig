@@ -9,7 +9,7 @@ import (
 
 func TestExportProjectsIAMPolicy(t *testing.T) {
 	// simulate effect of GS download old state
-	ioutil.WriteFile("state", []byte("20180216t120915_one.yaml"), os.ModePerm)
+	ioutil.WriteFile("state", []byte("010_one.yaml"), os.ModePerm)
 	defer os.Remove("state")
 
 	// simulate now
