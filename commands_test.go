@@ -156,7 +156,7 @@ func TestCmdUpAndStop(t *testing.T) {
 
 func TestCmdUpAndStopAfterLastApplied(t *testing.T) {
 	// simulate effect of GS download old state
-	if err := ioutil.WriteFile("state", []byte("20180216t120925_three.yaml"), os.ModePerm); err != nil {
+	if err := ioutil.WriteFile("state", []byte("030_three.yaml"), os.ModePerm); err != nil {
 		t.Fatal("unable to write state", err)
 	}
 	defer os.Remove("state")
@@ -164,7 +164,7 @@ func TestCmdUpAndStopAfterLastApplied(t *testing.T) {
 	cc := new(commandCapturer)
 	cc.err = errors.New("shell error")
 	runCommand = cc.runCommand
-	if err := newApp().Run([]string{"gmig", "up", "test/demo", "20180216t120922_two.yaml"}); err == nil {
+	if err := newApp().Run([]string{"gmig", "up", "test/demo", "020_two.yaml"}); err == nil {
 		wd, _ := os.Getwd()
 		t.Fatal("expected error", err, wd)
 	}
@@ -241,6 +241,45 @@ func TestCmdView(t *testing.T) {
 		t.Fatal("unexpected error", err, wd)
 	}
 	if got, want := len(cc.args), 3; got != want { // set config, load state, echo 3
-		t.Logf("got [%v] want [%v]", got, want)
+		t.Errorf("got [%v] want [%v]", got, want)
+	}
+}
+
+func TestCmdUpConditional(t *testing.T) {
+	osTempDir = func() string { return "." }
+	// simulate effect of GS download old state
+	if err := ioutil.WriteFile("state", []byte("040_error.yaml"), os.ModePerm); err != nil {
+		t.Fatal("unable to write state", err)
+	}
+	defer os.Remove("state")
+	// capture GC command
+	cc := new(commandCapturer)
+	runCommand = cc.runCommand
+	if err := newApp().Run([]string{"gmig", "up", "test/demo", "050_conditional.yaml"}); err != nil {
+		wd, _ := os.Getwd()
+		t.Fatal("unexpected error", err, wd)
+	}
+	if got, want := len(cc.args), 6; got != want {
+		t.Log(cc.args)
+		t.Errorf("got [%v] want [%v]", got, want)
+	}
+}
+
+func TestCmdUpConditionalFail(t *testing.T) {
+	osTempDir = func() string { return "." }
+	// simulate effect of GS download old state
+	if err := ioutil.WriteFile("state", []byte("050_conditional.yaml"), os.ModePerm); err != nil {
+		t.Fatal("unable to write state", err)
+	}
+	defer os.Remove("state")
+	// capture GC command
+	cc := new(commandCapturer)
+	runCommand = cc.runCommand
+	if err := newApp().Run([]string{"gmig", "up", "test/demo"}); err == nil {
+		wd, _ := os.Getwd()
+		t.Fatal("expected error", err, wd)
+	}
+	if got, want := len(cc.args), 2; got != want {
+		t.Errorf("got [%v] want [%v]", got, want)
 	}
 }
