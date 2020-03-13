@@ -12,9 +12,9 @@ build_inside:
 	mkdir -p target/windows && \
 	mkdir -p target/darwin && \
 	mkdir -p target/linux && \
-	GOOS=windows go build -ldflags "-X main.version=$(VERSION)" -o target/windows/gmig.exe && \
-	GOOS=darwin go build -ldflags "-X main.version=$(VERSION)" -o target/darwin/gmig && \
-	GOOS=linux go build -ldflags "-X main.version=$(VERSION)" -o target/linux/gmig && \
+	GOOS=windows go build -ldflags "-X main.Version=$(VERSION)" -o target/windows/gmig.exe && \
+	GOOS=darwin go build -ldflags "-X main.Version=$(VERSION)" -o target/darwin/gmig && \
+	GOOS=linux go build -ldflags "-X main.Version=$(VERSION)" -o target/linux/gmig && \
 	chmod +x -R target
 
 zip:
