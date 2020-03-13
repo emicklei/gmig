@@ -53,7 +53,7 @@ func started(c *cli.Context, action string) func() {
 	if !v {
 		return func() {}
 	}
-	log.Println("gmig version", version)
+	log.Println("gmig version", Version)
 	log.Println("BEGIN", action)
 	start := time.Now()
 	return func() { log.Println("END", action, "completed in", time.Now().Sub(start)) }

@@ -4,12 +4,11 @@ import (
 	"log"
 	"os"
 	"sort"
-	"time"
 
 	"github.com/urfave/cli"
 )
 
-var version = time.Now().String()
+var Version string
 
 func main() {
 	if err := newApp().Run(os.Args); err != nil {
@@ -19,7 +18,7 @@ func main() {
 
 func newApp() *cli.App {
 	app := cli.NewApp()
-	app.Version = version
+	app.Version = Version
 	app.EnableBashCompletion = true
 	app.Name = "gmig"
 	app.Usage = "Google Cloud Platform infrastructure migration tool"

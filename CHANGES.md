@@ -1,5 +1,9 @@
 # Changelist of gmig releases
 
+## v1.14.0 [2020-03-13]
+
+- add support for conditional migrations using boolean expression
+
 ## v1.13.0 [2020-03-11]
 
 - show status after up,down and force state
