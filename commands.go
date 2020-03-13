@@ -24,6 +24,10 @@ const (
 	execUndo            = "...    undo ..."
 	execPlan            = "...    plan ..."
 	stopped             = "... stopped ..."
+	skipped             = "--- skipped ---"
+	skipping            = "... skipping .."
+	conditionErrored    = "--- if error --"
+	conditionError      = "... if error .."
 )
 
 func cmdCreateMigration(c *cli.Context) error {
@@ -187,17 +191,41 @@ func cmdMigrationsStatus(c *cli.Context) error {
 		return errAbort
 	}
 	log.Println(statusSeparator)
-	var last string
-	for _, each := range all {
+	envs := mtx.config().shellEnv()
+	for i, each := range all {
 		status := applied
-		if each.Filename > mtx.lastApplied {
-			status = pending
-			if len(last) > 0 && last != status {
-				log.Println(statusSeparator)
+		// check skipped
+		pass, err := evaluateCondition(each.IfExpression, envs)
+		isPending := each.Filename > mtx.lastApplied
+		if err != nil {
+			if isPending {
+				status = conditionError
+			} else {
+				status = conditionErrored
+			}
+		} else {
+			// no error condition
+			if pass {
+				if isPending {
+					status = pending
+				} else {
+					status = applied
+				}
+			} else {
+				if isPending {
+					status = skipping
+				} else {
+					status = skipped
+				}
 			}
 		}
+		if err != nil {
+			printWarning("if: expression is invalid:", err)
+		}
+		if i > 0 && isPending {
+			log.Println(statusSeparator)
+		}
 		log.Printf("%s %s\n", status, pretty(each.Filename))
-		last = status
 	}
 	log.Println(statusSeparator)
 	return nil

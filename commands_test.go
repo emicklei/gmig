@@ -211,6 +211,7 @@ func TestCmdDown(t *testing.T) {
 }
 
 func TestCmdDownWhenNoLastMigration(t *testing.T) {
+	keepState()
 	// simulate effect of GS download old state
 	if err := ioutil.WriteFile("state", []byte(""), os.ModePerm); err != nil {
 		t.Fatal("unable to write state", err)
@@ -219,7 +220,7 @@ func TestCmdDownWhenNoLastMigration(t *testing.T) {
 	cc := new(commandCapturer)
 	runCommand = cc.runCommand
 	if err := newApp().Run([]string{"gmig", "down", "test/demo"}); err != nil {
-		expected := "gmig aborted"
+		expected := "gmig ABORTED"
 		if err.Error() != expected {
 			t.Errorf("got [%v] want [%v]", err, expected)
 		}

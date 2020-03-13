@@ -23,7 +23,7 @@ func printWarning(args ...interface{}) {
 	log.Println(append([]interface{}{"\033[1;31mWARNING:\033[0m"}, args...)...)
 }
 
-var errAbort = errors.New("gmig aborted")
+var errAbort = errors.New("gmig ABORTED")
 
 func checkExists(filename string) error {
 	_, err := os.Stat(filename)
