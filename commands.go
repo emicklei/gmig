@@ -103,7 +103,7 @@ func runMigrations(c *cli.Context, isLogOnly bool) error {
 		log.Printf("%s %-"+strconv.Itoa(prettyWidth)+"s (%s)\n", leadingTitle, pretty(each.Filename), each.Filename)
 		if isLogOnly {
 			log.Println("")
-			if LogAll(each.DoSection, mtx.config().shellEnv(), true); err != nil {
+			if LogAll(each.IfExpression, each.DoSection, mtx.config().shellEnv(), true); err != nil {
 				reportError(mtx.stateProvider.Config(), "plan do", err)
 				return errAbort
 			}

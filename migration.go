@@ -159,7 +159,20 @@ func ExecuteAll(ifExpression string, commands []string, envs []string, verbose b
 }
 
 // LogAll logs expanded commands using the environment variables of both the config and the OS.
-func LogAll(commands []string, envs []string, verbose bool) error {
+func LogAll(ifExpression string, commands []string, envs []string, verbose bool) error {
+	// check condition
+	pass, err := evaluateCondition(ifExpression, envs)
+	if err != nil {
+		log.Printf("unable to evaluate condition [%s] because:%v\n", ifExpression, err)
+		return errAbort
+	}
+	if !pass {
+		log.Printf(".. skipping ... (%d) commands because %s is false.\n", len(commands), ifExpression)
+		return nil
+	}
+	if len(commands) == 0 {
+		return nil
+	}
 	allEnv := append(os.Environ(), envs...)
 	envMap := map[string]string{}
 	for _, each := range allEnv {

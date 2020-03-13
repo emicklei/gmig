@@ -59,9 +59,17 @@ Sometimes environments do `not` need to be setup exactly the same way.
 Commands (do,undo,view) can be made conditional by adding an `if` section.
 You can only use custom environment variables and configuration parameters (PROJECT,ZONE,REGION).
 
-  if: (PROJECT == "your-project-id") && (ZONE == "my-zone")
+    if: PROJECT == "your-project-id"
+    do:
+    - gcloud condig list
 
-See [Language-Definition](https://github.com/antonmedv/expr/blob/master/docs/Language-Definition.md)
+or with combinations:
+
+    if: (PROJECT == "your-project-id") && (ZONE == "my-zone")
+    do:
+    - gcloud condig list
+
+For available operators, see [Language-Definition](https://github.com/antonmedv/expr/blob/master/docs/Language-Definition.md)
 
 ## Help
 
