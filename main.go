@@ -193,6 +193,54 @@ func newApp() *cli.App {
 					instance-group - identifier of the compute instance group
 					name:port      - mapping of a name to a port, e.g  http-port:80`,
 				},
+				{
+					Name:  "add-path-rules-to-path-matcher",
+					Usage: "Add a set of path rules to an existing path-matcher in a loadbalancer url-map.",
+					Action: func(c *cli.Context) error {
+						defer started(c, "add-path-rules-to-path-matcher")()
+						return cmdAddPathRulesToPathMatcher(c)
+					},
+					Flags: []cli.Flag{cli.StringFlag{
+						Name:     "url-map",
+						Required: true,
+						Usage:    `name of the url-map in the current project/region.`,
+					}, cli.StringFlag{
+						Name:     "path-matcher",
+						Required: true,
+						Usage:    `name of the path-matcher known to the url-map.`,
+					}, cli.StringFlag{
+						Name:     "service",
+						Required: true,
+						Usage:    `name of the backend service that handles call on the paths.`,
+					}, cli.StringFlag{
+						Name:     "paths",
+						Required: true,
+						Usage:    `comma separated list of paths of the set known to the service.`,
+					}},
+					ArgsUsage: ``,
+				},
+				{
+					Name:  "remove-path-rules-from-path-matcher",
+					Usage: "Remove a set of path rules from an existing path-matcher in a loadbalancer url-map.",
+					Action: func(c *cli.Context) error {
+						defer started(c, "remove-path-rules-from-path-matcher")()
+						return cmdRemovePathRulesFromPathMatcher(c)
+					},
+					Flags: []cli.Flag{cli.StringFlag{
+						Name:     "url-map",
+						Required: true,
+						Usage:    `name of the url-map in the current project/region.`,
+					}, cli.StringFlag{
+						Name:     "path-matcher",
+						Required: true,
+						Usage:    `name of the path-matcher known to the url-map.`,
+					}, cli.StringFlag{
+						Name:     "service",
+						Required: true,
+						Usage:    `name of the backend service that handles call on the paths.`,
+					}},
+					ArgsUsage: ``,
+				},
 			},
 		},
 		{
