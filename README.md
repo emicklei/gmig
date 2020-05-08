@@ -289,8 +289,13 @@ First it calls `get-named-ports` to retrieve all existing mappings. Then it will
 
 ### util delete-named-port \<instance-group> \<name:port>
 
-The Cloud SDK has a command to [set-named-ports](https://cloud.google.com/sdk/gcloud/reference/compute/instance-groups/set-named-ports) but not a command to add or delete a single name:port mapping. To simplify the migration command for deleting a name:port mapping, this gmig util command is added.
+The Cloud SDK has a command to [set-named-ports](https://cloud.google.com/sdk/gcloud/reference/compute/instance-groups/set-named-ports) but not a command to add or delete a single name:port mapping. To simplify the migration command for deleting a name:port mapping, this `gmig` util command is added.
 First it calls `get-named-ports` to retrieve all existing mappings. Then it will call `set-named-ports` without the mapping.
+
+### util add-path-rules-to-path-matcher [config folder] -url-map [url-map-name] -service [backend-service-name] -path-matcher [path-matcher-name] -paths "/v1/path/*, /v1/otherpath/*"
+
+The Cloud SDK has a command to [add a patch matcher](https://cloud.google.com/sdk/gcloud/reference/compute/url-maps/add-path-matcher) with a set of paths but not a command update the path rules of an existing path matcher in the url map. To write a migration that changes the set of paths (add,remove), this `gmig` util command is added.
+First is [exports](https://cloud.google.com/sdk/gcloud/reference/compute/url-maps/export) an URL map, updates the paths of the rules of a path-matcher, then imports the changed URL map. Because this migration is changing a regional resource which is typically shared by multiple services, the patching of the URL map is executed using a global lock (using the Bucket from the config).
 
 ## Examples
 
