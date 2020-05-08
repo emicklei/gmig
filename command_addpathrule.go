@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -40,6 +41,59 @@ type (
 		Service string   `yaml:"service"`
 	}
 )
+
+// findIndices returns (matcherIndex, ruleIndex )
+func (m *loadbalancerURLMap) findIndices(pathMatcherName, fqnService string, verbose bool) (int, int) {
+	ruleIndex := -1
+	matcherIndex := -1
+	for m, each := range m.PathMatchers {
+		if each.Name == pathMatcherName {
+			if verbose {
+				log.Println("found existing path matcher:", pathMatcherName)
+			}
+			matcherIndex = m
+		}
+		for i, other := range each.PathRules {
+			if other.Service == fqnService {
+				if verbose {
+					log.Println("found existing path rule:", fqnService)
+				}
+				ruleIndex = i
+			}
+		}
+	}
+	return matcherIndex, ruleIndex
+}
+
+func (m *loadbalancerURLMap) patchPathsAndService(isRemove bool, pathMatcherName, fqnService string, paths []string, verbose bool) error {
+	// check if exists based on service
+	matcherIndex, ruleIndex := m.findIndices(pathMatcherName, fqnService, verbose)
+	if matcherIndex == -1 {
+		err := fmt.Errorf("no path-matcher found with name [%s]", pathMatcherName)
+		printError(err.Error())
+		return errAbort
+	}
+	if isRemove {
+		// Delete
+		rules := m.PathMatchers[matcherIndex].PathRules
+		copy(rules[ruleIndex:], rules[ruleIndex+1:])
+		rules[len(rules)-1] = pathsAndService{}
+		rules = rules[:len(rules)-1]
+		m.PathMatchers[matcherIndex].PathRules = rules
+	} else {
+		// Update
+		toPatch := pathsAndService{Service: fqnService, Paths: paths}
+		if ruleIndex == -1 {
+			// add new path rule set
+			rules := m.PathMatchers[matcherIndex].PathRules
+			m.PathMatchers[matcherIndex].PathRules = append(rules, toPatch)
+		} else {
+			// replace existing path rule set
+			m.PathMatchers[matcherIndex].PathRules[ruleIndex] = toPatch
+		}
+	}
+	return nil
+}
 
 func cmdAddPathRulesToPathMatcher(c *cli.Context) error {
 	return patchPathRulesForPathMatcher(c, false)
@@ -105,49 +159,11 @@ func patchPathRulesForPathMatcher(c *cli.Context, isRemove bool) error {
 		mtx.config().Project,
 		mtx.config().Region,
 		serviceName)
-	// check if exists based on service
-	ruleIndex := -1
-	matcherIndex := -1
-	pathMatcherName := c.String("path-matcher")
-	for m, each := range urlMap.PathMatchers {
-		if each.Name == pathMatcherName {
-			if verbose {
-				log.Println("found existing path matcher:", pathMatcherName)
-			}
-			matcherIndex = m
-		}
-		for i, other := range each.PathRules {
-			if other.Service == fqnService {
-				if verbose {
-					log.Println("found existing path rule:", serviceName)
-				}
-				ruleIndex = i
-			}
-		}
-	}
-	if matcherIndex == -1 {
-		err := fmt.Errorf("no path-matcher found with name [%s]", pathMatcherName)
-		printError(err.Error())
-		return errAbort
-	}
-	if isRemove {
-		// Delete
-		rules := urlMap.PathMatchers[matcherIndex].PathRules
-		copy(rules[ruleIndex:], rules[ruleIndex+1:])
-		rules[len(rules)-1] = pathsAndService{}
-		rules = rules[:len(rules)-1]
-		urlMap.PathMatchers[matcherIndex].PathRules = rules
-	} else {
-		// Update
-		toPatch := pathsAndService{Service: fqnService, Paths: strings.Split(c.String("paths"), ",")}
-		if ruleIndex == -1 {
-			// add new path rule set
-			rules := urlMap.PathMatchers[matcherIndex].PathRules
-			urlMap.PathMatchers[matcherIndex].PathRules = append(rules, toPatch)
-		} else {
-			// replace existing path rule set
-			urlMap.PathMatchers[matcherIndex].PathRules[ruleIndex] = toPatch
-		}
+	if err := urlMap.patchPathsAndService(
+		isRemove,
+		c.String("path-matcher"), fqnService, strings.Split(c.String("paths"), ","),
+		true); err != nil {
+		return err
 	}
 	// can only import from source file
 	importdata, err := yaml.Marshal(urlMap)
@@ -155,7 +171,7 @@ func patchPathRulesForPathMatcher(c *cli.Context, isRemove bool) error {
 		printError(err.Error())
 		return errAbort
 	}
-	source := "patchPathRulesForPathMatcher.yaml"
+	source := filepath.Join(os.TempDir(), "patchPathRulesForPathMatcher.yaml")
 	err = ioutil.WriteFile(source, importdata, os.ModePerm)
 	if err != nil {
 		printError(err.Error())
