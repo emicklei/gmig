@@ -180,7 +180,7 @@ func patchPathRulesForPathMatcher(c *cli.Context, isRemove bool) error {
 	defer os.Remove(source)
 	// import
 	{
-		args := []string{"compute", "url-maps", "import", urlMapName, "--source", source, "--region", mtx.config().Region}
+		args := []string{"compute", "url-maps", "import", urlMapName, "--source", source, "--region", mtx.config().Region, "--quiet"}
 		cmd := exec.Command("gcloud", args...)
 		if verbose {
 			log.Println(strings.Join(append([]string{"gcloud"}, args...), " "))
