@@ -14,6 +14,8 @@ type migrationContext struct {
 	stateProvider StateProvider
 	// folder that contains migrations files
 	migrationsPath string
+	// actual absolute location of the configration file (gmig.yaml)
+	configurationPath string
 }
 
 func getMigrationContext(c *cli.Context) (ctx migrationContext, err error) {
@@ -39,6 +41,7 @@ func getMigrationContext(c *cli.Context) (ctx migrationContext, err error) {
 	if err != nil {
 		return
 	}
+	ctx.configurationPath = fullPathToConfig
 	ctx.migrationsPath = filepath.Dir(fullPathToConfig)
 	// see if flag overrides this
 	if migrationsHolder := c.String("migrations"); len(migrationsHolder) > 0 {
@@ -63,4 +66,10 @@ func getMigrationContext(c *cli.Context) (ctx migrationContext, err error) {
 
 func (m migrationContext) config() Config {
 	return m.stateProvider.Config()
+}
+
+func (m migrationContext) shellEnv() (envs []string) {
+	envs = m.config().shellEnv()
+	envs = append(envs, fmt.Sprintf("%s=%s", "GMIG_CONFIG_DIR", m.configurationPath))
+	return
 }

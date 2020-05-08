@@ -32,7 +32,7 @@ A change must have at least a `do` section and optionally an `undo` section.
 The `do` section typically has a list of gcloud commands that create resources but any available tool can be used.
 All lines will be executed at once using a single temporary shell script so you can use shell variables to simplify each section.
 The `undo` section typically has an ordered list of gcloud commands that deletes the same resources (in reverse order if relevant).
-Each command in each section can use the following environment variables: `$PROJECT`,`$REGION`,`$ZONE` and any additional environment variables populated from the target configuration (see `env` section in the configuration below).
+Each command in each section can use the following environment variables: `$PROJECT`,`$REGION`,`$ZONE`,`$GMIG_CONFIG_DIR`, and any additional environment variables populated from the target configuration (see `env` section in the configuration below).
 
 ## State
 
