@@ -161,7 +161,7 @@ func patchPathRulesForPathMatcher(c *cli.Context, isRemove bool) error {
 		serviceName)
 	if err := urlMap.patchPathsAndService(
 		isRemove,
-		c.String("path-matcher"), fqnService, strings.Split(c.String("paths"), ","),
+		c.String("path-matcher"), fqnService, strings.Split(strings.ReplaceAll(c.String("paths"), " ", ""), ","),
 		true); err != nil {
 		return err
 	}
@@ -178,6 +178,9 @@ func patchPathRulesForPathMatcher(c *cli.Context, isRemove bool) error {
 		return errAbort
 	}
 	defer os.Remove(source)
+	if verbose {
+		fmt.Println(string(importdata))
+	}
 	// import
 	{
 		args := []string{"compute", "url-maps", "import", urlMapName, "--source", source, "--region", mtx.config().Region, "--quiet"}
