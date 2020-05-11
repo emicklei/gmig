@@ -112,8 +112,12 @@ func patchPathRulesForPathMatcher(c *cli.Context, isRemove bool) error {
 	}
 	verbose := c.GlobalBool("v")
 	urlMapName := c.String("url-map")
+	scope := c.String("region") // optional
+	if len(scope) == 0 {
+		scope = "global"
+	}
 	// aquire lock
-	lockObjectName := fmt.Sprintf("project-%s-region-%s-urlmap-%s-gmig-lock", mtx.config().Project, mtx.config().Region, urlMapName)
+	lockObjectName := fmt.Sprintf("project-%s-region-%s-urlmap-%s-gmig-lock", mtx.config().Project, scope, urlMapName)
 	urlMapMutex, err := gcslock.New(context.Background(), mtx.config().Bucket, lockObjectName)
 	if err != nil {
 		printError(err.Error())
@@ -138,7 +142,14 @@ func patchPathRulesForPathMatcher(c *cli.Context, isRemove bool) error {
 		}
 	}()
 	// export
-	args := []string{"compute", "url-maps", "export", urlMapName, "--region", mtx.config().Region}
+	args := []string{"compute", "url-maps", "export", urlMapName}
+	region := c.String("region") // optional
+	isGlobal := len(region) == 0
+	if !isGlobal {
+		args = append(args, "--region", region)
+	} else {
+		args = append(args, "--global")
+	}
 	cmd := exec.Command("gcloud", args...)
 	if verbose {
 		log.Println(strings.Join(append([]string{"gcloud"}, args...), " "))
@@ -155,10 +166,17 @@ func patchPathRulesForPathMatcher(c *cli.Context, isRemove bool) error {
 		return errAbort
 	}
 	serviceName := c.String("service")
-	fqnService := fmt.Sprintf("https://www.googleapis.com/compute/v1/projects/%s/regions/%s/backendServices/%s",
-		mtx.config().Project,
-		mtx.config().Region,
-		serviceName)
+	var fqnService string
+	if isGlobal {
+		fqnService = fmt.Sprintf("https://www.googleapis.com/compute/v1/projects/%s/global/backendServices/%s",
+			mtx.config().Project,
+			serviceName)
+	} else {
+		fqnService = fmt.Sprintf("https://www.googleapis.com/compute/v1/projects/%s/regions/%s/backendServices/%s",
+			mtx.config().Project,
+			region,
+			serviceName)
+	}
 	if err := urlMap.patchPathsAndService(
 		isRemove,
 		c.String("path-matcher"), fqnService, strings.Split(strings.ReplaceAll(c.String("paths"), " ", ""), ","),
@@ -183,7 +201,12 @@ func patchPathRulesForPathMatcher(c *cli.Context, isRemove bool) error {
 	}
 	// import
 	{
-		args := []string{"compute", "url-maps", "import", urlMapName, "--source", source, "--region", mtx.config().Region, "--quiet"}
+		args := []string{"compute", "url-maps", "import", urlMapName, "--source", source, "--quiet"}
+		if isGlobal {
+			args = append(args, "--region", region)
+		} else {
+			args = append(args, "--global")
+		}
 		cmd := exec.Command("gcloud", args...)
 		if verbose {
 			log.Println(strings.Join(append([]string{"gcloud"}, args...), " "))
