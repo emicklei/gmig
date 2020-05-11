@@ -162,7 +162,7 @@ func patchPathRulesForPathMatcher(c *cli.Context, isRemove bool) error {
 	if err := urlMap.patchPathsAndService(
 		isRemove,
 		c.String("path-matcher"), fqnService, strings.Split(strings.ReplaceAll(c.String("paths"), " ", ""), ","),
-		true); err != nil {
+		verbose); err != nil {
 		return err
 	}
 	// can only import from source file

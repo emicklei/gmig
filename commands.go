@@ -92,9 +92,10 @@ func runMigrations(c *cli.Context, isLogOnly bool) error {
 			break
 		}
 	}
+	envs := mtx.shellEnv()
 	// if lastApplied is after stopAfter then it is also not found but then we don't care
 	if !found && stopAfter > mtx.lastApplied {
-		reportError(mtx.stateProvider.Config(), "up until stop", errors.New("No such migration file: "+stopAfter))
+		reportError(mtx.stateProvider.Config(), envs, "up until stop", errors.New("No such migration file: "+stopAfter))
 		return errAbort
 	}
 	prettyWidth := largestWidthOf(all)
@@ -107,19 +108,19 @@ func runMigrations(c *cli.Context, isLogOnly bool) error {
 		log.Printf("%s %-"+strconv.Itoa(prettyWidth)+"s (%s)\n", leadingTitle, pretty(each.Filename), each.Filename)
 		if isLogOnly {
 			log.Println("")
-			if LogAll(each.IfExpression, each.DoSection, mtx.shellEnv(), true); err != nil {
-				reportError(mtx.stateProvider.Config(), "plan do", err)
+			if LogAll(each.IfExpression, each.DoSection, envs, true); err != nil {
+				reportError(mtx.stateProvider.Config(), envs, "plan do", err)
 				return errAbort
 			}
 		} else {
-			if err := ExecuteAll(each.IfExpression, each.DoSection, mtx.shellEnv(), c.GlobalBool("v")); err != nil {
-				reportError(mtx.stateProvider.Config(), "do", err)
+			if err := ExecuteAll(each.IfExpression, each.DoSection, envs, c.GlobalBool("v")); err != nil {
+				reportError(mtx.stateProvider.Config(), envs, "do", err)
 				return errAbort
 			}
 			mtx.lastApplied = each.Filename
 			// save after each succesful migration
 			if err := mtx.stateProvider.SaveState(mtx.lastApplied); err != nil {
-				reportError(mtx.stateProvider.Config(), "save state", err)
+				reportError(mtx.stateProvider.Config(), envs, "save state", err)
 				return errAbort
 			}
 		}
@@ -152,8 +153,9 @@ func cmdMigrationsDown(c *cli.Context) error {
 	log.Println(statusSeparator)
 	log.Println(execUndo, pretty(mtx.lastApplied))
 	log.Println(statusSeparator)
-	if err := ExecuteAll(lastMigration.IfExpression, lastMigration.UndoSection, mtx.shellEnv(), c.GlobalBool("v")); err != nil {
-		reportError(mtx.stateProvider.Config(), "undo", err)
+	envs := mtx.shellEnv()
+	if err := ExecuteAll(lastMigration.IfExpression, lastMigration.UndoSection, envs, c.GlobalBool("v")); err != nil {
+		reportError(mtx.stateProvider.Config(), envs, "undo", err)
 		return errAbort
 	}
 	// save after succesful migration
@@ -162,7 +164,7 @@ func cmdMigrationsDown(c *cli.Context) error {
 		previousFilename = all[len(all)-2].Filename
 	}
 	if err := mtx.stateProvider.SaveState(previousFilename); err != nil {
-		reportError(mtx.stateProvider.Config(), "save state", err)
+		reportError(mtx.stateProvider.Config(), envs, "save state", err)
 		return errAbort
 	}
 	return nil

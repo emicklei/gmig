@@ -39,11 +39,20 @@ var runCommand = func(c *exec.Cmd) ([]byte, error) {
 	return c.CombinedOutput()
 }
 
-func reportError(cfg Config, action string, err error) error {
+func reportError(cfg Config, envs []string, action string, err error) error {
 	log.Printf("executing [%s] failed, error: [%v]\n", action, err)
 
+	fmt.Println()
+	log.Println("reporting environment variables ...")
+	for _, each := range envs {
+		fmt.Println(each)
+	}
+
+	fmt.Println()
 	log.Println("checking gmig config ...")
 	fmt.Println(cfg.ToJSON())
+
+	fmt.Println()
 	gcloudConfigList()
 	return err
 }
