@@ -202,7 +202,7 @@ func patchPathRulesForPathMatcher(c *cli.Context, isRemove bool) error {
 	// import
 	{
 		args := []string{"compute", "url-maps", "import", urlMapName, "--source", source, "--quiet"}
-		if isGlobal {
+		if !isGlobal {
 			args = append(args, "--region", region)
 		} else {
 			args = append(args, "--global")
