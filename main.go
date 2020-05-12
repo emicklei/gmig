@@ -216,6 +216,10 @@ func newApp() *cli.App {
 						Name:     "paths",
 						Required: true,
 						Usage:    `comma separated list of paths of the set known to the service.`,
+					}, cli.StringFlag{
+						Name:     "region",
+						Required: false,
+						Usage:    `if set then the url-map is regional, global otherwise`,
 					}},
 					ArgsUsage: ``,
 				},
@@ -238,6 +242,10 @@ func newApp() *cli.App {
 						Name:     "service",
 						Required: true,
 						Usage:    `name of the backend service that handles call on the paths.`,
+					}, cli.StringFlag{
+						Name:     "region",
+						Required: false,
+						Usage:    `if set then the url-map is regional, global otherwise`,
 					}},
 					ArgsUsage: ``,
 				},
