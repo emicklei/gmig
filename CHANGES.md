@@ -1,5 +1,10 @@
 # Changelist of gmig releases
 
+## v1.15.0 [2020-05-13]
+
+- add util for adding patch rules to a loadbalancer path matcher
+- improved error reporting
+
 ## v1.14.0 [2020-03-13]
 
 - add support for conditional migrations using boolean expression
