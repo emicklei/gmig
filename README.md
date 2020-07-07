@@ -106,7 +106,7 @@ For available operators, see [Language-Definition](https://github.com/antonmedv/
 Pre-compiled binaries are available for download from the Releases section on this page.
 If you want to create your own version, you need to compile it using the [Go SDK](https://golang.org/dl/).
 
-    go get github.com/emicklei/gmig
+    GO111MODULE=on go get github.com/emicklei/gmig
 
 ### init \<path>
 
