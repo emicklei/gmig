@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/urfave/cli"
 	"gopkg.in/yaml.v2"
 )
 
@@ -131,4 +132,15 @@ func TestEvaluateCondition(t *testing.T) {
 	if got, want := ok, true; got != want {
 		t.Errorf("got [%v] want [%v]", got, want)
 	}
+}
+
+func TestMigrationContextWithMigrationsOverride(t *testing.T) {
+	t.Skip()
+	c := new(cli.Context)
+	c.Set("migrations", "/tmp/here")
+	ctx, err := getMigrationContext(c)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(ctx)
 }

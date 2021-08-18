@@ -45,10 +45,14 @@ func getMigrationContext(c *cli.Context) (ctx migrationContext, err error) {
 	ctx.migrationsPath = filepath.Dir(fullPathToConfig)
 	// see if flag overrides this
 	if migrationsHolder := c.String("migrations"); len(migrationsHolder) > 0 {
-		ctx.migrationsPath, err = filepath.Abs(migrationsHolder)
-		if err != nil {
+		newPath, perr := filepath.Abs(migrationsHolder)
+		if ctx.config().verbose {
+			log.Printf("override migrations path with [%s] from [%s] to [%s] err:[%v]\n", migrationsHolder, ctx.migrationsPath, newPath, perr)
+		}
+		if perr != nil {
 			return
 		}
+		ctx.migrationsPath = newPath
 	}
 	if ctx.config().verbose {
 		log.Println("reading migrations from", ctx.migrationsPath)

@@ -254,7 +254,6 @@ func newApp() *cli.App {
 		{
 			Name:  "force",
 			Usage: "Force an action {state|do|undo}",
-			Flags: []cli.Flag{migrationsFlag},
 			Subcommands: []cli.Command{
 				{
 					Name:  "state",
@@ -266,6 +265,7 @@ func newApp() *cli.App {
 						}
 						return cmdMigrationsStatus(c)
 					},
+					Flags: []cli.Flag{migrationsFlag},
 					ArgsUsage: `<path>
 					path - name of the folder that contains the configuration of the target project.`,
 				},
@@ -276,6 +276,7 @@ func newApp() *cli.App {
 						defer started(c, "execute DO section")()
 						return cmdRundoOnly(c)
 					},
+					Flags: []cli.Flag{migrationsFlag},
 					ArgsUsage: `<path> <filename>
 						path - name of the folder that contains the configuration of the target project.
 						filename - name of the migration that contains a do: section.`,
@@ -287,6 +288,7 @@ func newApp() *cli.App {
 						defer started(c, "execute UNDO section")()
 						return cmdRunUndoOnly(c)
 					},
+					Flags: []cli.Flag{migrationsFlag},
 					ArgsUsage: `<path> <filename>
 					path - name of the folder that contains the configuration of the target project.
 					filename - name of the migration that contains a undo: section.`,

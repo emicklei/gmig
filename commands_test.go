@@ -115,6 +115,45 @@ func TestCmdForceState(t *testing.T) {
 	}
 }
 
+func TestCmdForceStateNested(t *testing.T) {
+	osTempDir = func() string { return "." }
+	// simulate effect of GS download old state
+	if err := ioutil.WriteFile("state", []byte("010_one.yaml"), os.ModePerm); err != nil {
+		t.Fatal("unable to write state", err)
+	}
+	defer os.Remove("state")
+
+	// capture GC command
+	cc := new(commandCapturer)
+	runCommand = cc.runCommand
+	// do not remove state because we need to inspect it
+	removeCount := 0
+	osRemove = func(string) error { removeCount++; return nil }
+	defer func() { osRemove = os.Remove }()
+
+	newState := "020_two.yaml"
+	if err := newApp().Run([]string{"gmig", "-v", "-q", "force", "state", "--migrations", "test", "test/demo/nested", newState}); err != nil {
+		wd, _ := os.Getwd()
+		t.Fatal("unexpected error", err, wd)
+	}
+	if got, want := removeCount, 2; got != want {
+		t.Logf("got [%v] want [%v]", got, want)
+	}
+	data, err := ioutil.ReadFile("state")
+	if err != nil {
+		abs, _ := filepath.Abs("state")
+		t.Fatal("unreadable state", abs, err)
+	}
+	if got, want := string(data), newState; got != want {
+		t.Logf("got [%v] want [%v]", got, want)
+	}
+	for i, each := range []string{"gsutil", "-q", "-h", "Content-Type:text/plain", "cp", "state", "gs://bucket/state"} {
+		if got, want := cc.args[2][i], each; got != want {
+			t.Logf("got [%v] want [%v]", got, want)
+		}
+	}
+}
+
 func TestCmdUp(t *testing.T) {
 	// simulate effect of GS download old state
 	if err := ioutil.WriteFile("state", []byte("010_one.yaml"), os.ModePerm); err != nil {
