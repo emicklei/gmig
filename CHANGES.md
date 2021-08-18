@@ -1,5 +1,9 @@
 # Changelist of gmig releases
 
+## v1.16.0 [2021-08-18]
+
+- fix handling `migrations` flag in force commands
+
 ## v1.15.0 [2020-05-13]
 
 - add util for adding patch rules to a loadbalancer path matcher
