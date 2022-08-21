@@ -1,5 +1,10 @@
 # Changelist of gmig releases
 
+## v1.17.0 [2022-08-21]
+
+- fix crash when JSON config is invalid
+- update dependencies (also for vulnerability)
+
 ## v1.16.0 [2021-08-18]
 
 - fix handling `migrations` flag in force commands
