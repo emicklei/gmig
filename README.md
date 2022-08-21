@@ -2,7 +2,7 @@
 
 pronounced as `gimmick`.
 
-[![Build Status](https://travis-ci.org/emicklei/gmig.png)](https://travis-ci.org/emicklei/gmig)
+[![Build Status](https://app.travis-ci.com/emicklei/gmig.svg?branch=master)](https://app.travis-ci.com/github/emicklei/gmig)
 [![Go Report Card](https://goreportcard.com/badge/github.com/emicklei/gmig)](https://goreportcard.com/report/github.com/emicklei/gmig)
 [![GoDoc](https://godoc.org/github.com/emicklei/gmig?status.svg)](https://godoc.org/github.com/emicklei/gmig)
 
@@ -300,4 +300,4 @@ First is [exports](https://cloud.google.com/sdk/gcloud/reference/compute/url-map
 
 This repository has a number of [examples](https://github.com/emicklei/gmig/tree/master/examples) of migrations.
 
-&copy; 2018, ernestmicklei.com. MIT License. Contributions welcome.
+&copy; 2022, ernestmicklei.com. MIT License. Contributions welcome.
