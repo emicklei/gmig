@@ -121,6 +121,20 @@ func newApp() *cli.App {
 				path - name of the folder that contains the configuration of the target project.`,
 		},
 		{
+			Name:  "down-all",
+			Usage: "Runs the undo section of all applied migrations.",
+			Action: func(c *cli.Context) error {
+				defer started(c, "down-all = undo all applied migration")()
+				if err := cmdMigrationsDownAll(c); err != nil {
+					return err
+				}
+				return cmdMigrationsStatus(c)
+			},
+			Flags: []cli.Flag{migrationsFlag},
+			ArgsUsage: `<path>
+				path - name of the folder that contains the configuration of the target project.`,
+		},
+		{
 			Name:  "status",
 			Usage: "List all migrations with details compared to the current state.",
 			Action: func(c *cli.Context) error {

@@ -134,6 +134,27 @@ func runMigrations(c *cli.Context, isLogOnly bool) error {
 	return nil
 }
 
+func cmdMigrationsDownAll(c *cli.Context) error {
+	mtx, err := getMigrationContext(c)
+	if mtx.lastApplied == "" {
+		printWarning("There are no migrations to undo")
+		return errAbort
+	}
+	//get all applied migrations
+	all, err := LoadMigrationsBetweenAnd(".", "", mtx.lastApplied)
+	if err != nil {
+		printError(err.Error())
+		return errAbort
+	}
+	for count := 0; count < len(all); count++ {
+		err := cmdMigrationsDown(c)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func cmdMigrationsDown(c *cli.Context) error {
 	mtx, err := getMigrationContext(c)
 	if err != nil {
