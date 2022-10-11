@@ -146,7 +146,7 @@ func cmdMigrationsDownAll(c *cli.Context) error {
 		printError(err.Error())
 		return errAbort
 	}
-	for count := 0; count < len(all); count++ {
+	for range all {
 		err := cmdMigrationsDown(c)
 		if err != nil {
 			return err
