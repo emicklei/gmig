@@ -37,17 +37,17 @@ Each command in each section can use the following environment variables: `$PROJ
 ## State
 
 Information about the last applied migration to a project is stored as a Google Storage Bucket object.
-Therefore, usage of this tool requires you to have create a Bucket and set the permissions (Storage Writer) accordingly. 
+Therefore, usage of this tool requires you to have create a Bucket and set the permissions (Storage Writer) accordingly.
 To view the current state of your infrastructure related to each migration, you can add the `view` section to the YAML file, such as:
 
     # add loadrunner service account
 
     do:
     - gcloud iam service-accounts create loadrunner --display-name "LoadRunner"
-    
+
     undo:
     - gcloud iam service-accounts delete loadrunner
-    
+
     view:
     - gcloud iam service-accounts describe loadrunner
 
@@ -85,6 +85,7 @@ For available operators, see [Language-Definition](https://github.com/antonmedv/
         up       Runs the do section of all pending migrations in order, one after the other.
                  If a migration file is specified then stop after applying that one.
         down     Runs the undo section of the last applied migration only.
+        down-all Runs the undo section of all applied migrations.
         plan     Log commands of the do section of all pending migrations in order, one after the other.
         status   List all migrations with details compared to the current state.
         view     Runs the view section of all applied migrations to see the current state reported by your infrastructure.
@@ -123,38 +124,38 @@ You must change the file `gmig.yaml` to set the Project and Bucket name.
     # gmig configuration file
     #
     # Google Cloud Platform migrations tool for infrastructure-as-code. See https://github.com/emicklei/gmig.
-    
+
     # [project] must be the Google Cloud Project ID where the infrastructure is created.
     # Its value is available as $PROJECT in your migrations.
     #
     # Required by gmig.
     project: my-project
-    
+
     # [region] must be a valid GCP region. See https://cloud.google.com/compute/docs/regions-zones/
     # A region is a specific geographical location where you can run your resources.
     # Its value is available as $REGION in your migrations.
     #
     # Not required by gmig but some gcloud and gsutil commands do require it.
     # region: europe-west1
-    
+
     # [zone] must be a valid GCP zone. See https://cloud.google.com/compute/docs/regions-zones/
     # Each region has one or more zones; most regions have three or more zones.
     # Its value is available as $ZONE in your migrations.
     #
     # Not required by gmig but some gcloud and gsutil commands do require it.
     # zone: europe-west1-b
-    
+
     # [bucket] must be a valid GCP Storage bucket.
     # A Google Storage Bucket is used to store information (object) about the last applied migration.
     # Bucket can contain multiple objects from multiple applications. Make sure the [state] is different for each app.
     #
     # Required by gmig.
     bucket: my-bucket
-    
+
     # [state] is the name of the object that hold information about the last applied migration.
     # Required by gmig.
     state: myapp-gmig-last-migration
-    
+
     # [env] are additional environment values that are available to each section of a migration file.
     # This can be used to create migrations that are independent of the target project.
     # By convention, use capitalized words for keys.
@@ -202,6 +203,13 @@ Executes one `undo` section of the last applied change to the infrastructure.
 If completed then update the `gmig-last-migration` object.
 
     gmig down my-gcp-production-project
+
+### down-all \<path> [--migrations folder]
+
+Executes `undo` section of all applied change to the infrastructure.
+Updates the `gmig-last-migration` object after each successfull step.
+
+    gmig down-all my-gcp-production-project
 
 ### view \<path> [migration file] [--migrations folder]
 
@@ -274,6 +282,7 @@ Use this command with care!.
     gmig force undo my-gcp-production-project 010_create_some_account.yaml
 
 ## export-env \<path>
+
 Export all available environment variable from the configuration file and also export $PROJECT, $REGION and $ZONE
 Use this command with care!.
 
@@ -291,7 +300,7 @@ First it calls `get-named-ports` to retrieve all existing mappings. Then it will
 The Cloud SDK has a command to [set-named-ports](https://cloud.google.com/sdk/gcloud/reference/compute/instance-groups/set-named-ports) but not a command to add or delete a single name:port mapping. To simplify the migration command for deleting a name:port mapping, this `gmig` util command is added.
 First it calls `get-named-ports` to retrieve all existing mappings. Then it will call `set-named-ports` without the mapping.
 
-### util add-path-rules-to-path-matcher [config folder] -url-map [url-map-name] -service [backend-service-name] -path-matcher [path-matcher-name] -paths "/v1/path/*, /v1/otherpath/*"
+### util add-path-rules-to-path-matcher [config folder] -url-map [url-map-name] -service [backend-service-name] -path-matcher [path-matcher-name] -paths "/v1/path/_, /v1/otherpath/_"
 
 The Cloud SDK has a command to [add a patch matcher](https://cloud.google.com/sdk/gcloud/reference/compute/url-maps/add-path-matcher) with a set of paths but not a command update the path rules of an existing path matcher in the url map. To write a migration that changes the set of paths (add,remove), this `gmig` util command is added.
 First is [exports](https://cloud.google.com/sdk/gcloud/reference/compute/url-maps/export) an URL map, updates the paths of the rules of a path-matcher, then imports the changed URL map. Because this migration is changing a regional resource which is typically shared by multiple services, the patching of the URL map is executed using a global lock (using the Bucket from the config).
