@@ -1,8 +1,9 @@
 # Changelist of gmig releases
 
-## [Unreleased]
+## v1.18.0 [2022-10-15]
 
 - add `down-all` command do execute `undo` section of all applied migrations
+  (thanks Vladimir Oganesov <vengeful.wiz@gmail.com)
 
 ## v1.17.0 [2022-08-21]
 
