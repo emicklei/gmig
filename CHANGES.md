@@ -1,5 +1,9 @@
 # Changelist of gmig releases
 
+## [Unreleased]
+
+- add `down-all` command do execute `undo` section of all applied migrations
+
 ## v1.17.0 [2022-08-21]
 
 - fix crash when JSON config is invalid
@@ -67,7 +71,6 @@
 ## v1.8.0
 
 - replace timestamps in migration files by indices. (010,015,...)
-
 
 ## v1.7.0, 2018-09-28
 
