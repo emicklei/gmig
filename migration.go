@@ -17,7 +17,7 @@ import (
 
 	"text/template"
 
-	"github.com/antonmedv/expr"
+	"github.com/expr-lang/expr"
 	"gopkg.in/yaml.v2"
 )
 

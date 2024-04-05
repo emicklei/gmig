@@ -108,7 +108,7 @@ func runMigrations(c *cli.Context, isLogOnly bool) error {
 		log.Printf("%s %-"+strconv.Itoa(prettyWidth)+"s (%s)\n", leadingTitle, pretty(each.Filename), each.Filename)
 		if isLogOnly {
 			log.Println("")
-			if LogAll(each.IfExpression, each.DoSection, envs, true); err != nil {
+			if LogAll(each.IfExpression, each.DoSection, envs, true) != nil {
 				reportError(mtx.stateProvider.Config(), envs, "plan do", err)
 				return errAbort
 			}
@@ -216,7 +216,7 @@ func cmdMigrationsStatus(c *cli.Context) error {
 	log.Println(statusSeparator)
 	envs := mtx.shellEnv()
 	for i, each := range all {
-		status := applied
+		var status string
 		// check skipped
 		pass, err := evaluateCondition(each.IfExpression, envs)
 		isPending := each.Filename > mtx.lastApplied

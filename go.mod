@@ -1,23 +1,20 @@
 module github.com/emicklei/gmig
 
 require (
-	github.com/antonmedv/expr v1.9.0
-	github.com/emicklei/tre v1.4.0
+	github.com/emicklei/tre v1.5.0
+	github.com/expr-lang/expr v1.16.3
 	github.com/marcacohen/gcslock v0.0.0-20180212104141-5782a95db7e2
-	github.com/urfave/cli v1.22.10
+	github.com/urfave/cli v1.22.14
 	gopkg.in/yaml.v2 v2.4.0
 )
 
 require (
-	cloud.google.com/go/compute v1.10.0 // indirect
-	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
-	github.com/golang/protobuf v1.5.2 // indirect
+	cloud.google.com/go/compute v1.25.1 // indirect
+	cloud.google.com/go/compute/metadata v0.2.3 // indirect
+	github.com/cpuguy83/go-md2man/v2 v2.0.4 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
-	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
-	golang.org/x/net v0.0.0-20221014081412-f15817d10f9b // indirect
-	golang.org/x/oauth2 v0.0.0-20221014153046-6fdb5e3db783 // indirect
-	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/protobuf v1.28.1 // indirect
+	golang.org/x/net v0.24.0 // indirect
+	golang.org/x/oauth2 v0.19.0 // indirect
 )
 
 go 1.18
