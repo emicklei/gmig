@@ -1,5 +1,10 @@
 # Changelist of gmig releases
 
+## v1.18.2 [2024-04-05]
+
+- update dependencies
+- upgrade to 1.18
+
 ## v1.18.0 [2022-10-15]
 
 - add `down-all` command do execute `undo` section of all applied migrations
