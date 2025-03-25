@@ -1,5 +1,9 @@
 # Changelist of gmig releases
 
+## v1.18.3 [2025-03-25]
+
+- update dependencies
+
 ## v1.18.2 [2024-04-05]
 
 - update dependencies
