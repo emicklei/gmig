@@ -24,7 +24,7 @@ func ExportStorageIAMPolicy(cfg Config) error {
 	if err := cmd.Run(); err != nil {
 		return err
 	}
-	buckets := strings.Split(strings.TrimSpace(string(out.Bytes())), "\n")
+	buckets := strings.Split(strings.TrimSpace(out.String()), "\n")
 
 	// build data structure for migration
 	type memberRolesPerBucket struct {
@@ -60,7 +60,7 @@ func ExportStorageIAMPolicy(cfg Config) error {
 			for _, role := range roles {
 				shortRole := strings.TrimPrefix(role, "roles/storage.")
 				cmd := fmt.Sprintf("  - gsutil iam ch %s:%s %s\n", member, shortRole, each.bucket)
-				fmt.Fprintf(content, cmd)
+				fmt.Fprintln(content, cmd)
 			}
 		}
 	}
@@ -77,7 +77,7 @@ func ExportStorageIAMPolicy(cfg Config) error {
 			for _, role := range roles {
 				shortRole := strings.TrimPrefix(role, "roles/storage.")
 				cmd := fmt.Sprintf("  - gsutil iam ch -d %s:%s %s\n", member, shortRole, each.bucket)
-				fmt.Fprintf(content, cmd)
+				fmt.Fprint(content, cmd)
 			}
 		}
 	}

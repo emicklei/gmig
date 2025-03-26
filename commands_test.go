@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -34,7 +33,7 @@ func TestCmdInitMissingConfig(t *testing.T) {
 func TestCmdStatusDemo(t *testing.T) {
 	osTempDir = func() string { return "." }
 	// simulate effect of GS download state
-	if err := ioutil.WriteFile("state", []byte("010_one.yaml"), os.ModePerm); err != nil {
+	if err := os.WriteFile("state", []byte("010_one.yaml"), os.ModePerm); err != nil {
 		t.Fatal("unable to write state", err)
 	}
 	defer os.Remove("state")
@@ -63,7 +62,7 @@ func TestCmdStatusDemo(t *testing.T) {
 func TestCmdStatusDemoWithMigrationsOption(t *testing.T) {
 	osTempDir = func() string { return "." }
 	// simulate effect of GS download state
-	if err := ioutil.WriteFile("state", []byte("010_one.yaml"), os.ModePerm); err != nil {
+	if err := os.WriteFile("state", []byte("010_one.yaml"), os.ModePerm); err != nil {
 		t.Fatal("unable to write state", err)
 	}
 	defer os.Remove("state")
@@ -79,7 +78,7 @@ func TestCmdStatusDemoWithMigrationsOption(t *testing.T) {
 func TestCmdForceState(t *testing.T) {
 	osTempDir = func() string { return "." }
 	// simulate effect of GS download old state
-	if err := ioutil.WriteFile("state", []byte("010_one.yaml"), os.ModePerm); err != nil {
+	if err := os.WriteFile("state", []byte("010_one.yaml"), os.ModePerm); err != nil {
 		t.Fatal("unable to write state", err)
 	}
 	defer os.Remove("state")
@@ -100,7 +99,7 @@ func TestCmdForceState(t *testing.T) {
 	if got, want := removeCount, 2; got != want {
 		t.Logf("got [%v] want [%v]", got, want)
 	}
-	data, err := ioutil.ReadFile("state")
+	data, err := os.ReadFile("state")
 	if err != nil {
 		abs, _ := filepath.Abs("state")
 		t.Fatal("unreadable state", abs, err)
@@ -118,7 +117,7 @@ func TestCmdForceState(t *testing.T) {
 func TestCmdForceStateNested(t *testing.T) {
 	osTempDir = func() string { return "." }
 	// simulate effect of GS download old state
-	if err := ioutil.WriteFile("state", []byte("010_one.yaml"), os.ModePerm); err != nil {
+	if err := os.WriteFile("state", []byte("010_one.yaml"), os.ModePerm); err != nil {
 		t.Fatal("unable to write state", err)
 	}
 	defer os.Remove("state")
@@ -139,7 +138,7 @@ func TestCmdForceStateNested(t *testing.T) {
 	if got, want := removeCount, 2; got != want {
 		t.Logf("got [%v] want [%v]", got, want)
 	}
-	data, err := ioutil.ReadFile("state")
+	data, err := os.ReadFile("state")
 	if err != nil {
 		abs, _ := filepath.Abs("state")
 		t.Fatal("unreadable state", abs, err)
@@ -156,7 +155,7 @@ func TestCmdForceStateNested(t *testing.T) {
 
 func TestCmdUp(t *testing.T) {
 	// simulate effect of GS download old state
-	if err := ioutil.WriteFile("state", []byte("010_one.yaml"), os.ModePerm); err != nil {
+	if err := os.WriteFile("state", []byte("010_one.yaml"), os.ModePerm); err != nil {
 		t.Fatal("unable to write state", err)
 	}
 	defer os.Remove("state")
@@ -176,7 +175,7 @@ func TestCmdUp(t *testing.T) {
 func TestCmdUpAndStop(t *testing.T) {
 	keepState()
 	// simulate effect of GS download old state
-	if err := ioutil.WriteFile("state", []byte("010_one.yaml"), os.ModePerm); err != nil {
+	if err := os.WriteFile("state", []byte("010_one.yaml"), os.ModePerm); err != nil {
 		t.Fatal("unable to write state", err)
 	}
 	defer os.Remove("state")
@@ -195,7 +194,7 @@ func TestCmdUpAndStop(t *testing.T) {
 
 func TestCmdUpAndStopAfterLastApplied(t *testing.T) {
 	// simulate effect of GS download old state
-	if err := ioutil.WriteFile("state", []byte("030_three.yaml"), os.ModePerm); err != nil {
+	if err := os.WriteFile("state", []byte("030_three.yaml"), os.ModePerm); err != nil {
 		t.Fatal("unable to write state", err)
 	}
 	defer os.Remove("state")
@@ -211,7 +210,7 @@ func TestCmdUpAndStopAfterLastApplied(t *testing.T) {
 
 func TestCmdUpAndStopAfterUnexistingFilename(t *testing.T) {
 	// simulate effect of GS download old state
-	if err := ioutil.WriteFile("state", []byte("010_one.yaml"), os.ModePerm); err != nil {
+	if err := os.WriteFile("state", []byte("010_one.yaml"), os.ModePerm); err != nil {
 		t.Fatal("unable to write state", err)
 	}
 	// capture GC command
@@ -234,7 +233,7 @@ func keepState() {
 func TestCmdDown(t *testing.T) {
 	keepState()
 	// simulate effect of GS download old state
-	if err := ioutil.WriteFile("state", []byte("010_one.yaml"), os.ModePerm); err != nil {
+	if err := os.WriteFile("state", []byte("010_one.yaml"), os.ModePerm); err != nil {
 		t.Fatal("unable to write state", err)
 	}
 	// capture GC command
@@ -252,7 +251,7 @@ func TestCmdDown(t *testing.T) {
 func TestCmdDownWhenNoLastMigration(t *testing.T) {
 	keepState()
 	// simulate effect of GS download old state
-	if err := ioutil.WriteFile("state", []byte(""), os.ModePerm); err != nil {
+	if err := os.WriteFile("state", []byte(""), os.ModePerm); err != nil {
 		t.Fatal("unable to write state", err)
 	}
 	// capture GC command
@@ -269,7 +268,7 @@ func TestCmdDownWhenNoLastMigration(t *testing.T) {
 func TestCmdView(t *testing.T) {
 	osTempDir = func() string { return "." }
 	// simulate effect of GS download old state
-	if err := ioutil.WriteFile("state", []byte("010_one.yaml"), os.ModePerm); err != nil {
+	if err := os.WriteFile("state", []byte("010_one.yaml"), os.ModePerm); err != nil {
 		t.Fatal("unable to write state", err)
 	}
 	defer os.Remove("state")
@@ -288,7 +287,7 @@ func TestCmdView(t *testing.T) {
 func TestCmdUpConditional(t *testing.T) {
 	osTempDir = func() string { return "." }
 	// simulate effect of GS download old state
-	if err := ioutil.WriteFile("state", []byte("040_error.yaml"), os.ModePerm); err != nil {
+	if err := os.WriteFile("state", []byte("040_error.yaml"), os.ModePerm); err != nil {
 		t.Fatal("unable to write state", err)
 	}
 	defer os.Remove("state")
@@ -308,7 +307,7 @@ func TestCmdUpConditional(t *testing.T) {
 func TestCmdUpConditionalFail(t *testing.T) {
 	osTempDir = func() string { return "." }
 	// simulate effect of GS download old state
-	if err := ioutil.WriteFile("state", []byte("050_conditional.yaml"), os.ModePerm); err != nil {
+	if err := os.WriteFile("state", []byte("050_conditional.yaml"), os.ModePerm); err != nil {
 		t.Fatal("unable to write state", err)
 	}
 	defer os.Remove("state")

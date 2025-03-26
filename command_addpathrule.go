@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -190,7 +189,7 @@ func patchPathRulesForPathMatcher(c *cli.Context, isRemove bool) error {
 		return errAbort
 	}
 	source := filepath.Join(os.TempDir(), "patchPathRulesForPathMatcher.yaml")
-	err = ioutil.WriteFile(source, importdata, os.ModePerm)
+	err = os.WriteFile(source, importdata, os.ModePerm)
 	if err != nil {
 		printError(err.Error())
 		return errAbort

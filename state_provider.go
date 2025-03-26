@@ -44,7 +44,7 @@ func (l FileStateProvider) LoadState() (string, error) {
 		d, _ := os.Getwd()
 		log.Println("reading local copy", l.stateFilename(), ",cwd=", d)
 	}
-	data, err := ioutil.ReadFile(l.stateFilename())
+	data, err := os.ReadFile(l.stateFilename())
 	return string(data), tre.New(err, "error reading state", "tempDir", l.tempDir, "lastMigration", l.Configuration.LastMigrationObjectName)
 }
 

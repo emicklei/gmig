@@ -65,7 +65,7 @@ func started(c *cli.Context, action string) func() {
 	log.Println("gmig version", Version)
 	log.Println("BEGIN", action)
 	start := time.Now()
-	return func() { log.Println("END", action, "completed in", time.Now().Sub(start)) }
+	return func() { log.Println("END", action, "completed in", time.Since(start)) }
 }
 
 func promptForYes(message string) bool {

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -77,7 +76,7 @@ func cmdInit(c *cli.Context) error {
 		return errAbort
 	}
 	location := filepath.Join(target, YAMLConfigFilename)
-	err = ioutil.WriteFile(location, []byte(initialYAMLConfig), os.ModePerm)
+	err = os.WriteFile(location, []byte(initialYAMLConfig), os.ModePerm)
 	if err != nil {
 		printError(err.Error())
 		return errAbort

@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -67,7 +66,7 @@ func ExportProjectsIAMPolicy(cfg Config) error {
 		fmt.Fprintf(content, "\n  # member = %s\n", member)
 		for _, role := range roles {
 			cmd := fmt.Sprintf("  - gcloud projects add-iam-policy-binding $PROJECT --member %s --role %s\n", member, role)
-			fmt.Fprintf(content, cmd)
+			fmt.Fprint(content, cmd)
 		}
 	}
 	fmt.Fprintf(content, "\nundo:")
@@ -75,12 +74,12 @@ func ExportProjectsIAMPolicy(cfg Config) error {
 		fmt.Fprintf(content, "\n  # member = %s\n", member)
 		for _, role := range roles {
 			cmd := fmt.Sprintf("  - gcloud projects remove-iam-policy-binding $PROJECT --member %s --role %s\n", member, role)
-			fmt.Fprintf(content, cmd)
+			fmt.Fprint(content, cmd)
 		}
 	}
 	filename := NewFilenameWithIndex("exported project iam policy")
 	if cfg.verbose {
 		log.Println("writing", filename)
 	}
-	return ioutil.WriteFile(filename, content.Bytes(), os.ModePerm)
+	return os.WriteFile(filename, content.Bytes(), os.ModePerm)
 }

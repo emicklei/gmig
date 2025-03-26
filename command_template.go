@@ -13,7 +13,7 @@ import (
 func cmdTemplate(c *cli.Context) error {
 	source := c.Args().First()
 	isRewrite := c.Bool("w")
-	data, err := ioutil.ReadFile(source)
+	data, err := os.ReadFile(source)
 	if err != nil {
 		printError(err.Error())
 		return errAbort

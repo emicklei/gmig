@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -61,7 +60,7 @@ func cmdCreateMigration(c *cli.Context) error {
 		printError("YAML creation failed")
 		return errAbort
 	}
-	return ioutil.WriteFile(filename, []byte(yaml), os.FileMode(0644)) // -rw-r--r--, see http://permissions-calculator.org/
+	return os.WriteFile(filename, []byte(yaml), os.FileMode(0644)) // -rw-r--r--, see http://permissions-calculator.org/
 }
 
 func cmdMigrationsUp(c *cli.Context) error {
@@ -136,6 +135,9 @@ func runMigrations(c *cli.Context, isLogOnly bool) error {
 
 func cmdMigrationsDownAll(c *cli.Context) error {
 	mtx, err := getMigrationContext(c)
+	if err != nil {
+		return err
+	}
 	if mtx.lastApplied == "" {
 		printWarning("There are no migrations to undo")
 		return errAbort

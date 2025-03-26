@@ -93,7 +93,7 @@ func NewFilenameWithIndex(desc string) string {
 
 // LoadMigration reads and parses a migration from a named file.
 func LoadMigration(absFilename string) (m Migration, err error) {
-	data, err := ioutil.ReadFile(absFilename)
+	data, err := os.ReadFile(absFilename)
 	if err != nil {
 		wd, _ := os.Getwd()
 		return m, fmt.Errorf("in %s, %s reading failed: %v", wd, absFilename, err)
@@ -224,7 +224,7 @@ func LoadMigrationsBetweenAnd(migrationsPath, firstFilename, lastFilename string
 		return
 	}
 	defer os.Chdir(here)
-	files, err := ioutil.ReadDir(".")
+	files, err := os.ReadDir(".")
 	if err != nil {
 		log.Println("unable to read migrations from folder", err)
 		return

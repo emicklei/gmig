@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 
 	"gopkg.in/yaml.v2"
@@ -45,7 +45,7 @@ type Config struct {
 }
 
 func loadAndUnmarshalConfig(location string, unmarshaller func(in []byte, out interface{}) (err error)) (*Config, error) {
-	data, err := ioutil.ReadFile(location)
+	data, err := os.ReadFile(location)
 
 	if err != nil {
 		return nil, err
